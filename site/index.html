@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Latent Value Network — Open Cooperative Infrastructure for the AI Era</title>
+<meta name="description" content="An open collaborative initiative designing the protocol layer for ambient human cooperation, mediated by AI agents that respect privacy and sovereignty.">
+<meta property="og:title" content="The Latent Value Network">
+<meta property="og:description" content="What if the help you need is already nearby? We're designing the protocol to make ambient cooperation real.">
+<meta property="og:type" content="website">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1B2A4A; --deep: #0F1A2E; --slate: #3D5A80; --teal: #2A9D8F;
+  --teal-glow: #34D1BF; --gold: #E9C46A; --cream: #FAF8F5; --warm: #F0EDE8;
+  --mid: #5A6577; --light: #8B95A5; --dark: #2C2C2C;
+  --f-display: 'Cormorant Garamond', Georgia, serif;
+  --f-body: 'DM Sans', system-ui, sans-serif;
+  --f-mono: 'JetBrains Mono', monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--f-body);color:var(--navy);background:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+::selection{background:rgba(42,157,143,.2)}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── Nav ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,26,46,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(42,157,143,.15);padding:0 1.5rem;transition:all .3s}
+nav .inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+nav .logo{font-family:var(--f-display);font-size:1.15rem;font-weight:700;color:white}
+nav .logo span{color:var(--teal-glow)}
+nav .links{display:flex;gap:1.5rem;align-items:center}
+nav .links a{font-size:.8rem;font-weight:500;color:rgba(255,255,255,.6);transition:color .2s;text-decoration:none}
+nav .links a:hover{color:white}
+nav .links .cta-nav{padding:.4rem 1rem;background:var(--teal);color:white;border-radius:4px;font-weight:600;font-size:.75rem}
+nav .links .cta-nav:hover{background:var(--teal-glow)}
+.mobile-menu{display:none;background:none;border:none;color:white;font-size:1.3rem;cursor:pointer}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(170deg,var(--deep) 0%,var(--navy) 50%,var(--slate) 100%);padding:8rem 1.5rem 5rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(42,157,143,.08) 0%,transparent 60%),radial-gradient(ellipse at 70% 30%,rgba(233,196,106,.05) 0%,transparent 50%);pointer-events:none}
+.hero .container{max-width:800px;margin:0 auto;position:relative}
+.hero .eyebrow{font-family:var(--f-mono);font-size:.7rem;color:var(--teal-glow);letter-spacing:.3em;text-transform:uppercase;margin-bottom:1.5rem}
+.hero h1{font-family:var(--f-display);font-size:clamp(2.4rem,6vw,4rem);font-weight:700;color:white;line-height:1.1;margin-bottom:1rem}
+.hero h1 em{color:var(--teal-glow);font-style:italic}
+.hero .lead{font-size:1.1rem;color:rgba(255,255,255,.6);max-width:600px;margin:0 auto 2rem;line-height:1.7}
+.hero .btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;font-family:var(--f-body);font-weight:600;border-radius:5px;cursor:pointer;transition:all .3s;text-decoration:none;border:none;font-size:.9rem}
+.btn-p{background:var(--teal);color:white}
+.btn-p:hover{background:var(--teal-glow);transform:translateY(-2px);box-shadow:0 8px 24px rgba(42,157,143,.3);text-decoration:none}
+.btn-s{background:transparent;color:white;border:1.5px solid rgba(255,255,255,.25)}
+.btn-s:hover{border-color:white;text-decoration:none}
+.hero .stat-row{display:flex;gap:2rem;justify-content:center;margin-top:3rem;flex-wrap:wrap}
+.hero .stat{text-align:center}
+.hero .stat .num{font-family:var(--f-display);font-size:2rem;font-weight:700;color:var(--gold)}
+.hero .stat .lbl{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.2rem;font-family:var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+
+/* ── Sections ── */
+section{padding:5rem 1.5rem}
+.section-container{max-width:900px;margin:0 auto}
+.section-narrow{max-width:700px;margin:0 auto}
+.section-eyebrow{font-family:var(--f-mono);font-size:.65rem;color:var(--teal);letter-spacing:.25em;text-transform:uppercase;margin-bottom:.8rem}
+.section-title{font-family:var(--f-display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;color:var(--navy);line-height:1.15;margin-bottom:1rem}
+.section-lead{font-size:1rem;color:var(--mid);line-height:1.7;margin-bottom:2rem}
+
+/* ── Problem Section ── */
+#problem{background:var(--cream)}
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:2rem}
+.story-card{background:white;border:1px solid rgba(0,0,0,.06);border-radius:10px;padding:1.5rem;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+.story-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--teal),var(--gold))}
+.story-card .avatar{font-size:1.8rem;margin-bottom:.5rem}
+.story-card .name{font-weight:600;font-size:.95rem}
+.story-card .role{font-size:.75rem;color:var(--light);margin-bottom:.5rem}
+.story-card .desc{font-size:.85rem;line-height:1.55;color:var(--mid)}
+.story-card .latent{margin-top:.6rem;padding:.5rem .7rem;background:rgba(42,157,143,.06);border-radius:6px;font-size:.8rem;color:var(--teal);font-weight:500}
+.gap-callout{background:linear-gradient(135deg,var(--navy),var(--deep));border-radius:10px;padding:2rem;text-align:center;color:white}
+.gap-callout h3{font-family:var(--f-display);font-size:1.5rem;color:var(--teal-glow);margin-bottom:.5rem}
+.gap-callout p{font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.6;max-width:550px;margin:0 auto}
+
+/* ── How It Works ── */
+#how{background:white}
+.how-steps{display:grid;gap:1.5rem;margin-top:2rem}
+.how-step{display:flex;gap:1.2rem;align-items:flex-start}
+.step-num{width:48px;height:48px;border-radius:50%;background:rgba(42,157,143,.1);display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-size:1.4rem;font-weight:700;color:var(--teal);flex-shrink:0}
+.step-content h3{font-family:var(--f-display);font-size:1.15rem;font-weight:600;color:var(--navy);margin-bottom:.3rem}
+.step-content p{font-size:.9rem;color:var(--mid);line-height:1.6}
+
+/* ── Evidence ── */
+#evidence{background:var(--cream)}
+.evidence-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin-top:1.5rem}
+.evidence-card{background:white;border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:1.3rem;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.evidence-card .stat-big{font-family:var(--f-display);font-size:2rem;font-weight:700;color:var(--teal);line-height:1}
+.evidence-card .stat-desc{font-size:.85rem;color:var(--mid);margin-top:.3rem;line-height:1.4}
+.evidence-card .source{font-size:.7rem;color:var(--light);margin-top:.5rem;font-family:var(--f-mono)}
+
+/* ── Audiences ── */
+#audiences{background:white}
+.audience-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.audience-tab{padding:.5rem 1.2rem;font-family:var(--f-body);font-size:.85rem;font-weight:500;border:1.5px solid #D1D5DB;border-radius:20px;background:white;color:var(--mid);cursor:pointer;transition:all .2s}
+.audience-tab:hover{border-color:var(--teal);color:var(--teal)}
+.audience-tab.active{background:var(--navy);border-color:var(--navy);color:white}
+.audience-content{display:none;animation:fadeUp .4s ease}
+.audience-content.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.audience-block{background:var(--cream);border-radius:10px;padding:2rem}
+.audience-block h3{font-family:var(--f-display);font-size:1.3rem;font-weight:600;color:var(--navy);margin-bottom:.5rem}
+.audience-block .pitch{font-size:.95rem;line-height:1.65;color:var(--mid);margin-bottom:1.2rem}
+.audience-block .entry-points{display:flex;flex-direction:column;gap:.5rem}
+.entry-point{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:white;border-radius:6px;font-size:.85rem;color:var(--navy);border:1px solid rgba(0,0,0,.04);transition:all .2s}
+.entry-point:hover{border-color:var(--teal);box-shadow:0 2px 8px rgba(42,157,143,.1)}
+.entry-point .ep-icon{font-size:1.1rem}
+.entry-point .ep-label{font-weight:500}
+.entry-point .ep-desc{color:var(--light);font-size:.75rem;margin-left:auto}
+
+/* ── Documents ── */
+#documents{background:var(--cream)}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:1.5rem}
+.doc-card{background:white;border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:1.3rem;text-align:center;transition:all .2s;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.doc-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:var(--teal)}
+.doc-card .doc-id{font-family:var(--f-mono);font-size:.6rem;color:var(--teal);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.4rem}
+.doc-card .doc-title{font-family:var(--f-display);font-size:1.05rem;font-weight:600;color:var(--navy);margin-bottom:.3rem}
+.doc-card .doc-desc{font-size:.75rem;color:var(--light);line-height:1.4}
+.doc-card .doc-status{display:inline-block;margin-top:.5rem;padding:.15rem .5rem;font-family:var(--f-mono);font-size:.6rem;border-radius:8px;letter-spacing:.05em}
+.doc-card .doc-status.done{background:rgba(42,157,143,.1);color:var(--teal)}
+.doc-card .doc-status.draft{background:rgba(233,196,106,.2);color:#B8860B}
+
+/* ── Provocations Preview ── */
+#provocations{background:white}
+.prov-preview{background:var(--cream);border-radius:10px;padding:1.5rem;margin-bottom:1rem;border-left:3px solid var(--teal);transition:all .2s}
+.prov-preview:hover{border-left-color:var(--gold);background:var(--warm)}
+.prov-preview .prov-num{font-family:var(--f-display);font-size:1.3rem;font-weight:700;color:var(--teal);opacity:.5;float:left;margin-right:.6rem;line-height:1}
+.prov-preview .prov-q{font-family:var(--f-display);font-size:1.05rem;font-weight:600;color:var(--navy);margin-bottom:.3rem}
+.prov-preview .prov-tease{font-size:.8rem;color:var(--mid);line-height:1.5}
+
+/* ── CTA ── */
+#join{background:linear-gradient(135deg,var(--navy),var(--deep));padding:5rem 1.5rem;text-align:center;color:white}
+#join h2{font-family:var(--f-display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;margin-bottom:.6rem}
+#join p{font-size:1rem;color:rgba(255,255,255,.6);max-width:550px;margin:0 auto 2rem;line-height:1.7}
+#join .btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+
+/* ── Footer ── */
+footer{background:var(--deep);padding:2.5rem 1.5rem;text-align:center;border-top:1px solid rgba(42,157,143,.1)}
+footer .f-logo{font-family:var(--f-display);font-size:1.1rem;color:white;margin-bottom:.4rem}
+footer .f-logo span{color:var(--teal-glow)}
+footer p{font-size:.7rem;color:rgba(255,255,255,.25);line-height:1.6}
+footer a{color:rgba(255,255,255,.4)}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  nav .links{display:none}
+  nav .links.open{display:flex;flex-direction:column;position:absolute;top:56px;left:0;right:0;background:var(--deep);padding:1rem;gap:.8rem}
+  .mobile-menu{display:block}
+  .story-grid{grid-template-columns:1fr}
+  .hero{padding:7rem 1.5rem 3rem}
+  .hero .stat-row{gap:1rem}
+  section{padding:3rem 1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="inner">
+    <div class="logo">Latent <span>Value</span> Network</div>
+    <button class="mobile-menu" onclick="document.querySelector('.links').classList.toggle('open')">☰</button>
+    <div class="links">
+      <a href="#problem">The Problem</a>
+      <a href="#how">How It Works</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#documents">Documents</a>
+      <a href="#provocations">Open Questions</a>
+      <a href="#audiences">Get Involved</a>
+      <a href="https://github.com/Sillinous/latent-value-network" class="cta-nav">GitHub →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Open Cooperative Infrastructure for the AI Era</div>
+    <h1>What if the help you need<br>is <em>already nearby?</em></h1>
+    <p class="lead">
+      Every day, millions of cooperative connections fail — not because people are unwilling,
+      but because neither party knows the other exists. We're designing the protocol to change that.
+    </p>
+    <div class="btns">
+      <a href="#demo" class="btn btn-p">Try the Interactive Demo</a>
+      <a href="#documents" class="btn btn-s">Read the Specification</a>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num">$1.3T</div><div class="lbl">Estimated Gap</div></div>
+      <div class="stat"><div class="num">42%</div><div class="lbl">Hidden Expertise</div></div>
+      <div class="stat"><div class="num">83%</div><div class="lbl">Jobs Via Weak Ties</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">Protocol Layers</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROBLEM ═══ -->
+<section id="problem">
+  <div class="section-container">
+    <div class="section-eyebrow">The Invisible Crisis</div>
+    <h2 class="section-title">The Latent Value Gap</h2>
+    <p class="section-lead">
+      A retired engineer who could diagnose your drainage problem in ten minutes lives three miles away.
+      A college student builds websites for fun while the food bank next door drowns in spreadsheets.
+      Neither knows the other exists. No marketplace, social network, or job board can find these matches —
+      because neither party would think to search.
+    </p>
+
+    <div class="story-grid">
+      <div class="story-card">
+        <div class="avatar">👩‍🔧</div>
+        <div class="name">Maria, 62</div>
+        <div class="role">Retired mechanical engineer</div>
+        <div class="desc">Volunteers at the library. Tends her garden. Feels a bit purposeless since retirement.</div>
+        <div class="latent">✦ 35 years of drainage & HVAC expertise she doesn't think of as "skills"</div>
+      </div>
+      <div class="story-card">
+        <div class="avatar">👨‍👧</div>
+        <div class="name">James, 34</div>
+        <div class="role">Single dad, warehouse worker</div>
+        <div class="desc">Water pooling near his foundation. Contractor quotes: $3,000. He figured he'd just deal with it.</div>
+        <div class="latent">✦ Skilled woodworker — Maria's library needs bookshelves</div>
+      </div>
+    </div>
+
+    <div class="gap-callout">
+      <h3>This connection died in silence.</h3>
+      <p>Maria could save James thousands. James could build what Maria's library needs.
+         Three miles apart. Invisible to each other. This happens millions of times, every day, everywhere.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section id="how">
+  <div class="section-container">
+    <div class="section-eyebrow">The Architecture</div>
+    <h2 class="section-title">Five Layers of Cooperative Infrastructure</h2>
+    <p class="section-lead">
+      The LVN is a protocol, not a platform. It enables AI agents that already understand your situation
+      to discover cooperative matches — without sharing your private data.
+    </p>
+
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Personal Context Engine</h3>
+          <p>Your AI assistant already understands your skills, challenges, and resources through normal conversation. This context stays on your device — sovereign and private.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Latent Capacity Discovery</h3>
+          <p>AI surfaces capabilities you don't recognize in yourself. Resolved three insurance disputes? That's latent negotiation expertise. Explain medical info to your family? That's health communication capacity.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Signal Exchange Protocol</h3>
+          <p>Your agent emits abstract, non-identifying signals — like a lock that only responds to specific key shapes. Complementary agents detect matches without either party exposing private context.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Trust & Reputation Fabric</h3>
+          <p>Distributed trust flows through relational chains — contextual, privacy-preserving, and bootstrappable through small cooperative acts. No centralized trust score.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Governance Layer</h3>
+          <p>Following Ostrom's principles for commons governance. Anti-capture mechanisms built into the protocol. Community-driven evolution with equity monitoring.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EVIDENCE ═══ -->
+<section id="evidence">
+  <div class="section-container">
+    <div class="section-eyebrow">The Research</div>
+    <h2 class="section-title">This isn't speculation. It's quantified.</h2>
+
+    <div class="evidence-grid">
+      <div class="evidence-card">
+        <div class="stat-big">83.4%</div>
+        <div class="stat-desc">of jobs found through occasional or rare contacts, not close friends</div>
+        <div class="source">Granovetter 1973; Rajkumar et al., Science 2022</div>
+      </div>
+      <div class="evidence-card">
+        <div class="stat-big">#1</div>
+        <div class="stat-desc">Cross-class friendships are the single strongest predictor of upward economic mobility</div>
+        <div class="source">Chetty et al., Nature 2022 (21B friendships)</div>
+      </div>
+      <div class="evidence-card">
+        <div class="stat-big">42%</div>
+        <div class="stat-desc">of organizational skills are known only to the person who holds them</div>
+        <div class="source">Organizational knowledge loss research</div>
+      </div>
+      <div class="evidence-card">
+        <div class="stat-big">2.5h</div>
+        <div class="stat-desc">per day spent searching for information someone nearby already has</div>
+        <div class="source">IDC knowledge worker study</div>
+      </div>
+      <div class="evidence-card">
+        <div class="stat-big">76%</div>
+        <div class="stat-desc">of mutual aid requests go unfilled due to matching failures, not lack of capacity</div>
+        <div class="source">Bender et al., 2024</div>
+      </div>
+      <div class="evidence-card">
+        <div class="stat-big">r=.58</div>
+        <div class="stat-desc">correlation: trust levels predict cooperative behavior across 147 nations</div>
+        <div class="source">Xue et al. 2025 meta-analysis</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AUDIENCES ═══ -->
+<section id="audiences">
+  <div class="section-container">
+    <div class="section-eyebrow">Your Path In</div>
+    <h2 class="section-title">We need different minds for different problems</h2>
+    <p class="section-lead">The LVN is deliberately multidisciplinary. Here's where your expertise fits.</p>
+
+    <div class="audience-tabs">
+      <button class="audience-tab active" onclick="showAudience('researchers')">Researchers</button>
+      <button class="audience-tab" onclick="showAudience('engineers')">Engineers & Developers</button>
+      <button class="audience-tab" onclick="showAudience('practitioners')">Community Practitioners</button>
+      <button class="audience-tab" onclick="showAudience('economists')">Economists & Ethicists</button>
+      <button class="audience-tab" onclick="showAudience('curious')">Curious Minds</button>
+    </div>
+
+    <div class="audience-content active" id="aud-researchers">
+      <div class="audience-block">
+        <h3>For Researchers & Academics</h3>
+        <p class="pitch">
+          The LVN draws on network science, information economics, mechanism design, and trust research —
+          but several core technical problems remain unsolved. The protocol specification identifies six formal
+          open questions, each of which could be a research contribution. We're particularly looking for
+          people working on privacy-preserving computation, social network analysis, and commons governance.
+        </p>
+        <div class="entry-points">
+          <div class="entry-point"><span class="ep-icon">📄</span><span class="ep-label">Evidence Base (WD-002)</span><span class="ep-desc">22 citations mapping the gap</span></div>
+          <div class="entry-point"><span class="ep-icon">🔬</span><span class="ep-label">Protocol Specification (WD-003)</span><span class="ep-desc">Formal open questions</span></div>
+          <div class="entry-point"><span class="ep-icon">💬</span><span class="ep-label">Provocation #2</span><span class="ep-desc">Privacy-preserving semantic matching</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audience-content" id="aud-engineers">
+      <div class="audience-block">
+        <h3>For Engineers & Developers</h3>
+        <p class="pitch">
+          The signal exchange protocol needs implementation. We need people who understand MCP, A2A,
+          distributed systems, and cryptographic primitives. The protocol spec defines data structures,
+          state machines, and integration points — but we haven't written a line of implementation code yet.
+          The architecture is designed to build on existing AI coordination standards.
+        </p>
+        <div class="entry-points">
+          <div class="entry-point"><span class="ep-icon">⚙️</span><span class="ep-label">Protocol Specification (WD-003)</span><span class="ep-desc">Signal vectors, handshake state machine</span></div>
+          <div class="entry-point"><span class="ep-icon">🔧</span><span class="ep-label">GitHub Repository</span><span class="ep-desc">Issues, architecture, contribution guide</span></div>
+          <div class="entry-point"><span class="ep-icon">💬</span><span class="ep-label">Provocation #8</span><span class="ep-desc">AI assistant interoperability</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audience-content" id="aud-practitioners">
+      <div class="audience-block">
+        <h3>For Community Practitioners & Organizers</h3>
+        <p class="pitch">
+          You know what cooperation actually looks like on the ground — the mutual aid networks, the
+          informal help that keeps communities functioning. The LVN needs your reality check. Does this
+          architecture match how cooperation actually works? What are we missing? We're designing pilot
+          programs and need practitioners who can tell us when we're being naive.
+        </p>
+        <div class="entry-points">
+          <div class="entry-point"><span class="ep-icon">📖</span><span class="ep-label">White Paper (WD-001)</span><span class="ep-desc">The foundational vision</span></div>
+          <div class="entry-point"><span class="ep-icon">🎯</span><span class="ep-label">Interactive Demo</span><span class="ep-desc">Experience the matching concept</span></div>
+          <div class="entry-point"><span class="ep-icon">💬</span><span class="ep-label">Provocation #10</span><span class="ep-desc">Where should we pilot first?</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audience-content" id="aud-economists">
+      <div class="audience-block">
+        <h3>For Economists & Ethicists</h3>
+        <p class="pitch">
+          The hardest problems in the LVN aren't technical — they're about incentives, governance, and values.
+          How do you design a value exchange system that accommodates gifts and markets simultaneously?
+          How do you govern a digital commons without recreating the platform capture problem?
+          How do you ensure the system serves the least-connected, not just the most?
+        </p>
+        <div class="entry-points">
+          <div class="entry-point"><span class="ep-icon">📊</span><span class="ep-label">Evidence Base (WD-002)</span><span class="ep-desc">Quantified gap across 6 domains</span></div>
+          <div class="entry-point"><span class="ep-icon">💬</span><span class="ep-label">Provocations #4, #5, #7</span><span class="ep-desc">Equity, pricing, platform capture</span></div>
+          <div class="entry-point"><span class="ep-icon">🏛️</span><span class="ep-label">Provocation #6</span><span class="ep-desc">Trust bootstrapping without bias</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audience-content" id="aud-curious">
+      <div class="audience-block">
+        <h3>For Curious Minds</h3>
+        <p class="pitch">
+          You don't need credentials to contribute. Some of the most important insights come from people
+          who experience the problem firsthand. If you've ever needed help that was nearby but invisible —
+          if you've ever had skills that nobody asked you to use — you understand the Latent Value Gap
+          better than any researcher.
+        </p>
+        <div class="entry-points">
+          <div class="entry-point"><span class="ep-icon">🎯</span><span class="ep-label">Interactive Demo</span><span class="ep-desc">Discover your latent value</span></div>
+          <div class="entry-point"><span class="ep-icon">🤔</span><span class="ep-label">10 Provocations</span><span class="ep-desc">Pick one, take a side</span></div>
+          <div class="entry-point"><span class="ep-icon">💬</span><span class="ep-label">Provocation #9</span><span class="ep-desc">Is the gap even real?</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DOCUMENTS ═══ -->
+<section id="documents">
+  <div class="section-container">
+    <div class="section-eyebrow">The Working Documents</div>
+    <h2 class="section-title">Everything is open. Everything is a draft.</h2>
+    <p class="section-lead">These documents define the current state of the initiative. All are working drafts released under CC BY-SA 4.0. Critique is as valuable as contribution.</p>
+
+    <div class="doc-grid">
+      <div class="doc-card" onclick="window.open('#wd001')">
+        <div class="doc-id">WD-001</div>
+        <div class="doc-title">Foundational White Paper</div>
+        <div class="doc-desc">5,000 words defining the vision, architecture, and principles</div>
+        <div class="doc-status done">Complete v0.1</div>
+      </div>
+      <div class="doc-card" onclick="window.open('#wd002')">
+        <div class="doc-id">WD-002</div>
+        <div class="doc-title">Evidence Base</div>
+        <div class="doc-desc">22 academic citations quantifying the Latent Value Gap across 6 domains</div>
+        <div class="doc-status done">Complete v0.1</div>
+      </div>
+      <div class="doc-card" onclick="window.open('#wd003')">
+        <div class="doc-id">WD-003</div>
+        <div class="doc-title">Signal Exchange Protocol</div>
+        <div class="doc-desc">Formal specification for privacy-preserving cooperative matching</div>
+        <div class="doc-status done">Complete v0.1</div>
+      </div>
+      <div class="doc-card" onclick="window.open('#wd004')">
+        <div class="doc-id">WD-004</div>
+        <div class="doc-title">Explainer Script</div>
+        <div class="doc-desc">2-minute animated storyboard for the concept video</div>
+        <div class="doc-status done">Complete v0.1</div>
+      </div>
+      <div class="doc-card" style="border:1.5px dashed var(--teal);">
+        <div class="doc-id" style="color:var(--gold)">WD-005</div>
+        <div class="doc-title">Trust Fabric Spec</div>
+        <div class="doc-desc">Layer 4 specification — open for contributors</div>
+        <div class="doc-status draft">Seeking Authors</div>
+      </div>
+      <div class="doc-card" style="border:1.5px dashed var(--teal);">
+        <div class="doc-id" style="color:var(--gold)">WD-006</div>
+        <div class="doc-title">Governance Framework</div>
+        <div class="doc-desc">Layer 5 specification — Ostrom-informed commons governance</div>
+        <div class="doc-status draft">Seeking Authors</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROVOCATIONS PREVIEW ═══ -->
+<section id="provocations">
+  <div class="section-container">
+    <div class="section-eyebrow">The Hard Questions</div>
+    <h2 class="section-title">10 Provocations That Need Your Mind</h2>
+    <p class="section-lead">
+      These are genuine debates where reasonable people disagree. Pick the one that annoys you most —
+      where you think we're wrong — and tell us why.
+    </p>
+
+    <div class="prov-preview"><span class="prov-num">01</span><div class="prov-q">Should the embedding model be centralized or federated?</div><div class="prov-tease">Who controls what "complementarity" means controls who gets matched with whom.</div></div>
+    <div class="prov-preview"><span class="prov-num">02</span><div class="prov-q">Is privacy-preserving semantic matching actually possible?</div><div class="prov-tease">ZK proofs work for exact attributes. Can they handle fuzzy, semantic complementarity?</div></div>
+    <div class="prov-preview"><span class="prov-num">03</span><div class="prov-q">Does ambient matching inevitably become surveillance?</div><div class="prov-tease">A system that understands your needs also understands your vulnerabilities.</div></div>
+    <div class="prov-preview"><span class="prov-num">04</span><div class="prov-q">How do you prevent the network from only serving the already-connected?</div><div class="prov-tease">Technology adoption follows power laws. The early adopters aren't the people who need this most.</div></div>
+    <div class="prov-preview"><span class="prov-num">05</span><div class="prov-q">Should matches include a price?</div><div class="prov-tease">Does adding value signals make exchanges more equitable — or commodify cooperation?</div></div>
+
+    <div style="text-align:center;margin-top:1.5rem;">
+      <a href="provocations.html" class="btn btn-p" style="text-decoration:none">Read All 10 Provocations →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ JOIN ═══ -->
+<section id="join">
+  <h2>The hardest problems are open by design.</h2>
+  <p>
+    We're building this as an open protocol — not a company, not a platform.
+    We need cryptographers, economists, ethicists, engineers, organizers, and people who know
+    what cooperation looks like on the ground.
+  </p>
+  <div class="btns">
+    <a href="https://github.com/Sillinous/latent-value-network" class="btn btn-p" style="text-decoration:none">Join on GitHub</a>
+    <a href="demo.html" class="btn btn-s" style="text-decoration:none">Try the Demo</a>
+    <a href="provocations.html" class="btn btn-s" style="text-decoration:none">Debate the Open Questions</a>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="f-logo">Latent <span>Value</span> Network</div>
+  <p>
+    An open collaborative initiative · Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a><br>
+    Not a company. Not a platform. A protocol for human cooperation.<br><br>
+    Inspired by the work of Elinor Ostrom, Mark Granovetter, Raj Chetty, and everyone<br>
+    who believes cooperation doesn't need to be this hard.
+  </p>
+</footer>
+
+<script>
+function showAudience(id) {
+  document.querySelectorAll('.audience-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.audience-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('aud-' + id).classList.add('active');
+}
+</script>
+
+</body>
+</html>

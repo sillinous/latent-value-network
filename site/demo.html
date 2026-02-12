@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discover Your Latent Value — The Latent Value Network</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1B2A4A;
+  --deep: #0F1A2E;
+  --slate: #3D5A80;
+  --teal: #2A9D8F;
+  --teal-glow: #34D1BF;
+  --gold: #E9C46A;
+  --warm-cream: #FAF8F5;
+  --warm-gray: #F0EDE8;
+  --mid-text: #5A6577;
+  --light-text: #8B95A5;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  color: var(--navy);
+  background: var(--warm-cream);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Noise overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+::selection { background: rgba(42,157,143,0.2); }
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── Header ── */
+header {
+  padding: 2rem 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(42,157,143,0.15);
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+.logo span { color: var(--teal); }
+
+.tagline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--light-text);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+/* ── Screens ── */
+.screen { display: none; padding: 3rem 0 4rem; }
+.screen.active { display: block; }
+
+/* ── Screen 1: Intro ── */
+.intro-hero {
+  text-align: center;
+  padding: 4rem 0 2rem;
+}
+
+.intro-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.intro-hero h1 em {
+  color: var(--teal);
+  font-style: italic;
+}
+
+.intro-lead {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--mid-text);
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+}
+
+.story-card {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--teal), var(--gold));
+}
+
+.story-card .person {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.story-card .avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  background: var(--warm-gray);
+}
+
+.story-card .name {
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 1rem;
+}
+
+.story-card .role {
+  font-size: 0.8rem;
+  color: var(--light-text);
+}
+
+.story-card .situation {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--mid-text);
+}
+
+.story-card .hidden-value {
+  margin-top: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(42,157,143,0.06);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--teal);
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.6s ease;
+}
+
+.story-card .hidden-value.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-btn {
+  display: block;
+  margin: 2rem auto;
+  padding: 0.7rem 2rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--teal);
+  border: 1.5px solid var(--teal);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.reveal-btn:hover {
+  background: var(--teal);
+  color: white;
+}
+
+.match-arrow {
+  text-align: center;
+  padding: 1rem 0;
+  opacity: 0;
+  transition: all 0.8s ease;
+}
+
+.match-arrow.visible { opacity: 1; }
+
+.match-arrow .line {
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--teal), var(--gold));
+  margin: 0 auto;
+}
+
+.match-arrow .label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 0.5rem;
+}
+
+.match-explanation {
+  background: linear-gradient(135deg, var(--navy), var(--deep));
+  border-radius: 12px;
+  padding: 2rem;
+  color: white;
+  text-align: center;
+  margin: 1.5rem 0;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.8s ease;
+}
+
+.match-explanation.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.match-explanation h3 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: var(--teal-glow);
+}
+
+.match-explanation p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.7);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.cta-section {
+  text-align: center;
+  padding: 2rem 0;
+  opacity: 0;
+  transition: all 0.8s ease;
+}
+
+.cta-section.visible { opacity: 1; }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2.5rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  background: var(--slate);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(27,42,74,0.2);
+}
+
+/* ── Screen 2: Your Profile ── */
+.profile-section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.profile-section .subtitle {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--mid-text);
+  margin-bottom: 2.5rem;
+}
+
+.input-group {
+  margin-bottom: 2rem;
+}
+
+.input-group label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 0.3rem;
+}
+
+.input-group .hint {
+  font-size: 0.8rem;
+  color: var(--light-text);
+  margin-bottom: 0.6rem;
+}
+
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.chip {
+  padding: 0.5rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1.5px solid var(--divider, #D1D5DB);
+  border-radius: 20px;
+  background: white;
+  color: var(--mid-text);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.chip:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.chip.selected {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: white;
+}
+
+.custom-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.custom-input input {
+  flex: 1;
+  padding: 0.5rem 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.custom-input input:focus { border-color: var(--teal); }
+
+.custom-input button {
+  padding: 0.5rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--warm-gray);
+  color: var(--navy);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.context-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 10px;
+  outline: none;
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+
+.context-textarea:focus { border-color: var(--teal); }
+
+.progress-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+}
+
+.progress-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #D1D5DB;
+  transition: all 0.3s;
+}
+
+.progress-dot.active { background: var(--teal); transform: scale(1.3); }
+.progress-dot.done { background: var(--gold); }
+
+/* ── Screen 3: Discovery ── */
+.discovery-section { text-align: center; }
+
+.discovery-section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.scanning-animation {
+  width: 200px; height: 200px;
+  margin: 2rem auto;
+  position: relative;
+}
+
+.scan-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(42,157,143,0.2);
+  border-radius: 50%;
+  animation: scanPulse 2s infinite ease-out;
+}
+
+.scan-ring:nth-child(2) { animation-delay: 0.5s; }
+.scan-ring:nth-child(3) { animation-delay: 1s; }
+
+@keyframes scanPulse {
+  0% { transform: scale(0.3); opacity: 1; border-color: rgba(42,157,143,0.6); }
+  100% { transform: scale(1.2); opacity: 0; border-color: rgba(42,157,143,0); }
+}
+
+.scan-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px; height: 16px;
+  background: var(--teal);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(42,157,143,0.5);
+}
+
+.scan-status {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--light-text);
+  letter-spacing: 0.05em;
+}
+
+.scan-status .highlight { color: var(--teal); font-weight: 500; }
+
+/* ── Screen 4: Results ── */
+.results-section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+
+.results-subtitle {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--mid-text);
+  margin-bottom: 2rem;
+}
+
+.match-card {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+
+.match-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.match-card .match-type {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 12px;
+  margin-bottom: 0.8rem;
+}
+
+.match-type.you-offer { background: rgba(42,157,143,0.1); color: var(--teal); }
+.match-type.you-need { background: rgba(233,196,106,0.2); color: #B8860B; }
+.match-type.mutual { background: rgba(27,42,74,0.08); color: var(--navy); }
+
+.match-card .match-person {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
+}
+
+.match-card .match-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: var(--warm-gray);
+}
+
+.match-card .match-name {
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 0.95rem;
+}
+
+.match-card .match-distance {
+  font-size: 0.75rem;
+  color: var(--light-text);
+}
+
+.match-card .match-insight {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--mid-text);
+  margin-bottom: 0.8rem;
+}
+
+.match-card .match-bridge {
+  padding: 0.6rem 0.8rem;
+  background: linear-gradient(135deg, rgba(42,157,143,0.06), rgba(233,196,106,0.06));
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--slate);
+  border-left: 3px solid var(--teal);
+}
+
+.match-card .match-bridge strong { color: var(--navy); }
+
+.latent-value-counter {
+  background: linear-gradient(135deg, var(--navy), var(--deep));
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  margin: 2rem 0;
+  color: white;
+}
+
+.latent-value-counter h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--teal-glow);
+  margin-bottom: 0.5rem;
+}
+
+.counter-value {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.counter-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.counter-explanation {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+  margin-top: 1rem;
+  line-height: 1.5;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.insight-box {
+  background: var(--warm-gray);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin: 2rem 0;
+}
+
+.insight-box h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 0.6rem;
+}
+
+.insight-box p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--mid-text);
+}
+
+.final-cta {
+  text-align: center;
+  padding: 2rem 0 3rem;
+}
+
+.final-cta h3 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.final-cta p {
+  font-size: 0.95rem;
+  color: var(--mid-text);
+  margin-bottom: 1.5rem;
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.8rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background: var(--navy);
+  color: white;
+}
+
+/* ── Footer ── */
+footer {
+  background: var(--deep);
+  padding: 2rem;
+  text-align: center;
+}
+
+footer p {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+}
+
+footer .f-logo {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+footer .f-logo span { color: var(--teal); }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeUp 0.6s forwards;
+}
+
+@media (max-width: 640px) {
+  .story-card { padding: 1.5rem; }
+  .match-card { padding: 1.3rem; }
+  .container { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="logo">Latent <span>Value</span> Network</div>
+    <div class="tagline">Interactive Concept Demo</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SCREEN 1: THE STORY -->
+<!-- ═══════════════════════════════════════ -->
+<div id="screen-intro" class="screen active">
+  <div class="container">
+    <div class="intro-hero">
+      <h1>What if the help you need<br>is <em>already nearby?</em></h1>
+      <p class="intro-lead">
+        Every day, millions of cooperative connections fail to happen — not because people are unwilling, 
+        but because neither party knows the other exists. This is the <strong>Latent Value Gap</strong>.
+        Let us show you.
+      </p>
+    </div>
+
+    <div class="story-card" id="story-maria">
+      <div class="person">
+        <div class="avatar">👩‍🔧</div>
+        <div>
+          <div class="name">Maria, 62</div>
+          <div class="role">Retired mechanical engineer · Newton, IL</div>
+        </div>
+      </div>
+      <div class="situation">
+        Maria retired two years ago. She volunteers at the library and tends her garden. 
+        She's been feeling a bit purposeless since retirement — her grandkids live far away 
+        and she misses solving problems.
+      </div>
+      <div class="hidden-value" id="maria-hidden">
+        ✦ Latent value: 35 years of drainage and HVAC expertise. Fixed her own septic system twice. 
+        Could diagnose most residential infrastructure problems in an afternoon.
+      </div>
+    </div>
+
+    <div class="match-arrow" id="arrow1">
+      <div class="line"></div>
+      <div class="label">invisible connection</div>
+    </div>
+
+    <div class="story-card" id="story-james">
+      <div class="person">
+        <div class="avatar">👨‍👧</div>
+        <div>
+          <div class="name">James, 34</div>
+          <div class="role">Single dad, warehouse worker · 3 miles from Maria</div>
+        </div>
+      </div>
+      <div class="situation">
+        James has been noticing water pooling in his yard near the foundation. He Googled it once 
+        but the contractor quotes were $3,000+. He figured he'd just deal with it. He doesn't 
+        know it's slowly damaging his home's foundation.
+      </div>
+      <div class="hidden-value" id="james-hidden">
+        ✦ Latent value: James rebuilt a deck last summer and is a skilled woodworker. 
+        Maria's library needs new bookshelves — a project James would actually enjoy.
+      </div>
+    </div>
+
+    <div class="match-explanation" id="match-explain">
+      <h3>This connection died in silence.</h3>
+      <p>
+        Maria could diagnose James's drainage problem in 10 minutes and save him thousands. 
+        James could build the bookshelves Maria's library needs. 
+        Neither searched for the other. Neither knew they should.<br><br>
+        <strong>This is the Latent Value Gap.</strong> And it happens millions of times every day.
+      </p>
+    </div>
+
+    <button class="reveal-btn" id="btn-reveal" onclick="revealStory()">Reveal the invisible connections</button>
+
+    <div class="cta-section" id="intro-cta">
+      <p style="font-size:0.95rem; color:var(--mid-text); margin-bottom:1rem;">
+        Now imagine an AI that could sense these connections — not by surveilling people,<br>
+        but by understanding the situations they're <em>already sharing</em> with their AI assistant.
+      </p>
+      <button class="btn-primary" onclick="showScreen('screen-profile')">
+        Try It With Your Own Situation →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SCREEN 2: YOUR PROFILE -->
+<!-- ═══════════════════════════════════════ -->
+<div id="screen-profile" class="screen">
+  <div class="container profile-section">
+    <h2>Tell us about your situation</h2>
+    <p class="subtitle">We'll show you the latent value you didn't know you had — and the connections you're missing.</p>
+
+    <div class="progress-bar">
+      <div class="progress-dot active" id="pd1"></div>
+      <div class="progress-dot" id="pd2"></div>
+      <div class="progress-dot" id="pd3"></div>
+    </div>
+
+    <!-- Step 1: Skills / knowledge -->
+    <div id="step1" class="step">
+      <div class="input-group">
+        <label>What are you good at?</label>
+        <div class="hint">Select all that apply, or add your own. Think broadly — hobbies, work, life experience.</div>
+        <div class="chip-container" id="skills-chips">
+          <div class="chip" data-v="home-repair">Home repair</div>
+          <div class="chip" data-v="cooking">Cooking</div>
+          <div class="chip" data-v="teaching">Teaching / explaining</div>
+          <div class="chip" data-v="tech-support">Tech support</div>
+          <div class="chip" data-v="gardening">Gardening</div>
+          <div class="chip" data-v="organizing">Organizing / planning</div>
+          <div class="chip" data-v="writing">Writing</div>
+          <div class="chip" data-v="finance">Financial planning</div>
+          <div class="chip" data-v="driving">Driving / logistics</div>
+          <div class="chip" data-v="healthcare">Healthcare knowledge</div>
+          <div class="chip" data-v="childcare">Childcare</div>
+          <div class="chip" data-v="coding">Programming</div>
+          <div class="chip" data-v="design">Design / creative</div>
+          <div class="chip" data-v="languages">Multiple languages</div>
+          <div class="chip" data-v="legal">Legal knowledge</div>
+          <div class="chip" data-v="farming">Farming / agriculture</div>
+        </div>
+        <div class="custom-input">
+          <input type="text" id="custom-skill" placeholder="Add something else...">
+          <button onclick="addCustomChip('skills-chips','custom-skill')">Add</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="nextStep(2)" style="display:block;margin:1.5rem auto;">Continue →</button>
+    </div>
+
+    <!-- Step 2: Challenges / needs -->
+    <div id="step2" class="step" style="display:none;">
+      <div class="input-group">
+        <label>What are you dealing with right now?</label>
+        <div class="hint">Challenges, projects, things you wish you had help with — big or small.</div>
+        <div class="chip-container" id="needs-chips">
+          <div class="chip" data-v="home-maintenance">Home maintenance issues</div>
+          <div class="chip" data-v="career-change">Career transition</div>
+          <div class="chip" data-v="health-nav">Navigating healthcare</div>
+          <div class="chip" data-v="small-business">Growing a small business</div>
+          <div class="chip" data-v="parenting">Parenting challenges</div>
+          <div class="chip" data-v="loneliness">Feeling isolated</div>
+          <div class="chip" data-v="financial-stress">Financial stress</div>
+          <div class="chip" data-v="learning-tech">Learning new technology</div>
+          <div class="chip" data-v="elder-care">Elder care / aging parents</div>
+          <div class="chip" data-v="legal-issue">Legal situation</div>
+          <div class="chip" data-v="moving">Moving / relocation</div>
+          <div class="chip" data-v="side-project">Side project stuck</div>
+          <div class="chip" data-v="community">Want to give back</div>
+          <div class="chip" data-v="education">Education / credentials</div>
+        </div>
+        <div class="custom-input">
+          <input type="text" id="custom-need" placeholder="Add something else...">
+          <button onclick="addCustomChip('needs-chips','custom-need')">Add</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="nextStep(3)" style="display:block;margin:1.5rem auto;">Continue →</button>
+    </div>
+
+    <!-- Step 3: Context -->
+    <div id="step3" class="step" style="display:none;">
+      <div class="input-group">
+        <label>Anything else about your situation?</label>
+        <div class="hint">Optional. A sentence or two gives us more to work with. For example: "I just moved to a new town" or "I have a truck and free mornings."</div>
+        <textarea class="context-textarea" id="context-input" placeholder="I have a lot of experience with...  /  I've been struggling with...  /  I have access to..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="startDiscovery()" style="display:block;margin:1.5rem auto;">Discover My Latent Value →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SCREEN 3: SCANNING -->
+<!-- ═══════════════════════════════════════ -->
+<div id="screen-discovery" class="screen">
+  <div class="container discovery-section">
+    <h2>Scanning for latent connections...</h2>
+
+    <div class="scanning-animation">
+      <div class="scan-ring"></div>
+      <div class="scan-ring"></div>
+      <div class="scan-ring"></div>
+      <div class="scan-center"></div>
+    </div>
+
+    <div class="scan-status" id="scan-status">
+      Analyzing your situation...
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SCREEN 4: RESULTS -->
+<!-- ═══════════════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <div class="container results-section">
+    <h2>Your Latent Value Map</h2>
+    <p class="results-subtitle">Here's what an ambient matching system could surface for you — connections neither party would have searched for.</p>
+
+    <div id="matches-container"></div>
+
+    <div class="latent-value-counter">
+      <h3>Your Estimated Latent Value</h3>
+      <div class="counter-value" id="lv-counter">0</div>
+      <div class="counter-label">potential cooperative connections in a community of 1,000</div>
+      <div class="counter-explanation">
+        This is a simulation. In a real community with ambient matching, 
+        these connections would surface naturally — no searching, no profiles, no marketplace.
+        Just your AI noticing that someone nearby has exactly what you need, or needs exactly what you have.
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <h3>What you probably didn't know about yourself</h3>
+      <p id="latent-insight">Loading insight...</p>
+    </div>
+
+    <div class="insight-box" style="border-left: 3px solid var(--gold);">
+      <h3>The research says...</h3>
+      <p>
+        <strong>83.4%</strong> of jobs are found through occasional or rare contacts, not close friends 
+        (Granovetter, 1973). Cross-class friendships are the <strong>single strongest predictor</strong> of 
+        upward economic mobility (Chetty et al., 2022). Knowledge workers spend <strong>2.5 hours per day</strong> 
+        searching for information that someone nearby already has (IDC). 
+        The connections that matter most are the ones nobody thinks to look for.
+      </p>
+    </div>
+
+    <div class="final-cta">
+      <h3>This doesn't exist yet. We're building it.</h3>
+      <p>
+        The Latent Value Network is an open collaborative initiative designing the protocol layer 
+        that could make ambient cooperation real. We need cryptographers, economists, ethicists, 
+        engineers, and practitioners.
+      </p>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="window.open('#whitepaper')">Read the White Paper</button>
+        <button class="btn-secondary" onclick="window.open('#github')">Join on GitHub</button>
+        <button class="btn-secondary" onclick="showScreen('screen-role')">Find Your Role →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SCREEN 5: FIND YOUR ROLE -->
+<!-- ═══════════════════════════════════════ -->
+<div id="screen-role" class="screen">
+  <div class="container profile-section">
+    <h2>Where do you fit in?</h2>
+    <p class="subtitle">The LVN needs diverse minds. Help us figure out where your expertise is most needed.</p>
+
+    <div class="input-group">
+      <label>What's your background?</label>
+      <div class="hint">Select all that resonate — formal credentials aren't required.</div>
+      <div class="chip-container" id="role-chips">
+        <div class="chip" data-v="ml-ai">AI / Machine Learning</div>
+        <div class="chip" data-v="crypto">Cryptography / Security</div>
+        <div class="chip" data-v="economics">Economics / Game Theory</div>
+        <div class="chip" data-v="network-sci">Network Science</div>
+        <div class="chip" data-v="ethics">Ethics / Philosophy</div>
+        <div class="chip" data-v="social-sci">Social Science / Psychology</div>
+        <div class="chip" data-v="systems-arch">Systems Architecture</div>
+        <div class="chip" data-v="community-org">Community Organizing</div>
+        <div class="chip" data-v="social-work">Social Work / Mutual Aid</div>
+        <div class="chip" data-v="product">Product Design / UX</div>
+        <div class="chip" data-v="policy">Public Policy</div>
+        <div class="chip" data-v="interested">Just interested / curious</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>What excites you most?</label>
+      <div class="chip-container" id="interest-chips">
+        <div class="chip" data-v="privacy">Making matching truly private</div>
+        <div class="chip" data-v="equity">Ensuring equity by design</div>
+        <div class="chip" data-v="trust">Building trust without surveillance</div>
+        <div class="chip" data-v="governance">Governing a digital commons</div>
+        <div class="chip" data-v="piloting">Running real-world pilots</div>
+        <div class="chip" data-v="measuring">Quantifying the gap</div>
+        <div class="chip" data-v="red-teaming">Breaking it (adversarial thinking)</div>
+        <div class="chip" data-v="integration">Making it work with existing AI</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="showRoleResult()" style="display:block;margin:2rem auto;">Show My Path →</button>
+
+    <div id="role-result" style="display:none; margin-top:2rem;"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-logo">Latent <span>Value</span> Network</div>
+  <p>An open collaborative initiative · CC BY-SA 4.0<br>This is a concept demonstration, not a live service.</p>
+</footer>
+
+<script>
+// ── State ──
+const state = {
+  skills: new Set(),
+  needs: new Set(),
+  context: '',
+  roles: new Set(),
+  interests: new Set()
+};
+
+// ── Chip selection ──
+document.querySelectorAll('.chip-container').forEach(container => {
+  container.addEventListener('click', e => {
+    if (!e.target.classList.contains('chip')) return;
+    e.target.classList.toggle('selected');
+    const val = e.target.dataset.v;
+    const id = container.id;
+    let set;
+    if (id === 'skills-chips') set = state.skills;
+    else if (id === 'needs-chips') set = state.needs;
+    else if (id === 'role-chips') set = state.roles;
+    else if (id === 'interest-chips') set = state.interests;
+    if (set) {
+      if (e.target.classList.contains('selected')) set.add(val);
+      else set.delete(val);
+    }
+  });
+});
+
+function addCustomChip(containerId, inputId) {
+  const input = document.getElementById(inputId);
+  const val = input.value.trim();
+  if (!val) return;
+  const container = document.getElementById(containerId);
+  const chip = document.createElement('div');
+  chip.className = 'chip selected';
+  chip.dataset.v = val.toLowerCase().replace(/\s+/g, '-');
+  chip.textContent = val;
+  container.appendChild(chip);
+  input.value = '';
+  if (containerId === 'skills-chips') state.skills.add(chip.dataset.v);
+  else state.needs.add(chip.dataset.v);
+  chip.addEventListener('click', () => {
+    chip.classList.toggle('selected');
+    const s = containerId === 'skills-chips' ? state.skills : state.needs;
+    if (chip.classList.contains('selected')) s.add(chip.dataset.v);
+    else s.delete(chip.dataset.v);
+  });
+}
+
+// ── Navigation ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+  document.getElementById('step' + n).style.display = 'block';
+  document.querySelectorAll('.progress-dot').forEach((d, i) => {
+    d.classList.remove('active');
+    d.classList.remove('done');
+    if (i < n - 1) d.classList.add('done');
+    if (i === n - 1) d.classList.add('active');
+  });
+}
+
+// ── Intro story reveal ──
+function revealStory() {
+  document.getElementById('maria-hidden').classList.add('revealed');
+  setTimeout(() => document.getElementById('james-hidden').classList.add('revealed'), 400);
+  setTimeout(() => document.getElementById('arrow1').classList.add('visible'), 800);
+  setTimeout(() => document.getElementById('match-explain').classList.add('visible'), 1200);
+  setTimeout(() => document.getElementById('intro-cta').classList.add('visible'), 1800);
+  document.getElementById('btn-reveal').style.display = 'none';
+}
+
+// ── Match generation engine ──
+const communityMembers = [
+  { name: "Sarah", age: 28, emoji: "👩‍💻", role: "UX designer, freelance", distance: "0.5 mi",
+    skills: ["design", "coding", "writing", "tech-support"], 
+    needs: ["small-business", "financial-stress", "loneliness"],
+    story: "Recently went freelance and is building a client base. Struggles with invoicing and taxes. Misses having coworkers." },
+  { name: "Robert", age: 71, emoji: "👴", role: "Retired accountant", distance: "1.2 mi",
+    skills: ["finance", "organizing", "teaching"],
+    needs: ["learning-tech", "loneliness", "community"],
+    story: "Spent 40 years doing taxes and financial planning. Would love to help people but doesn't know how to offer. Learning to use his new tablet." },
+  { name: "Priya", age: 35, emoji: "👩‍🍳", role: "Restaurant owner", distance: "0.8 mi",
+    skills: ["cooking", "languages", "organizing", "small-business"],
+    needs: ["tech-support", "side-project", "home-maintenance"],
+    story: "Runs a small Indian restaurant. Needs a better website but can't afford an agency. Has a commercial kitchen idle 4 days a week." },
+  { name: "Marcus", age: 19, emoji: "👨‍🎓", role: "Community college student", distance: "2 mi",
+    skills: ["coding", "tech-support", "driving", "design"],
+    needs: ["career-change", "education", "financial-stress"],
+    story: "Studying computer science. Builds websites for fun but doesn't think of it as a marketable skill. Has a truck and free mornings." },
+  { name: "Diana", age: 45, emoji: "👩‍⚕️", role: "Nurse practitioner", distance: "1.5 mi",
+    skills: ["healthcare", "teaching", "organizing", "elder-care"],
+    needs: ["home-maintenance", "parenting", "side-project"],
+    story: "Works at the county clinic. Constantly explains medical info to patients but doesn't see that as 'teaching.' Her porch needs repair." },
+  { name: "Tom", age: 52, emoji: "🧑‍🌾", role: "Small farm operator", distance: "3 mi",
+    skills: ["farming", "home-repair", "driving", "gardening"],
+    needs: ["small-business", "learning-tech", "legal-issue"],
+    story: "Optimized his irrigation through trial and error. Has surplus equipment sitting idle. Wants to sell direct-to-consumer but doesn't know where to start." },
+  { name: "Lisa", age: 38, emoji: "👩‍🏫", role: "Former teacher, now stay-at-home mom", distance: "0.3 mi",
+    skills: ["teaching", "childcare", "writing", "organizing"],
+    needs: ["career-change", "loneliness", "side-project", "community"],
+    story: "Left teaching 3 years ago. Misses intellectual engagement. Has curriculum design skills she doesn't think anyone needs." },
+  { name: "Jin", age: 42, emoji: "👨‍🔬", role: "Lab technician", distance: "4 mi",
+    skills: ["healthcare", "coding", "languages", "gardening"],
+    needs: ["elder-care", "community", "side-project"],
+    story: "Speaks Korean and English fluently. Parents are aging and navigating the healthcare system is overwhelming. Grows specialty vegetables on his balcony." },
+  { name: "Carmen", age: 55, emoji: "👩‍💼", role: "Nonprofit director", distance: "1 mi",
+    skills: ["organizing", "writing", "legal", "community-org"],
+    needs: ["tech-support", "financial-stress", "learning-tech"],
+    story: "Runs a community food bank. Drowning in paperwork. The org's data is in spreadsheets that nobody understands. Could really use a volunteer with database skills." },
+  { name: "Derek", age: 31, emoji: "👨‍🔧", role: "Electrician", distance: "2.5 mi",
+    skills: ["home-repair", "driving", "teaching"],
+    needs: ["legal-issue", "parenting", "financial-stress"],
+    story: "Great at his trade but terrible at the business side. Needs help with contracts and customer management. Coaches his kid's soccer team." },
+];
+
+function generateMatches() {
+  const skills = state.skills;
+  const needs = state.needs;
+  const matches = [];
+
+  communityMembers.forEach(member => {
+    let score = 0;
+    let reasons = [];
+    let type = 'mutual';
+
+    // You can help them
+    const youCanHelp = [...skills].filter(s => member.needs.some(n => isRelated(s, n)));
+    // They can help you
+    const theyCanHelp = member.skills.filter(s => [...needs].some(n => isRelated(s, n)));
+
+    if (youCanHelp.length > 0) {
+      score += youCanHelp.length * 2;
+      reasons.push({ dir: 'offer', items: youCanHelp });
+    }
+    if (theyCanHelp.length > 0) {
+      score += theyCanHelp.length * 2;
+      reasons.push({ dir: 'need', items: theyCanHelp });
+    }
+
+    // Cross-boundary bonus
+    const yourSkillSet = new Set([...skills]);
+    const theirSkillSet = new Set(member.skills);
+    const overlap = [...yourSkillSet].filter(s => theirSkillSet.has(s)).length;
+    if (overlap === 0 && score > 0) score += 3; // Maximum cross-boundary bonus
+
+    if (score > 0) {
+      if (youCanHelp.length > 0 && theyCanHelp.length === 0) type = 'you-offer';
+      else if (theyCanHelp.length > 0 && youCanHelp.length === 0) type = 'you-need';
+      else type = 'mutual';
+
+      matches.push({ member, score, reasons, type });
+    }
+  });
+
+  // Sort by score, take top 5
+  matches.sort((a, b) => b.score - a.score);
+  return matches.slice(0, 5);
+}
+
+function isRelated(skill, need) {
+  const relations = {
+    'home-repair': ['home-maintenance'],
+    'cooking': ['community', 'loneliness'],
+    'teaching': ['education', 'learning-tech', 'career-change'],
+    'tech-support': ['learning-tech', 'side-project', 'small-business'],
+    'gardening': ['community', 'loneliness'],
+    'organizing': ['small-business', 'career-change', 'financial-stress'],
+    'writing': ['small-business', 'side-project', 'career-change'],
+    'finance': ['financial-stress', 'small-business'],
+    'driving': ['moving', 'community'],
+    'healthcare': ['health-nav', 'elder-care'],
+    'childcare': ['parenting'],
+    'coding': ['side-project', 'small-business', 'learning-tech'],
+    'design': ['small-business', 'side-project'],
+    'languages': ['community', 'education'],
+    'legal': ['legal-issue'],
+    'farming': ['community', 'home-maintenance'],
+  };
+  // Direct match
+  if (skill === need) return true;
+  // Related match
+  if (relations[skill] && relations[skill].includes(need)) return true;
+  return false;
+}
+
+function buildMatchNarrative(match) {
+  const m = match.member;
+  const youOffer = match.reasons.filter(r => r.dir === 'offer');
+  const theyOffer = match.reasons.filter(r => r.dir === 'need');
+
+  let insight = '';
+  if (youOffer.length > 0 && theyOffer.length > 0) {
+    insight = `${m.story} Meanwhile, your experience could help with exactly the challenges ${m.name} faces — and ${m.name} has skills that map to what you're dealing with. Neither of you would have searched for the other.`;
+  } else if (youOffer.length > 0) {
+    insight = `${m.story} Your background maps directly to what ${m.name} needs — but ${m.name} wouldn't know to look for someone like you, and you wouldn't know ${m.name} exists.`;
+  } else {
+    insight = `${m.story} ${m.name}'s experience is exactly what your situation calls for — but you'd never find each other through a job board, marketplace, or social network.`;
+  }
+
+  let bridge = '';
+  if (match.type === 'mutual') {
+    bridge = `<strong>Mutual exchange:</strong> You each have something the other needs, in domains different enough that no platform would connect you.`;
+  } else if (match.type === 'you-offer') {
+    bridge = `<strong>You have latent capacity</strong> that ${m.name} needs — expertise you probably don't think of as expertise.`;
+  } else {
+    bridge = `<strong>${m.name} has latent capacity</strong> that maps to your situation — capabilities ${m.name} doesn't even advertise.`;
+  }
+
+  return { insight, bridge };
+}
+
+function buildLatentInsight() {
+  const skills = [...state.skills];
+  const insights = [];
+
+  if (skills.includes('cooking')) insights.push("Your cooking experience isn't just a hobby — it's potential community-building infrastructure. People bond over food, and you have the skill to create those bonds.");
+  if (skills.includes('home-repair')) insights.push("Your home repair skills are invisible gold in any community. Most people's #1 unspoken need is help with their house — and most can't afford professional help.");
+  if (skills.includes('teaching')) insights.push("Your ability to explain things is a superpower most people undervalue. In a world of complexity, the capacity to make things clear is one of the most transferable latent capabilities.");
+  if (skills.includes('coding')) insights.push("Your programming skills map to dozens of non-obvious needs: the nonprofit drowning in spreadsheets, the small business with a terrible website, the farmer who needs an inventory system.");
+  if (skills.includes('organizing')) insights.push("Your organizational skills are invisible infrastructure. Most community groups and small operations fail not from lack of passion but from lack of the kind of structural thinking you do naturally.");
+  if (skills.includes('finance')) insights.push("Financial literacy is one of the most unevenly distributed capabilities. Your knowledge about money management could be life-changing for people who never had access to a financial advisor.");
+  if (skills.includes('driving')) insights.push("Having a vehicle and willingness to drive is latent logistics capacity. For people without transportation, your 20-minute drive could be the difference between accessing a service or not.");
+  if (skills.includes('healthcare')) insights.push("Your healthcare knowledge helps people navigate one of the most confusing systems they encounter. Just knowing how to talk to a doctor or read a medical bill is expertise most people lack.");
+  if (skills.includes('gardening')) insights.push("Gardening knowledge maps to food security, mental health, community building, and environmental education. What feels like 'just a hobby' to you is a bundle of latent capacities.");
+
+  if (insights.length === 0) {
+    insights.push("Every skill you've developed through life experience — even the ones you'd never put on a resume — represents latent value that someone nearby almost certainly needs. The problem isn't willingness. It's visibility.");
+  }
+
+  return insights.slice(0, 2).join(" ");
+}
+
+// ── Discovery flow ──
+function startDiscovery() {
+  state.context = document.getElementById('context-input').value;
+  showScreen('screen-discovery');
+
+  const statusEl = document.getElementById('scan-status');
+  const messages = [
+    'Analyzing your situation...',
+    'Identifying <span class="highlight">latent capabilities</span> you may not have recognized...',
+    'Scanning community of <span class="highlight">1,000 simulated neighbors</span>...',
+    'Finding <span class="highlight">cross-boundary matches</span>...',
+    'Discovering connections <span class="highlight">nobody searched for</span>...',
+    'Building your latent value map...',
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    i++;
+    if (i < messages.length) {
+      statusEl.innerHTML = messages[i];
+    } else {
+      clearInterval(interval);
+      showResults();
+    }
+  }, 1200);
+}
+
+function showResults() {
+  const matches = generateMatches();
+  showScreen('screen-results');
+
+  const container = document.getElementById('matches-container');
+  container.innerHTML = '';
+
+  // If no matches (user selected nothing), add some defaults
+  let displayMatches = matches;
+  if (displayMatches.length === 0) {
+    state.skills.add('organizing');
+    state.needs.add('community');
+    displayMatches = generateMatches();
+  }
+
+  displayMatches.forEach((match, i) => {
+    const { insight, bridge } = buildMatchNarrative(match);
+    const typeLabel = match.type === 'you-offer' ? 'You can help' : match.type === 'you-need' ? 'They can help you' : 'Mutual exchange';
+
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    card.innerHTML = `
+      <div class="match-type ${match.type}">${typeLabel}</div>
+      <div class="match-person">
+        <div class="match-avatar">${match.member.emoji}</div>
+        <div>
+          <div class="match-name">${match.member.name}, ${match.member.age}</div>
+          <div class="match-distance">${match.member.role} · ${match.member.distance} away</div>
+        </div>
+      </div>
+      <div class="match-insight">${insight}</div>
+      <div class="match-bridge">${bridge}</div>
+    `;
+    container.appendChild(card);
+
+    setTimeout(() => card.classList.add('visible'), 300 + i * 250);
+  });
+
+  // Counter animation
+  const counterEl = document.getElementById('lv-counter');
+  const targetCount = Math.max(displayMatches.length * 12 + Math.floor(Math.random() * 20) + 15, 27);
+  let count = 0;
+  const counterInterval = setInterval(() => {
+    count += Math.ceil((targetCount - count) / 8);
+    if (count >= targetCount) { count = targetCount; clearInterval(counterInterval); }
+    counterEl.textContent = count;
+  }, 60);
+
+  // Latent insight
+  document.getElementById('latent-insight').textContent = buildLatentInsight();
+}
+
+// ── Role finder ──
+function showRoleResult() {
+  const roles = [];
+  document.querySelectorAll('#role-chips .chip.selected').forEach(c => roles.push(c.dataset.v));
+  const interests = [];
+  document.querySelectorAll('#interest-chips .chip.selected').forEach(c => interests.push(c.dataset.v));
+
+  const roleMap = {
+    'ml-ai': { group: 'AI Integration', focus: 'Context engines, embedding models, agent architectures', oqs: ['OQ-1: Embedding Model Governance', 'OQ-2: Semantic Matching Under Encryption'] },
+    'crypto': { group: 'Privacy & Cryptography', focus: 'Signal protocol, ZK matching, threat modeling', oqs: ['OQ-2: Semantic Matching Under Encryption', 'OQ-4: Cross-Community Signal Compatibility'] },
+    'economics': { group: 'Theory & Foundations', focus: 'Mechanism design, incentive structures, value exchange', oqs: ['OQ-5: Value Exchange Integration', 'OQ-6: Governance of Parameter Evolution'] },
+    'network-sci': { group: 'Theory & Foundations', focus: 'Graph theory, topology optimization, diffusion dynamics', oqs: ['OQ-4: Cross-Community Signal Compatibility'] },
+    'ethics': { group: 'Ethics & Equity', focus: 'Red-teaming, equity analysis, harm inversion', oqs: ['OQ-5: Value Exchange Integration', 'OQ-3: Cold Start for Individuals'] },
+    'social-sci': { group: 'Ethics & Equity', focus: 'Trust formation, adoption research, behavioral analysis', oqs: ['OQ-3: Cold Start for Individuals'] },
+    'systems-arch': { group: 'AI Integration', focus: 'Protocol design, MCP/A2A integration, distributed systems', oqs: ['OQ-4: Cross-Community Signal Compatibility', 'OQ-6: Governance of Parameter Evolution'] },
+    'community-org': { group: 'Community & Practice', focus: 'Pilot design, practitioner input, impact measurement', oqs: ['OQ-3: Cold Start for Individuals', 'OQ-5: Value Exchange Integration'] },
+    'social-work': { group: 'Community & Practice', focus: 'Grounding the architecture in real-world needs', oqs: ['OQ-3: Cold Start for Individuals'] },
+    'product': { group: 'AI Integration', focus: 'User experience of progressive disclosure, consent flows', oqs: ['OQ-3: Cold Start for Individuals'] },
+    'policy': { group: 'Ethics & Equity', focus: 'Regulatory considerations, governance frameworks', oqs: ['OQ-6: Governance of Parameter Evolution'] },
+    'interested': { group: 'Community & Practice', focus: 'Discussion, feedback, spreading the word', oqs: [] },
+  };
+
+  let html = '<div style="background:white;border-radius:12px;padding:2rem;border:1px solid rgba(0,0,0,0.06);box-shadow:0 2px 12px rgba(0,0,0,0.04);">';
+  html += '<h3 style="font-family:var(--font-display);font-size:1.4rem;color:var(--navy);margin-bottom:1rem;">Your Path Into the LVN</h3>';
+
+  if (roles.length === 0 && interests.length === 0) {
+    html += '<p style="color:var(--mid-text);">Select some options above and we\'ll map your path!</p>';
+  } else {
+    const groups = new Set();
+    const allOqs = new Set();
+    roles.forEach(r => {
+      if (roleMap[r]) {
+        groups.add(roleMap[r].group);
+        roleMap[r].oqs.forEach(o => allOqs.add(o));
+      }
+    });
+
+    html += '<div style="margin-bottom:1rem;">';
+    html += '<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Recommended Working Group(s)</div>';
+    [...groups].forEach(g => {
+      html += `<span style="display:inline-block;padding:0.3rem 0.8rem;background:rgba(42,157,143,0.1);color:var(--teal);font-weight:600;border-radius:12px;margin:0.2rem 0.3rem 0.2rem 0;font-size:0.85rem;">${g}</span>`;
+    });
+    html += '</div>';
+
+    if (allOqs.size > 0) {
+      html += '<div style="margin-bottom:1rem;">';
+      html += '<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Open Questions You Could Help Solve</div>';
+      [...allOqs].forEach(oq => {
+        html += `<div style="padding:0.4rem 0;font-size:0.9rem;color:var(--mid-text);border-bottom:1px solid rgba(0,0,0,0.04);">${oq}</div>`;
+      });
+      html += '</div>';
+    }
+
+    html += '<div style="margin-top:1.5rem;padding:1rem;background:var(--warm-gray);border-radius:8px;">';
+    html += '<div style="font-size:0.9rem;color:var(--mid-text);line-height:1.6;">';
+    html += '<strong style="color:var(--navy);">Next step:</strong> Read the White Paper (WD-001) and Protocol Specification (WD-003), then open a Discussion on GitHub introducing yourself and which open questions intrigue you. The working groups are forming now — early voices shape the direction.';
+    html += '</div></div>';
+  }
+
+  html += '</div>';
+
+  const resultEl = document.getElementById('role-result');
+  resultEl.innerHTML = html;
+  resultEl.style.display = 'block';
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+
+</body>
+</html>
