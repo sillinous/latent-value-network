@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVN Architecture — System Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1B2A4A;--deep:#0F1A2E;--slate:#3D5A80;--teal:#2A9D8F;--teal-glow:#34D1BF;
+  --gold:#E9C46A;--cream:#FAF8F5;--warm:#F0EDE8;--mid:#5A6577;--light:#8B95A5;
+  --red:#DC2626;--green:#16A34A;--purple:#7C3AED;--orange:#EA580C;
+  --f-d:'Cormorant Garamond',Georgia,serif;--f-b:'DM Sans',system-ui,sans-serif;--f-m:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f-b);background:var(--deep);color:white;min-height:100vh;overflow-x:hidden}
+.container{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+
+header{text-align:center;padding:2rem 0 1rem}
+header h1{font-family:var(--f-d);font-size:2rem;font-weight:700;color:white}
+header h1 span{color:var(--teal-glow)}
+header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
+
+.legend{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin:1rem 0 2rem;padding:1rem;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid rgba(255,255,255,.06)}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--light)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+
+/* Layer cards */
+.layers{display:flex;flex-direction:column;gap:1px;position:relative}
+
+.layer{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:1.5rem;display:grid;grid-template-columns:60px 1fr 280px;gap:1.2rem;align-items:start;transition:all .3s;cursor:pointer;position:relative}
+.layer:hover{background:rgba(255,255,255,.06);border-color:rgba(42,157,143,.3)}
+.layer.active{background:rgba(42,157,143,.06);border-color:var(--teal)}
+
+.layer-num{font-family:var(--f-d);font-size:2.2rem;font-weight:700;opacity:.3;line-height:1;text-align:center;padding-top:.2rem}
+.layer.active .layer-num{opacity:1;color:var(--teal-glow)}
+
+.layer-main h3{font-family:var(--f-d);font-size:1.2rem;font-weight:700;color:white;margin-bottom:.3rem}
+.layer-main .subtitle{font-size:.8rem;color:var(--teal);margin-bottom:.5rem;font-weight:500}
+.layer-main p{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.5}
+
+.layer-detail{font-size:.75rem;background:rgba(0,0,0,.2);border-radius:6px;padding:.8rem;display:none}
+.layer.active .layer-detail{display:block}
+.detail-row{display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.detail-row:last-child{border:none}
+.detail-label{color:var(--light);font-family:var(--f-m);font-size:.65rem}
+.detail-value{color:rgba(255,255,255,.7);font-size:.72rem;text-align:right}
+
+/* Connection arrows between layers */
+.conn{display:flex;align-items:center;justify-content:center;padding:.3rem 0;position:relative}
+.conn-line{width:2px;height:24px;background:linear-gradient(to bottom,rgba(42,157,143,.4),rgba(233,196,106,.3))}
+.conn-label{position:absolute;left:50%;transform:translateX(-50%);font-family:var(--f-m);font-size:.55rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;background:var(--deep);padding:0 .5rem}
+
+/* Privacy boundary */
+.privacy-boundary{margin:1rem 0;position:relative;text-align:center}
+.privacy-line{height:2px;background:repeating-linear-gradient(90deg,var(--red),var(--red) 8px,transparent 8px,transparent 16px);opacity:.4}
+.privacy-label{display:inline-block;background:var(--deep);padding:.2rem .8rem;font-family:var(--f-m);font-size:.6rem;color:var(--red);letter-spacing:.15em;text-transform:uppercase;position:relative;top:-8px;border:1px solid rgba(220,38,38,.2);border-radius:3px}
+
+/* Integration sidebar */
+.integration-panel{margin-top:2rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:1.5rem}
+.integration-panel h3{font-family:var(--f-d);font-size:1.1rem;color:white;margin-bottom:1rem}
+.int-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem}
+.int-card{background:rgba(0,0,0,.2);border-radius:6px;padding:.8rem;border:1px solid rgba(255,255,255,.04)}
+.int-card .int-name{font-weight:600;font-size:.85rem;color:var(--teal-glow);margin-bottom:.3rem}
+.int-card .int-maps{font-size:.72rem;color:rgba(255,255,255,.4);line-height:1.4}
+.int-card .int-maps strong{color:rgba(255,255,255,.6)}
+
+/* Data flow diagram */
+.flow-section{margin-top:2rem}
+.flow-section h3{font-family:var(--f-d);font-size:1.1rem;color:white;margin-bottom:1rem;text-align:center}
+.flow-diagram{display:flex;align-items:center;justify-content:center;gap:.3rem;flex-wrap:wrap;padding:1rem;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid rgba(255,255,255,.04)}
+.flow-node{padding:.5rem .8rem;border-radius:6px;font-size:.72rem;font-weight:600;text-align:center;min-width:100px}
+.flow-arrow{color:var(--gold);font-size:1.2rem;opacity:.5}
+.flow-private{background:rgba(42,157,143,.15);border:1px solid rgba(42,157,143,.3);color:var(--teal-glow)}
+.flow-transform{background:rgba(233,196,106,.12);border:1px solid rgba(233,196,106,.25);color:var(--gold)}
+.flow-public{background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);color:#A78BFA}
+.flow-mutual{background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.25);color:#4ADE80}
+
+/* Responsive */
+@media(max-width:768px){
+  .layer{grid-template-columns:40px 1fr;gap:.8rem}
+  .layer-detail{grid-column:1/-1}
+  .flow-diagram{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Latent <span>Value</span> Network — Architecture</h1>
+  <p>Five-layer protocol stack for privacy-preserving ambient cooperation</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Private / Sovereign</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Transformation Boundary</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Protocol / Network</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Mutual / Consensual</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Privacy Boundary</div>
+</div>
+
+<!-- LAYER 5 -->
+<div class="layers">
+  <div class="layer" onclick="toggleLayer(this)" data-layer="5">
+    <div class="layer-num">5</div>
+    <div class="layer-main">
+      <h3>Governance Layer</h3>
+      <div class="subtitle">Commons governance following Ostrom's principles</div>
+      <p>Protocol evolution through transparent, community-driven standards processes. Anti-capture mechanisms prevent single-entity enclosure. Graduated conflict resolution. Equity monitoring across all network operations.</p>
+    </div>
+    <div class="layer-detail">
+      <div class="detail-row"><span class="detail-label">Framework</span><span class="detail-value">Ostrom's 8 principles</span></div>
+      <div class="detail-row"><span class="detail-label">Scope</span><span class="detail-value">Parameter evolution, disputes, equity</span></div>
+      <div class="detail-row"><span class="detail-label">Anti-capture</span><span class="detail-value">Protocol-level, structural</span></div>
+      <div class="detail-row"><span class="detail-label">Spec status</span><span class="detail-value" style="color:var(--gold)">WD-006 · Seeking authors</span></div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span class="conn-label">governs parameters & disputes</span></div>
+
+  <!-- LAYER 4 -->
+  <div class="layer" onclick="toggleLayer(this)" data-layer="4">
+    <div class="layer-num">4</div>
+    <div class="layer-main">
+      <h3>Trust & Reputation Fabric</h3>
+      <div class="subtitle">Distributed, contextual, relational trust</div>
+      <p>Trust flows through relational chains — not centralized scores. Contextual reputation means trusted-for-X doesn't imply trusted-for-Y. Privacy-preserving trust signals verified through zero-knowledge proofs. Bootstrappable through small, low-stakes cooperative acts.</p>
+    </div>
+    <div class="layer-detail">
+      <div class="detail-row"><span class="detail-label">Model</span><span class="detail-value">Relational chain, not score</span></div>
+      <div class="detail-row"><span class="detail-label">Privacy</span><span class="detail-value">ZK trust verification</span></div>
+      <div class="detail-row"><span class="detail-label">Bootstrap</span><span class="detail-value">Low-stakes acts + institutional anchors</span></div>
+      <div class="detail-row"><span class="detail-label">Spec status</span><span class="detail-value" style="color:var(--gold)">WD-005 · Drafting</span></div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span class="conn-label">trust queries during handshake</span></div>
+
+  <div class="privacy-boundary">
+    <div class="privacy-line"></div>
+    <div class="privacy-label">Network / Protocol Boundary</div>
+  </div>
+
+  <!-- LAYER 3 -->
+  <div class="layer active" onclick="toggleLayer(this)" data-layer="3">
+    <div class="layer-num">3</div>
+    <div class="layer-main">
+      <h3>Signal Exchange Protocol</h3>
+      <div class="subtitle">Core technical innovation — privacy-preserving matching</div>
+      <p>AI agents discover cooperative matches without exposing private context. Four-phase protocol: Signal Generation (context → abstract vectors), Match Discovery (complementarity detection), Negotiation Handshake (progressive disclosure), and Feedback Loop (differential privacy learning).</p>
+    </div>
+    <div class="layer-detail">
+      <div class="detail-row"><span class="detail-label">Signal dims</span><span class="detail-value">d=128 embedding + Bloom filters</span></div>
+      <div class="detail-row"><span class="detail-label">Discovery</span><span class="detail-value">Relay / P2P / Community-anchored</span></div>
+      <div class="detail-row"><span class="detail-label">Handshake</span><span class="detail-value">6-state machine, consent at each step</span></div>
+      <div class="detail-row"><span class="detail-label">Feedback ε</span><span class="detail-value">1.0 per user per epoch</span></div>
+      <div class="detail-row"><span class="detail-label">Spec status</span><span class="detail-value" style="color:var(--teal-glow)">WD-003 · Complete v0.1</span></div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span class="conn-label">abstract signals only ↑ · private context ↓</span></div>
+
+  <div class="privacy-boundary">
+    <div class="privacy-line"></div>
+    <div class="privacy-label">Sovereignty Boundary — nothing above here sees raw context</div>
+  </div>
+
+  <!-- LAYER 2 -->
+  <div class="layer" onclick="toggleLayer(this)" data-layer="2">
+    <div class="layer-num">2</div>
+    <div class="layer-main">
+      <h3>Latent Capacity Discovery</h3>
+      <div class="subtitle">AI surfaces capabilities you don't recognize</div>
+      <p>Analyzes behavioral patterns to identify unrecognized expertise, resources, and cooperative potential. Surfaces discoveries to the user first — "You seem to have developed expertise in X. Would you be open to being connected with others?" Respects agency while expanding awareness.</p>
+    </div>
+    <div class="layer-detail">
+      <div class="detail-row"><span class="detail-label">Input</span><span class="detail-value">Behavioral patterns, not self-report</span></div>
+      <div class="detail-row"><span class="detail-label">Output</span><span class="detail-value">Capability model + confidence scores</span></div>
+      <div class="detail-row"><span class="detail-label">Constraint</span><span class="detail-value">User sees & approves all discoveries</span></div>
+      <div class="detail-row"><span class="detail-label">Evidence</span><span class="detail-value">Dunning-Kruger, expertise blindness</span></div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span class="conn-label">enriches context model</span></div>
+
+  <!-- LAYER 1 -->
+  <div class="layer" onclick="toggleLayer(this)" data-layer="1">
+    <div class="layer-num">1</div>
+    <div class="layer-main">
+      <h3>Personal Context Engine</h3>
+      <div class="subtitle">Private, sovereign model of your situation</div>
+      <p>Your AI assistant builds a rich model of your skills, challenges, resources, trajectories, and cooperative preferences through normal conversation. This model is local and sovereign — it lives within your AI agent, never transmitted in full. Continuously updated without forms or profiles.</p>
+    </div>
+    <div class="layer-detail">
+      <div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">User's device / agent only</span></div>
+      <div class="detail-row"><span class="detail-label">Update method</span><span class="detail-value">Ambient (conversation-derived)</span></div>
+      <div class="detail-row"><span class="detail-label">Dimensions</span><span class="detail-value">Skills, needs, resources, trajectory, prefs</span></div>
+      <div class="detail-row"><span class="detail-label">Sovereignty</span><span class="detail-value">Never leaves user boundary in full</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Flow -->
+<div class="flow-section">
+  <h3>Data Flow: From Private Context to Cooperative Match</h3>
+  <div class="flow-diagram">
+    <div class="flow-node flow-private">Conversation<br><small>with AI assistant</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node flow-private">Context Model<br><small>L1: private, local</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node flow-private">Latent Discovery<br><small>L2: surfaces capabilities</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node flow-transform">Signal Generation<br><small>L3: context → vector</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node flow-public">Signal Exchange<br><small>L3: abstract, non-ID</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node flow-public">Match Discovery<br><small>L3: complementarity</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node flow-mutual">Handshake<br><small>L3: progressive reveal</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node flow-mutual">Connection<br><small>identified, consensual</small></div>
+  </div>
+</div>
+
+<!-- Integration -->
+<div class="integration-panel">
+  <h3>Integration with AI Standards</h3>
+  <div class="int-grid">
+    <div class="int-card">
+      <div class="int-name">MCP</div>
+      <div class="int-maps"><strong>Maps to:</strong> Layers 1-2. Personal context engine implements as MCP context resources. New <code>cooperative_context</code> resource type.</div>
+    </div>
+    <div class="int-card">
+      <div class="int-name">A2A</div>
+      <div class="int-maps"><strong>Maps to:</strong> Layer 3. Signal emission, relay, candidate notification, and handshake state transitions use A2A message types.</div>
+    </div>
+    <div class="int-card">
+      <div class="int-name">UCP</div>
+      <div class="int-maps"><strong>Maps to:</strong> Transport layer. UIE envelopes carry signal vectors through API → shared services → event bus → AI orchestration.</div>
+    </div>
+    <div class="int-card">
+      <div class="int-name">Trust Fabric</div>
+      <div class="int-maps"><strong>Maps to:</strong> Layer 4. Provides trust queries during handshake evaluation. ZK verification of relational trust chains.</div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:2rem;padding:1.5rem;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04)">
+  <p style="font-size:.75rem;color:var(--light)">
+    The Latent Value Network · Architecture Diagram · v0.1<br>
+    <span style="color:var(--teal)">Green layers</span> = sovereign (your device) · 
+    <span style="color:var(--gold)">Gold boundary</span> = transformation point · 
+    <span style="color:#A78BFA">Purple layers</span> = protocol/network · 
+    <span style="color:#4ADE80">Green flows</span> = mutual/consensual<br>
+    Click any layer to expand technical details
+  </p>
+</div>
+
+</div>
+
+<script>
+function toggleLayer(el) {
+  const wasActive = el.classList.contains('active');
+  document.querySelectorAll('.layer').forEach(l => l.classList.remove('active'));
+  if (!wasActive) el.classList.add('active');
+}
+</script>
+</body>
+</html>
