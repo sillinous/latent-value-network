@@ -96,47 +96,28 @@ lvn/
 
 ## Roadmap
 
-### Phase I — Foundation ← *We are here*
-> Now → Q2 2026
+### Current Status: Phase 0 Complete, Entering Phase 1
 
-- [x] Initial white paper (v0.1)
-- [x] Project hub and repository
-- [ ] Literature review: social capital, network theory, information economics
-- [ ] Working group formation across disciplines
-- [ ] White paper refinement through collaborative review
-- [ ] Problem quantification: measuring the Latent Value Gap
+See [ROADMAP.md](ROADMAP.md) for the full 4-phase plan.
 
-### Phase II — Protocol Design
-> Q2 → Q4 2026
+**Completed:**
+- [x] WD-001: Foundational White Paper (v0.1)
+- [x] WD-002: Evidence Base (22 academic citations, 6 evidence streams)
+- [x] WD-003: Signal Exchange Protocol Specification (Layer 3)
+- [x] WD-004: Explainer Video Script/Storyboard (2 min, 6 scenes)
+- [x] WD-005: Trust & Reputation Fabric Specification (Layer 4)
+- [x] Interactive concept demo
+- [x] 10 Provocations discussion document
+- [x] Architecture diagram
+- [x] GitHub repository with issue templates and 11 seeded discussions
+- [x] 6 audience-specific outreach posts
+- [x] Unified project hub website
 
-- [ ] Signal Exchange Protocol formal specification
-- [ ] Privacy-preserving computation approach selection
-- [ ] Game-theoretic incentive structure analysis
-- [ ] Ethical red-teaming (with veto power over architecture)
-- [ ] Integration mapping to MCP, A2A, ACP, UCP
-
-### Phase III — Integration Architecture
-> Q4 2026 → Q2 2027
-
-- [ ] Reference implementation of core protocol
-- [ ] AI assistant integration layer design
-- [ ] Developer documentation
-- [ ] Interoperability testing
-
-### Phase IV — Pilot Communities
-> 2027
-
-- [ ] Community selection and co-design process
-- [ ] Constrained domain pilot deployment
-- [ ] Impact measurement framework
-- [ ] Iteration based on practitioner feedback
-
-### Phase V — Open Protocol
-> 2027+
-
-- [ ] Public protocol release
-- [ ] Multi-platform implementation support
-- [ ] Governance transition to community stewardship
+**Next:**
+- [ ] WD-006: Governance Framework (Layer 5) — seeking authors
+- [ ] Working group formation (5 groups, see ROADMAP.md)
+- [ ] Community outreach to target audiences
+- [ ] First pilot community identification
 
 ## Contributing
 
@@ -161,7 +142,7 @@ lvn/
 4. **Submit a PR** with research, analysis, or specification work
 5. **Challenge the assumptions** — the most valuable contributions may be the ones that find flaws
 
-See [CONTRIBUTING.md](community/CONTRIBUTING.md) for detailed guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## Working Groups
 

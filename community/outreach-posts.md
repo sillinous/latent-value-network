@@ -28,8 +28,8 @@ The **Signal Exchange Protocol** (open spec, CC BY-SA 4.0) defines:
 2. What training objective produces an embedding space where *complementary* (not similar) situations cluster?
 3. How do you federate embedding model training without producing inconsistent signal spaces?
 
-Full spec: [link to WD-003]
-GitHub: [link to repo]
+Full spec: [https://github.com/sillinous/latent-value-network/blob/main/docs](https://github.com/sillinous/latent-value-network)
+GitHub: [https://github.com/sillinous/latent-value-network](https://github.com/sillinous/latent-value-network)
 
 We're looking for adversarial thinkers, not cheerleaders. If you think this can't work, we want to know why.
 
@@ -53,8 +53,8 @@ We've written a foundational white paper, an evidence base drawing on Chetty's s
 
 We need governance thinkers. Read our **10 Provocations** — especially #4 (equity), #6 (trust bootstrapping), #7 (protocol vs. platform), and #10 (where to pilot) — and tell us where we're getting it wrong.
 
-Full materials: [link to hub]
-GitHub: [link to repo]
+Full materials: [https://latent-value-network.netlify.app](https://latent-value-network.netlify.app)
+GitHub: [https://github.com/sillinous/latent-value-network](https://github.com/sillinous/latent-value-network)
 
 ---
 
@@ -77,8 +77,8 @@ GitHub: [link to repo]
 2. Input on whether the signal vector structure is compatible with how you're building agent systems
 3. Red-teaming of the privacy model — can the handshake protocol be implemented with current MCP capabilities?
 
-Protocol spec: [link to WD-003]
-GitHub: [link to repo]
+Protocol spec: [https://github.com/sillinous/latent-value-network/blob/main/docs](https://github.com/sillinous/latent-value-network)
+GitHub: [https://github.com/sillinous/latent-value-network](https://github.com/sillinous/latent-value-network)
 
 This is pre-implementation. We're soliciting architectural critique before writing code.
 
@@ -102,8 +102,8 @@ Your AI assistant (Claude, ChatGPT, whatever you use) already knows what you're 
 - What would break in your community? What would help?
 - Where should we pilot this first?
 
-Try the interactive demo: [link]
-Read the provocations (especially #4, #9, #10): [link]
+Try the interactive demo: [https://latent-value-network.netlify.app/demo](https://latent-value-network.netlify.app/demo)
+Read the provocations (especially #4, #9, #10): [https://latent-value-network.netlify.app/demo](https://latent-value-network.netlify.app/demo)
 
 We're not selling anything. This is an open protocol released under Creative Commons. We're looking for partners, not customers.
 
@@ -127,6 +127,6 @@ We've published four working documents, an interactive concept demo, and 10 open
 
 **Pilot opportunity:** We're looking for a community of ~500 people to run the first real-world test. Ideal: diverse population, existing cooperative culture, institutional trust anchors (library, community center, clinic). If your community might be interested, we want to talk.
 
-Hub: [link]
-GitHub: [link]
-Contact: [link to Discussion]
+Hub: [https://latent-value-network.netlify.app/demo](https://latent-value-network.netlify.app/demo)
+GitHub: [https://latent-value-network.netlify.app/demo](https://latent-value-network.netlify.app/demo)
+Contact: [https://github.com/sillinous/latent-value-network/discussions](https://github.com/sillinous/latent-value-network/discussions)
