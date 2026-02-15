@@ -106,6 +106,8 @@ See [ROADMAP.md](ROADMAP.md) for the full 4-phase plan.
 - [x] WD-003: Signal Exchange Protocol Specification (Layer 3)
 - [x] WD-004: Explainer Video Script/Storyboard (2 min, 6 scenes)
 - [x] WD-005: Trust & Reputation Fabric Specification (Layer 4)
+- [x] WD-006: Governance Framework (Layer 5)
+- [x] Reference Implementation Outline (MVP pseudocode architecture)
 - [x] Interactive concept demo
 - [x] 10 Provocations discussion document
 - [x] Architecture diagram
@@ -114,7 +116,6 @@ See [ROADMAP.md](ROADMAP.md) for the full 4-phase plan.
 - [x] Unified project hub website
 
 **Next:**
-- [ ] WD-006: Governance Framework (Layer 5) — seeking authors
 - [ ] Working group formation (5 groups, see ROADMAP.md)
 - [ ] Community outreach to target audiences
 - [ ] First pilot community identification

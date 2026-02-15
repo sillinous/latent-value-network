@@ -161,6 +161,7 @@ footer a{color:rgba(255,255,255,.4)}
 <script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
+<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;focus:position:relative;left:auto;top:auto;width:auto;height:auto;overflow:visible;">Skip to main content</a>
 
 <!-- ═══ NAV ═══ -->
 <nav>
@@ -180,7 +181,7 @@ footer a{color:rgba(255,255,255,.4)}
 </nav>
 
 <!-- ═══ HERO ═══ -->
-<section class="hero">
+<section class="hero" id="main-content" role="main">
   <div class="container">
     <div class="eyebrow">Open Cooperative Infrastructure for the AI Era</div>
     <h1>What if the help you need<br>is <em>already nearby?</em></h1>
@@ -189,7 +190,7 @@ footer a{color:rgba(255,255,255,.4)}
       but because neither party knows the other exists. We're designing the protocol to change that.
     </p>
     <div class="btns">
-      <a href="demo.html" class="btn btn-p">Try the Interactive Demo</a>
+      <a href="demo.html" class="btn btn-p" role="link">Try the Interactive Demo</a>
       <a href="#documents" class="btn btn-s">Read the Specification</a>
     </div>
     <div class="stat-row">
@@ -439,47 +440,47 @@ footer a{color:rgba(255,255,255,.4)}
     <p class="section-lead">These documents define the current state of the initiative. All are working drafts released under CC BY-SA 4.0. Critique is as valuable as contribution.</p>
 
     <div class="doc-grid">
-      <div class="doc-card" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md')">
+      <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md')">
         <div class="doc-id">WD-001</div>
         <div class="doc-title">Foundational White Paper</div>
         <div class="doc-desc">5,000 words defining the vision, architecture, and principles</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
-      <div class="doc-card" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-002-evidence-base.md')">
+      <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-002-evidence-base.md')">
         <div class="doc-id">WD-002</div>
         <div class="doc-title">Evidence Base</div>
         <div class="doc-desc">22 academic citations quantifying the Latent Value Gap across 6 domains</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
-      <div class="doc-card" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-003-signal-exchange-protocol.md')">
+      <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-003-signal-exchange-protocol.md')">
         <div class="doc-id">WD-003</div>
         <div class="doc-title">Signal Exchange Protocol</div>
         <div class="doc-desc">Formal specification for privacy-preserving cooperative matching</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
-      <div class="doc-card" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-004-explainer-script.md')">
+      <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-004-explainer-script.md')">
         <div class="doc-id">WD-004</div>
         <div class="doc-title">Explainer Script</div>
         <div class="doc-desc">2-minute animated storyboard for the concept video</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
-      <div class="doc-card" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-005-trust-fabric.md')">
+      <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-005-trust-fabric.md')">
         <div class="doc-id">WD-005</div>
         <div class="doc-title">Trust & Reputation Fabric</div>
         <div class="doc-desc">Layer 4: distributed contextual trust with ZK verification</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
-      <div class="doc-card" style="border:1.5px dashed var(--teal);">
+      <div class="doc-card" role="button" tabindex="0" style="border:1.5px dashed var(--teal);">
         <div class="doc-id" style="color:var(--gold)">WD-005</div>
         <div class="doc-title">Trust Fabric Spec</div>
-        <div class="doc-desc">Layer 4 specification — open for contributors</div>
-        <div class="doc-status draft">Seeking Authors</div>
+        <div class="doc-desc">Layer 4: distributed contextual trust with ZK verification</div>
+        <div class="doc-status done">Complete v0.1</div>
       </div>
-      <div class="doc-card" style="border:1.5px dashed var(--teal);">
+      <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-006-governance-framework.md')">
         <div class="doc-id" style="color:var(--gold)">WD-006</div>
         <div class="doc-title">Governance Framework</div>
-        <div class="doc-desc">Layer 5 specification — Ostrom-informed commons governance</div>
-        <div class="doc-status draft">Seeking Authors</div>
+        <div class="doc-desc">Layer 5: Ostrom-based commons governance, anti-capture mechanisms</div>
+        <div class="doc-status done">Complete v0.1</div>
       </div>
     </div>
   </div>
@@ -502,7 +503,7 @@ footer a{color:rgba(255,255,255,.4)}
     <div class="prov-preview"><span class="prov-num">05</span><div class="prov-q">Should matches include a price?</div><div class="prov-tease">Does adding value signals make exchanges more equitable — or commodify cooperation?</div></div>
 
     <div style="text-align:center;margin-top:1.5rem;">
-      <a href="provocations.html" class="btn btn-p" style="text-decoration:none">Read All 10 Provocations →</a>
+      <a href="provocations.html" class="btn btn-p" role="link" style="text-decoration:none">Read All 10 Provocations →</a>
     </div>
   </div>
 </section>
@@ -516,7 +517,7 @@ footer a{color:rgba(255,255,255,.4)}
     what cooperation looks like on the ground.
   </p>
   <div class="btns">
-    <a href="https://github.com/sillinous/latent-value-network" class="btn btn-p" style="text-decoration:none">Join on GitHub</a>
+    <a href="https://github.com/sillinous/latent-value-network" class="btn btn-p" role="link" style="text-decoration:none">Join on GitHub</a>
     <a href="demo.html" class="btn btn-s" style="text-decoration:none">Try the Demo</a>
     <a href="provocations.html" class="btn btn-s" style="text-decoration:none">Debate the Open Questions</a>
   </div>
