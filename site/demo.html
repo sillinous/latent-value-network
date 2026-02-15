@@ -718,8 +718,10 @@ footer .f-logo span { color: var(--teal); }
 <meta property="og:title" content="Interactive Demo — Latent Value Network">
 <meta property="og:description" content="Experience the Latent Value Gap firsthand. Discover cooperative connections you didn't know existed in a simulated community.">
 <meta property="og:type" content="website">
+<script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
+<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;&:focus{position:static;width:auto;height:auto}">Skip to content</a>
 <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,26,46,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(42,157,143,.15);padding:0 1.5rem">
   <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:50px">
     <a href="index.html" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.05rem;font-weight:700;color:white;text-decoration:none">Latent <span style="color:#34D1BF">Value</span> Network</a>
@@ -815,7 +817,7 @@ footer .f-logo span { color: var(--teal); }
         Now imagine an AI that could sense these connections — not by surveilling people,<br>
         but by understanding the situations they're <em>already sharing</em> with their AI assistant.
       </p>
-      <button class="btn-primary" onclick="showScreen('screen-profile')">
+      <button class="btn-primary" role="button" onclick="showScreen('screen-profile')">
         Try It With Your Own Situation →
       </button>
     </div>
@@ -842,29 +844,29 @@ footer .f-logo span { color: var(--teal); }
         <label>What are you good at?</label>
         <div class="hint">Select all that apply, or add your own. Think broadly — hobbies, work, life experience.</div>
         <div class="chip-container" id="skills-chips">
-          <div class="chip" data-v="home-repair">Home repair</div>
-          <div class="chip" data-v="cooking">Cooking</div>
-          <div class="chip" data-v="teaching">Teaching / explaining</div>
-          <div class="chip" data-v="tech-support">Tech support</div>
-          <div class="chip" data-v="gardening">Gardening</div>
-          <div class="chip" data-v="organizing">Organizing / planning</div>
-          <div class="chip" data-v="writing">Writing</div>
-          <div class="chip" data-v="finance">Financial planning</div>
-          <div class="chip" data-v="driving">Driving / logistics</div>
-          <div class="chip" data-v="healthcare">Healthcare knowledge</div>
-          <div class="chip" data-v="childcare">Childcare</div>
-          <div class="chip" data-v="coding">Programming</div>
-          <div class="chip" data-v="design">Design / creative</div>
-          <div class="chip" data-v="languages">Multiple languages</div>
-          <div class="chip" data-v="legal">Legal knowledge</div>
-          <div class="chip" data-v="farming">Farming / agriculture</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="home-repair">Home repair</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="cooking">Cooking</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="teaching">Teaching / explaining</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="tech-support">Tech support</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="gardening">Gardening</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="organizing">Organizing / planning</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="writing">Writing</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="finance">Financial planning</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="driving">Driving / logistics</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="healthcare">Healthcare knowledge</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="childcare">Childcare</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="coding">Programming</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="design">Design / creative</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="languages">Multiple languages</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="legal">Legal knowledge</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="farming">Farming / agriculture</div>
         </div>
         <div class="custom-input">
           <input type="text" id="custom-skill" placeholder="Add something else...">
           <button onclick="addCustomChip('skills-chips','custom-skill')">Add</button>
         </div>
       </div>
-      <button class="btn-primary" onclick="nextStep(2)" style="display:block;margin:1.5rem auto;">Continue →</button>
+      <button class="btn-primary" role="button" onclick="nextStep(2)" style="display:block;margin:1.5rem auto;">Continue →</button>
     </div>
 
     <!-- Step 2: Challenges / needs -->
@@ -873,27 +875,27 @@ footer .f-logo span { color: var(--teal); }
         <label>What are you dealing with right now?</label>
         <div class="hint">Challenges, projects, things you wish you had help with — big or small.</div>
         <div class="chip-container" id="needs-chips">
-          <div class="chip" data-v="home-maintenance">Home maintenance issues</div>
-          <div class="chip" data-v="career-change">Career transition</div>
-          <div class="chip" data-v="health-nav">Navigating healthcare</div>
-          <div class="chip" data-v="small-business">Growing a small business</div>
-          <div class="chip" data-v="parenting">Parenting challenges</div>
-          <div class="chip" data-v="loneliness">Feeling isolated</div>
-          <div class="chip" data-v="financial-stress">Financial stress</div>
-          <div class="chip" data-v="learning-tech">Learning new technology</div>
-          <div class="chip" data-v="elder-care">Elder care / aging parents</div>
-          <div class="chip" data-v="legal-issue">Legal situation</div>
-          <div class="chip" data-v="moving">Moving / relocation</div>
-          <div class="chip" data-v="side-project">Side project stuck</div>
-          <div class="chip" data-v="community">Want to give back</div>
-          <div class="chip" data-v="education">Education / credentials</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="home-maintenance">Home maintenance issues</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="career-change">Career transition</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="health-nav">Navigating healthcare</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="small-business">Growing a small business</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="parenting">Parenting challenges</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="loneliness">Feeling isolated</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="financial-stress">Financial stress</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="learning-tech">Learning new technology</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="elder-care">Elder care / aging parents</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="legal-issue">Legal situation</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="moving">Moving / relocation</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="side-project">Side project stuck</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="community">Want to give back</div>
+          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="education">Education / credentials</div>
         </div>
         <div class="custom-input">
           <input type="text" id="custom-need" placeholder="Add something else...">
           <button onclick="addCustomChip('needs-chips','custom-need')">Add</button>
         </div>
       </div>
-      <button class="btn-primary" onclick="nextStep(3)" style="display:block;margin:1.5rem auto;">Continue →</button>
+      <button class="btn-primary" role="button" onclick="nextStep(3)" style="display:block;margin:1.5rem auto;">Continue →</button>
     </div>
 
     <!-- Step 3: Context -->
@@ -903,7 +905,7 @@ footer .f-logo span { color: var(--teal); }
         <div class="hint">Optional. A sentence or two gives us more to work with. For example: "I just moved to a new town" or "I have a truck and free mornings."</div>
         <textarea class="context-textarea" id="context-input" placeholder="I have a lot of experience with...  /  I've been struggling with...  /  I have access to..."></textarea>
       </div>
-      <button class="btn-primary" onclick="startDiscovery()" style="display:block;margin:1.5rem auto;">Discover My Latent Value →</button>
+      <button class="btn-primary" role="button" onclick="startDiscovery()" style="display:block;margin:1.5rem auto;">Discover My Latent Value →</button>
     </div>
   </div>
 </div>
@@ -913,9 +915,9 @@ footer .f-logo span { color: var(--teal); }
 <!-- ═══════════════════════════════════════ -->
 <div id="screen-discovery" class="screen">
   <div class="container discovery-section" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh">
-    <canvas id="net-canvas" width="560" height="380" style="border-radius:12px;margin-bottom:1.2rem"></canvas>
+    <canvas id="net-canvas" aria-label="Network visualization showing connections forming between community members" width="560" height="380" style="border-radius:12px;margin-bottom:1.2rem"></canvas>
 
-    <div class="scan-status" id="scan-status">
+    <div class="scan-status" id="scan-status" aria-live="polite" role="status">
       Analyzing your situation...
     </div>
   </div>
@@ -966,9 +968,9 @@ footer .f-logo span { color: var(--teal); }
         engineers, and practitioners.
       </p>
       <div class="btn-group">
-        <button class="btn-primary" onclick="window.open('#whitepaper')">Read the White Paper</button>
-        <button class="btn-secondary" onclick="window.open('#github')">Join on GitHub</button>
-        <button class="btn-secondary" onclick="showScreen('screen-role')">Find Your Role →</button>
+        <button class="btn-primary" role="button" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md')">Read the White Paper</button>
+        <button class="btn-secondary" role="button" onclick="window.open('https://github.com/sillinous/latent-value-network')">Join on GitHub</button>
+        <button class="btn-secondary" role="button" onclick="showScreen('screen-role')">Find Your Role →</button>
       </div>
     </div>
   </div>
@@ -986,36 +988,36 @@ footer .f-logo span { color: var(--teal); }
       <label>What's your background?</label>
       <div class="hint">Select all that resonate — formal credentials aren't required.</div>
       <div class="chip-container" id="role-chips">
-        <div class="chip" data-v="ml-ai">AI / Machine Learning</div>
-        <div class="chip" data-v="crypto">Cryptography / Security</div>
-        <div class="chip" data-v="economics">Economics / Game Theory</div>
-        <div class="chip" data-v="network-sci">Network Science</div>
-        <div class="chip" data-v="ethics">Ethics / Philosophy</div>
-        <div class="chip" data-v="social-sci">Social Science / Psychology</div>
-        <div class="chip" data-v="systems-arch">Systems Architecture</div>
-        <div class="chip" data-v="community-org">Community Organizing</div>
-        <div class="chip" data-v="social-work">Social Work / Mutual Aid</div>
-        <div class="chip" data-v="product">Product Design / UX</div>
-        <div class="chip" data-v="policy">Public Policy</div>
-        <div class="chip" data-v="interested">Just interested / curious</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="ml-ai">AI / Machine Learning</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="crypto">Cryptography / Security</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="economics">Economics / Game Theory</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="network-sci">Network Science</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="ethics">Ethics / Philosophy</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="social-sci">Social Science / Psychology</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="systems-arch">Systems Architecture</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="community-org">Community Organizing</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="social-work">Social Work / Mutual Aid</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="product">Product Design / UX</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="policy">Public Policy</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="interested">Just interested / curious</div>
       </div>
     </div>
 
     <div class="input-group">
       <label>What excites you most?</label>
       <div class="chip-container" id="interest-chips">
-        <div class="chip" data-v="privacy">Making matching truly private</div>
-        <div class="chip" data-v="equity">Ensuring equity by design</div>
-        <div class="chip" data-v="trust">Building trust without surveillance</div>
-        <div class="chip" data-v="governance">Governing a digital commons</div>
-        <div class="chip" data-v="piloting">Running real-world pilots</div>
-        <div class="chip" data-v="measuring">Quantifying the gap</div>
-        <div class="chip" data-v="red-teaming">Breaking it (adversarial thinking)</div>
-        <div class="chip" data-v="integration">Making it work with existing AI</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="privacy">Making matching truly private</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="equity">Ensuring equity by design</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="trust">Building trust without surveillance</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="governance">Governing a digital commons</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="piloting">Running real-world pilots</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="measuring">Quantifying the gap</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="red-teaming">Breaking it (adversarial thinking)</div>
+        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="integration">Making it work with existing AI</div>
       </div>
     </div>
 
-    <button class="btn-primary" onclick="showRoleResult()" style="display:block;margin:2rem auto;">Show My Path →</button>
+    <button class="btn-primary" role="button" onclick="showRoleResult()" style="display:block;margin:2rem auto;">Show My Path →</button>
 
     <div id="role-result" style="display:none; margin-top:2rem;"></div>
   </div>
@@ -1507,6 +1509,18 @@ function showResults() {
 
   // Latent insight
   document.getElementById('latent-insight').textContent = buildLatentInsight();
+
+  // Add share button
+  const shareDiv = document.createElement('div');
+  shareDiv.style.cssText = 'text-align:center;margin:1.5rem 0;';
+  const shareText = `I discovered ${displayMatches.length} latent connections in the Latent Value Network demo — cooperative matches nobody would have searched for. Try it yourself:`;
+  const shareUrl = 'https://latent-value-network.netlify.app/demo';
+  if (navigator.share) {
+    shareDiv.innerHTML = `<button onclick="navigator.share({title:'My Latent Value Map',text:'${shareText}',url:'${shareUrl}'})" style="padding:.55rem 1.2rem;font-family:var(--font-body);font-size:.85rem;font-weight:600;background:var(--teal);color:white;border:none;border-radius:5px;cursor:pointer">Share Your Results</button>`;
+  } else {
+    shareDiv.innerHTML = `<button onclick="navigator.clipboard.writeText('${shareText} ${shareUrl}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Share Link',1500)})" style="padding:.55rem 1.2rem;font-family:var(--font-body);font-size:.85rem;font-weight:600;background:var(--teal);color:white;border:none;border-radius:5px;cursor:pointer">Copy Share Link</button>`;
+  }
+  container.parentElement.insertBefore(shareDiv, container.nextSibling);
 }
 
 // ── Role finder ──
@@ -1516,56 +1530,98 @@ function showRoleResult() {
   const interests = [];
   document.querySelectorAll('#interest-chips .chip.selected').forEach(c => interests.push(c.dataset.v));
 
+  // Also pull in skills from the earlier profile to auto-suggest
+  const sk = state.skills;
+  if (sk.has('coding') || sk.has('tech-support')) roles.push('systems-arch');
+  if (sk.has('design')) roles.push('product');
+  if (sk.has('teaching') || sk.has('childcare')) roles.push('community-org');
+  if (sk.has('organizing') || sk.has('legal')) roles.push('policy');
+  if (sk.has('finance')) roles.push('economics');
+  if (sk.has('healthcare')) roles.push('social-work');
+  if (sk.has('farming') || sk.has('gardening') || sk.has('home-repair')) roles.push('community-org');
+  if (sk.has('writing')) roles.push('community-org');
+
   const roleMap = {
-    'ml-ai': { group: 'AI Integration', focus: 'Context engines, embedding models, agent architectures', oqs: ['OQ-1: Embedding Model Governance', 'OQ-2: Semantic Matching Under Encryption'] },
-    'crypto': { group: 'Privacy & Cryptography', focus: 'Signal protocol, ZK matching, threat modeling', oqs: ['OQ-2: Semantic Matching Under Encryption', 'OQ-4: Cross-Community Signal Compatibility'] },
-    'economics': { group: 'Theory & Foundations', focus: 'Mechanism design, incentive structures, value exchange', oqs: ['OQ-5: Value Exchange Integration', 'OQ-6: Governance of Parameter Evolution'] },
-    'network-sci': { group: 'Theory & Foundations', focus: 'Graph theory, topology optimization, diffusion dynamics', oqs: ['OQ-4: Cross-Community Signal Compatibility'] },
-    'ethics': { group: 'Ethics & Equity', focus: 'Red-teaming, equity analysis, harm inversion', oqs: ['OQ-5: Value Exchange Integration', 'OQ-3: Cold Start for Individuals'] },
-    'social-sci': { group: 'Ethics & Equity', focus: 'Trust formation, adoption research, behavioral analysis', oqs: ['OQ-3: Cold Start for Individuals'] },
-    'systems-arch': { group: 'AI Integration', focus: 'Protocol design, MCP/A2A integration, distributed systems', oqs: ['OQ-4: Cross-Community Signal Compatibility', 'OQ-6: Governance of Parameter Evolution'] },
-    'community-org': { group: 'Community & Practice', focus: 'Pilot design, practitioner input, impact measurement', oqs: ['OQ-3: Cold Start for Individuals', 'OQ-5: Value Exchange Integration'] },
-    'social-work': { group: 'Community & Practice', focus: 'Grounding the architecture in real-world needs', oqs: ['OQ-3: Cold Start for Individuals'] },
-    'product': { group: 'AI Integration', focus: 'User experience of progressive disclosure, consent flows', oqs: ['OQ-3: Cold Start for Individuals'] },
-    'policy': { group: 'Ethics & Equity', focus: 'Regulatory considerations, governance frameworks', oqs: ['OQ-6: Governance of Parameter Evolution'] },
-    'interested': { group: 'Community & Practice', focus: 'Discussion, feedback, spreading the word', oqs: [] },
+    'ml-ai': { group: 'AI Integration', focus: 'Context engines, embedding models, agent architectures', oqs: ['OQ-1: Embedding Model Governance', 'OQ-2: Semantic Matching Under Encryption'], provs: ['#2', '#8'], doc: 'WD-003' },
+    'crypto': { group: 'Privacy & Cryptography', focus: 'Signal protocol, ZK matching, threat modeling', oqs: ['OQ-2: Semantic Matching Under Encryption', 'OQ-4: Cross-Community Signal Compatibility'], provs: ['#2', '#3'], doc: 'WD-003' },
+    'economics': { group: 'Theory & Foundations', focus: 'Mechanism design, incentive structures, value exchange', oqs: ['OQ-5: Value Exchange Integration', 'OQ-6: Governance of Parameter Evolution'], provs: ['#5', '#9'], doc: 'WD-002' },
+    'network-sci': { group: 'Theory & Foundations', focus: 'Graph theory, topology optimization, diffusion dynamics', oqs: ['OQ-4: Cross-Community Signal Compatibility'], provs: ['#1', '#9'], doc: 'WD-002' },
+    'ethics': { group: 'Ethics & Equity', focus: 'Red-teaming, equity analysis, harm inversion', oqs: ['OQ-5: Value Exchange Integration', 'OQ-3: Cold Start for Individuals'], provs: ['#3', '#4', '#6'], doc: 'WD-005' },
+    'social-sci': { group: 'Ethics & Equity', focus: 'Trust formation, adoption research, behavioral analysis', oqs: ['OQ-3: Cold Start for Individuals'], provs: ['#6', '#4'], doc: 'WD-005' },
+    'systems-arch': { group: 'AI Integration', focus: 'Protocol design, MCP/A2A integration, distributed systems', oqs: ['OQ-4: Cross-Community Signal Compatibility', 'OQ-6: Governance of Parameter Evolution'], provs: ['#7', '#8'], doc: 'WD-003' },
+    'community-org': { group: 'Community & Practice', focus: 'Pilot design, practitioner input, impact measurement', oqs: ['OQ-3: Cold Start for Individuals', 'OQ-5: Value Exchange Integration'], provs: ['#10', '#4'], doc: 'WD-001' },
+    'social-work': { group: 'Community & Practice', focus: 'Grounding the architecture in real-world needs', oqs: ['OQ-3: Cold Start for Individuals'], provs: ['#4', '#10'], doc: 'WD-001' },
+    'product': { group: 'AI Integration', focus: 'User experience of progressive disclosure, consent flows', oqs: ['OQ-3: Cold Start for Individuals'], provs: ['#3', '#8'], doc: 'WD-003' },
+    'policy': { group: 'Ethics & Equity', focus: 'Regulatory considerations, governance frameworks', oqs: ['OQ-6: Governance of Parameter Evolution'], provs: ['#7', '#5'], doc: 'WD-005' },
+    'interested': { group: 'Community & Practice', focus: 'Discussion, feedback, spreading the word', oqs: [], provs: ['#9', '#10'], doc: 'WD-001' },
   };
+
+  // Deduplicate roles
+  const uniqueRoles = [...new Set(roles)];
 
   let html = '<div style="background:white;border-radius:12px;padding:2rem;border:1px solid rgba(0,0,0,0.06);box-shadow:0 2px 12px rgba(0,0,0,0.04);">';
   html += '<h3 style="font-family:var(--font-display);font-size:1.4rem;color:var(--navy);margin-bottom:1rem;">Your Path Into the LVN</h3>';
 
-  if (roles.length === 0 && interests.length === 0) {
+  if (uniqueRoles.length === 0 && interests.length === 0) {
     html += '<p style="color:var(--mid-text);">Select some options above and we\'ll map your path!</p>';
   } else {
-    const groups = new Set();
+    const groups = new Map();
     const allOqs = new Set();
-    roles.forEach(r => {
+    const allProvs = new Set();
+    let startDoc = 'WD-001';
+    uniqueRoles.forEach(r => {
       if (roleMap[r]) {
-        groups.add(roleMap[r].group);
-        roleMap[r].oqs.forEach(o => allOqs.add(o));
+        const rm = roleMap[r];
+        if (!groups.has(rm.group)) groups.set(rm.group, rm.focus);
+        rm.oqs.forEach(o => allOqs.add(o));
+        rm.provs.forEach(p => allProvs.add(p));
+        startDoc = rm.doc;
       }
     });
 
-    html += '<div style="margin-bottom:1rem;">';
-    html += '<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Recommended Working Group(s)</div>';
-    [...groups].forEach(g => {
-      html += `<span style="display:inline-block;padding:0.3rem 0.8rem;background:rgba(42,157,143,0.1);color:var(--teal);font-weight:600;border-radius:12px;margin:0.2rem 0.3rem 0.2rem 0;font-size:0.85rem;">${g}</span>`;
+    // Working groups with focus areas
+    html += '<div style="margin-bottom:1.2rem;">';
+    html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">Recommended Working Group(s)</div>';
+    [...groups.entries()].forEach(([g, focus]) => {
+      html += `<div style="margin-bottom:.5rem;padding:0.6rem 0.8rem;background:rgba(42,157,143,0.06);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;">`;
+      html += `<div style="font-weight:600;color:var(--teal);font-size:0.88rem;">${g}</div>`;
+      html += `<div style="font-size:0.78rem;color:var(--mid-text);margin-top:0.15rem;">${focus}</div>`;
+      html += `</div>`;
     });
     html += '</div>';
 
+    // Provocations to start with
+    if (allProvs.size > 0) {
+      html += '<div style="margin-bottom:1rem;">';
+      html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Start With These Provocations</div>';
+      html += '<div style="font-size:0.85rem;color:var(--mid-text);">Join the discussion on Provocations ';
+      html += [...allProvs].join(', ');
+      html += ' — <a href="provocations.html" style="color:var(--teal);">read them here</a> or <a href="https://github.com/sillinous/latent-value-network/discussions" style="color:var(--teal);">debate on GitHub</a>.</div>';
+      html += '</div>';
+    }
+
     if (allOqs.size > 0) {
       html += '<div style="margin-bottom:1rem;">';
-      html += '<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Open Questions You Could Help Solve</div>';
+      html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--slate);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Open Research Questions For You</div>';
       [...allOqs].forEach(oq => {
-        html += `<div style="padding:0.4rem 0;font-size:0.9rem;color:var(--mid-text);border-bottom:1px solid rgba(0,0,0,0.04);">${oq}</div>`;
+        html += `<div style="padding:0.35rem 0;font-size:0.85rem;color:var(--mid-text);border-bottom:1px solid rgba(0,0,0,0.04);">${oq}</div>`;
       });
       html += '</div>';
     }
 
+    // Non-GitHub path + GitHub path
     html += '<div style="margin-top:1.5rem;padding:1rem;background:var(--warm-gray);border-radius:8px;">';
-    html += '<div style="font-size:0.9rem;color:var(--mid-text);line-height:1.6;">';
-    html += '<strong style="color:var(--navy);">Next step:</strong> Read the White Paper (WD-001) and Protocol Specification (WD-003), then open a Discussion on GitHub introducing yourself and which open questions intrigue you. The working groups are forming now — early voices shape the direction.';
-    html += '</div></div>';
+    html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--navy);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">Your Next Steps</div>';
+    html += '<div style="font-size:0.88rem;color:var(--mid-text);line-height:1.6;">';
+    html += `<strong style="color:var(--navy);">1.</strong> Read <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/${startDoc.replace('-','')}-${startDoc === 'WD-001' ? 'white-paper' : startDoc === 'WD-002' ? 'evidence-base' : startDoc === 'WD-003' ? 'signal-exchange-protocol' : 'trust-fabric'}.md" style="color:var(--teal);">${startDoc}</a> — the document most relevant to your path.<br>`;
+    html += `<strong style="color:var(--navy);">2.</strong> Pick a provocation and join the debate.<br>`;
+    html += `<strong style="color:var(--navy);">3.</strong> Introduce yourself:`;
+    html += '</div>';
+    html += '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;">';
+    html += '<a href="https://github.com/sillinous/latent-value-network/issues/new?template=introduction.md" style="display:inline-block;padding:.45rem 1rem;font-size:.82rem;font-weight:600;background:var(--navy);color:white;border-radius:5px;text-decoration:none;">Introduce on GitHub</a>';
+    html += '<a href="mailto:latentvaluenetwork@proton.me?subject=LVN Introduction&body=Hi! I\'m interested in contributing to the LVN.%0A%0AMy background: %0AMy interest: %0AWorking group: ' + encodeURIComponent([...groups.keys()].join(', ')) + '" style="display:inline-block;padding:.45rem 1rem;font-size:.82rem;font-weight:600;background:transparent;color:var(--navy);border:1.5px solid var(--navy);border-radius:5px;text-decoration:none;">Introduce via Email</a>';
+    html += '</div>';
+    html += '</div>';
   }
 
   html += '</div>';
@@ -1575,6 +1631,15 @@ function showRoleResult() {
   resultEl.style.display = 'block';
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
+
+// Keyboard accessibility for chips
+document.addEventListener('keydown', function(e) {
+  if (e.target.classList.contains('chip') && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    e.target.click();
+    e.target.setAttribute('aria-checked', e.target.classList.contains('selected') ? 'true' : 'false');
+  }
+});
 </script>
 
 </body>
