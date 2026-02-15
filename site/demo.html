@@ -912,15 +912,8 @@ footer .f-logo span { color: var(--teal); }
 <!-- SCREEN 3: SCANNING -->
 <!-- ═══════════════════════════════════════ -->
 <div id="screen-discovery" class="screen">
-  <div class="container discovery-section">
-    <h2>Scanning for latent connections...</h2>
-
-    <div class="scanning-animation">
-      <div class="scan-ring"></div>
-      <div class="scan-ring"></div>
-      <div class="scan-ring"></div>
-      <div class="scan-center"></div>
-    </div>
+  <div class="container discovery-section" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh">
+    <canvas id="net-canvas" width="560" height="380" style="border-radius:12px;margin-bottom:1.2rem"></canvas>
 
     <div class="scan-status" id="scan-status">
       Analyzing your situation...
@@ -1310,10 +1303,123 @@ function buildLatentInsight() {
   return insights.slice(0, 2).join(" ");
 }
 
+// ── Network canvas visualization ──
+let canvasAnim;
+function runNetCanvas(matchedNames) {
+  const canvas = document.getElementById('net-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = Math.min(560, window.innerWidth - 40);
+  const H = canvas.height = 380;
+  const cx = W/2, cy = H/2;
+
+  // Build nodes: you in center, community around
+  const nodes = [{x:cx, y:cy, r:12, color:'#E9C46A', label:'You', matched:true}];
+  communityMembers.forEach((m, i) => {
+    const angle = (i / communityMembers.length) * Math.PI * 2 - Math.PI/2;
+    const baseR = 110 + Math.random() * 40;
+    nodes.push({
+      x: cx + Math.cos(angle) * baseR,
+      y: cy + Math.sin(angle) * baseR,
+      r: matchedNames.has(m.name) ? 9 : 5,
+      color: matchedNames.has(m.name) ? '#2A9D8F' : 'rgba(255,255,255,0.1)',
+      label: m.name,
+      matched: matchedNames.has(m.name),
+      emoji: m.emoji,
+    });
+  });
+
+  // Edges to matched nodes
+  const edges = [];
+  let ei = 0;
+  communityMembers.forEach((m, i) => {
+    if (matchedNames.has(m.name)) {
+      edges.push({from:0, to:i+1, delay:ei*350, alpha:0});
+      ei++;
+    }
+  });
+
+  let t0 = null;
+  function draw(ts) {
+    if (!t0) t0 = ts;
+    const el = ts - t0;
+    ctx.clearRect(0,0,W,H);
+
+    // Background
+    ctx.fillStyle = '#0F1A2E';
+    ctx.fillRect(0,0,W,H);
+
+    // Subtle grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.015)';
+    ctx.lineWidth = 1;
+    for (let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for (let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Draw edges (animate in after 600ms)
+    edges.forEach(e => {
+      const t = Math.max(0, el - 600 - e.delay);
+      e.alpha = Math.min(1, t/400);
+      if (e.alpha <= 0) return;
+      const n0 = nodes[e.from], n1 = nodes[e.to];
+      const progress = Math.min(1, t/350);
+      const dx = n1.x-n0.x, dy = n1.y-n0.y;
+      const grad = ctx.createLinearGradient(n0.x,n0.y,n1.x,n1.y);
+      grad.addColorStop(0, 'rgba(233,196,106,'+e.alpha*0.6+')');
+      grad.addColorStop(1, 'rgba(42,157,143,'+e.alpha*0.6+')');
+      ctx.beginPath();
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.moveTo(n0.x, n0.y);
+      ctx.lineTo(n0.x+dx*progress, n0.y+dy*progress);
+      ctx.stroke();
+      if (progress >= 1) {
+        ctx.beginPath();ctx.strokeStyle='rgba(42,157,143,'+e.alpha*0.12+')';ctx.lineWidth=6;
+        ctx.moveTo(n0.x,n0.y);ctx.lineTo(n1.x,n1.y);ctx.stroke();
+      }
+    });
+
+    // Draw nodes
+    nodes.forEach((n, i) => {
+      const appear = Math.min(1, el/(200+i*40));
+      ctx.globalAlpha = appear;
+      // Glow for matched
+      if (n.matched && i>0 && el > 600) {
+        ctx.beginPath();ctx.arc(n.x,n.y,(n.r+5)*appear,0,Math.PI*2);
+        ctx.fillStyle='rgba(42,157,143,0.12)';ctx.fill();
+      }
+      // You glow
+      if (i===0) {
+        ctx.beginPath();ctx.arc(n.x,n.y,20*appear,0,Math.PI*2);
+        ctx.fillStyle='rgba(233,196,106,0.08)';ctx.fill();
+      }
+      // Node
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r*appear,0,Math.PI*2);
+      ctx.fillStyle=n.color;ctx.fill();
+      // Label
+      if (n.matched || i===0) {
+        ctx.fillStyle = i===0?'#E9C46A':'rgba(255,255,255,0.6)';
+        ctx.font = (i===0?'600 10':'500 8')+'px "DM Sans",sans-serif';
+        ctx.textAlign='center';
+        ctx.fillText(n.label, n.x, n.y+n.r+12);
+      }
+      ctx.globalAlpha = 1;
+    });
+
+    canvasAnim = requestAnimationFrame(draw);
+  }
+  cancelAnimationFrame(canvasAnim);
+  requestAnimationFrame(draw);
+}
+
 // ── Discovery flow ──
 function startDiscovery() {
   state.context = document.getElementById('context-input').value;
   showScreen('screen-discovery');
+
+  // Pre-compute matches so we know who to highlight
+  const preMatches = generateMatches();
+  const matchedNames = new Set(preMatches.map(m => m.member.name));
+  runNetCanvas(matchedNames);
 
   const statusEl = document.getElementById('scan-status');
   const messages = [
@@ -1332,6 +1438,7 @@ function startDiscovery() {
       statusEl.innerHTML = messages[i];
     } else {
       clearInterval(interval);
+      cancelAnimationFrame(canvasAnim);
       showResults();
     }
   }, 1200);
