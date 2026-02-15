@@ -17,3 +17,8 @@
   from = "/provocations"
   to = "/provocations.html"
   status = 200
+
+[[redirects]]
+  from = "/architecture"
+  to = "/architecture.html"
+  status = 200

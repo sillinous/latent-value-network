@@ -49,7 +49,7 @@ The LVN has completed its initial specification phase and is transitioning to co
 | Community & Practice | Pilot design, practitioner input, impact | 5-10 organizers | Pilot community identification and assessment |
 
 **Milestones:**
-- [ ] WD-006: Governance Framework specification drafted (Layer 5)
+- [x] WD-006: Governance Framework specification drafted (Layer 5)
 - [ ] LVN Cooperative Taxonomy v0.1 (shared by L3 signal filters and L4 trust domains)
 - [ ] Community Charter establishing decision-making processes
 - [ ] At least 3 Provocation discussions with substantive multi-participant debate

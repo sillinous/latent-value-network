@@ -1,34 +1,25 @@
 ---
-name: Introduction
-about: Introduce yourself and find your working group
-title: "[INTRO] "
-labels: introduction, community
-assignees: ''
+name: "\U0001F44B Introduction"
+about: Tell us who you are and how you'd like to contribute
+title: "Introduction: [Your Name]"
+labels: introduction
 ---
 
-## Hi! 👋
+## About You
 
-<!-- Tell us a bit about yourself. No credentials required — just what draws you to this. -->
+**Background/expertise:**
+<!-- What's your professional or academic background? -->
 
-## What brought you here?
+**What interests you about the LVN?**
+<!-- What drew you here? A specific provocation, the technical challenge, the social vision? -->
 
-<!-- How did you find the LVN? What resonated? -->
+**Working group interest:**
+<!-- Which group(s) align with your skills? See ROADMAP.md for details. -->
+<!-- Options: AI Integration, Privacy & Cryptography, Theory & Foundations, Ethics & Equity, Community & Practice -->
 
-## Where do you want to contribute?
+**What document caught your attention?**
+<!-- Our working documents: WD-001 White Paper, WD-002 Evidence Base, WD-003 Signal Exchange Protocol, WD-004 Explainer Script, WD-005 Trust Fabric, WD-006 Governance Framework -->
 
-<!-- Check all that apply -->
+## How You'd Like to Contribute
 
-- [ ] **AI Integration** — Context engines, embedding models, MCP/A2A integration
-- [ ] **Privacy & Cryptography** — Signal protocol, ZK matching, threat modeling
-- [ ] **Theory & Foundations** — Mechanism design, network science, incentive structures
-- [ ] **Ethics & Equity** — Red-teaming, equity analysis, governance design
-- [ ] **Community & Practice** — Pilot design, practitioner input, impact measurement
-- [ ] **Not sure yet** — I want to read more first
-
-## Which open question interests you most?
-
-<!-- Optional: reference a provocation number or OQ from the spec -->
-
-## Anything else?
-
-<!-- Questions, concerns, ideas, criticisms — all welcome. -->
+<!-- Examples: critique the protocol spec, propose alternative approaches, connect us with relevant communities, run adversarial analysis, help with pilot design, etc. -->

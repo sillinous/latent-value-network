@@ -1,27 +1,24 @@
 ---
-name: Open Question Response
-about: Respond to one of the LVN's open questions or provocations
-title: "[OQ-#] "
-labels: open-question, discussion
-assignees: ''
+name: "\U00002753 Open Question Response"
+about: Respond to one of the 10 provocations or open questions
+title: "[OQ-#]: "
+labels: open-question
 ---
 
-## Which Open Question?
+## Which Provocation / Open Question?
 
-<!-- Reference by number (OQ-1 through OQ-6 from the Protocol Spec, or Provocation 1-10) -->
+<!-- Reference the provocation number (1-10) or open question from any WD. 
+     Provocations: https://github.com/sillinous/latent-value-network/discussions
+     Protocol open questions: WD-003 Section XIII
+     Trust open questions: WD-005 Section IX
+     Governance open questions: WD-006 Section VIII -->
 
-## Your Position
-
-<!-- Which position (A, B, C) do you lean toward, or do you have a new one? -->
+**Position (A / B / C / Other):**
 
 ## Your Argument
 
-<!-- What's the strongest case for your position? What failure modes does it defend against? -->
+<!-- Make the case. Reference evidence where possible. -->
 
-## What You're Worried About
+## What Would Change Your Mind?
 
-<!-- What's the biggest risk of the approach you're advocating? Be honest about the tradeoffs. -->
-
-## Your Background (Optional)
-
-<!-- What perspective do you bring to this question? Not credentials — just relevant context. -->
+<!-- What evidence or argument would shift your position? -->

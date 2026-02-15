@@ -1,31 +1,33 @@
 ---
-name: Technical Proposal
-about: Propose a specific technical approach for a protocol component
-title: "[PROPOSAL] "
-labels: proposal, technical
-assignees: ''
+name: "\U0001F527 Technical Proposal"
+about: Propose a specific change to the protocol, architecture, or specifications
+title: "[Proposal]: "
+labels: technical-proposal
 ---
 
-## Component
+## Which Specification?
 
-<!-- Which protocol layer or component does this address? (L1-L5, Signal Generation, Match Discovery, etc.) -->
+<!-- WD-001 White Paper, WD-002 Evidence Base, WD-003 Signal Exchange Protocol, 
+     WD-004 Explainer, WD-005 Trust Fabric, WD-006 Governance, 
+     Reference Implementation, or new component -->
 
-## Problem Statement
+## Summary
 
-<!-- What specific problem or gap in the current specification does this address? -->
+<!-- One paragraph: what are you proposing and why? -->
 
-## Proposed Approach
+## Detailed Proposal
 
-<!-- Describe your technical approach. Include pseudocode, diagrams, or references as appropriate. -->
+<!-- Technical details. Include pseudocode, diagrams, or formal notation as appropriate. -->
 
-## Privacy Analysis
+## Impact Analysis
 
-<!-- How does this approach interact with the privacy requirements (P1-P5)? -->
+<!-- What does this change affect? Which layers, parameters, or components?
+     Reference specific sections of the working documents. -->
 
-## Tradeoffs
+## Trade-offs
 
-<!-- What does this approach sacrifice? What alternatives did you consider? -->
+<!-- What does this proposal sacrifice? Every design decision has costs. -->
 
-## Implementation Complexity
+## Related Work
 
-<!-- Rough estimate: how hard is this to implement? What dependencies does it require? -->
+<!-- Relevant papers, implementations, or standards. -->

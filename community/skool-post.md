@@ -84,3 +84,12 @@ The goal at this stage isn’t code. It’s **rigorous conceptual development** 
 Looking forward to hearing what you all think. Challenge it. Break it. Make it better.
 
 — Travis
+
+---
+
+**Links:**
+- GitHub Repository: https://github.com/sillinous/latent-value-network
+- Project Hub: https://latent-value-network.netlify.app
+- Interactive Demo: https://latent-value-network.netlify.app/demo
+- 10 Provocations: https://latent-value-network.netlify.app/provocations
+- Working Documents: WD-001 through WD-006 available in the repo's docs/ folder

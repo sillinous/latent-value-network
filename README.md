@@ -108,6 +108,7 @@ See [ROADMAP.md](ROADMAP.md) for the full 4-phase plan.
 - [x] WD-005: Trust & Reputation Fabric Specification (Layer 4)
 - [x] WD-006: Governance Framework (Layer 5)
 - [x] Reference Implementation Outline (MVP pseudocode architecture)
+- [x] Research Landscape (related work and positioning)
 - [x] Interactive concept demo
 - [x] 10 Provocations discussion document
 - [x] Architecture diagram

@@ -45,7 +45,7 @@ Submit a PR to the `specs/` directory with:
 
 ### 4. Working Group Participation
 
-Join or form a working group focused on a specific aspect of the project. Current groups and how to join are listed in `community/working-groups/`.
+Join or form a working group focused on a specific aspect of the project. Current groups, milestones, and timeline are in [ROADMAP.md](ROADMAP.md). The five working groups are: AI Integration, Privacy & Cryptography, Theory & Foundations, Ethics & Equity, and Community & Practice.
 
 ## Contribution Guidelines
 
