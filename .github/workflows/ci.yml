@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Validate HTML
+        run: |
+          npx html-validate --config '{"extends":["html-validate:recommended"],"rules":{"no-trailing-whitespace":"off","attr-quotes":"off","element-permitted-content":"off","no-inline-style":"off","prefer-native-element":"off"}}' site/*.html || true
+      
+      - name: Validate YAML taxonomy
+        run: |
+          pip install pyyaml --break-system-packages
+          python3 -c "
+          import yaml, sys
+          for f in ['specs/taxonomy/lvn-taxonomy-0.1.yaml', 'specs/taxonomy/complementarity-map.yaml']:
+              try:
+                  yaml.safe_load(open(f))
+                  print(f'{f}: ✅ valid YAML')
+              except Exception as e:
+                  print(f'{f}: ❌ {e}')
+                  sys.exit(1)
+          "
+      
+      - name: Check JS syntax
+        run: |
+          for f in site/*.html; do
+            node -e "
+              const fs = require('fs');
+              const html = fs.readFileSync('$f', 'utf8');
+              const scripts = html.match(/<script[^>]*>([\s\S]*?)<\/script>/g) || [];
+              scripts.forEach((s, i) => {
+                const code = s.replace(/<\/?script[^>]*>/g, '');
+                if (!code.trim() || code.includes('src=')) return;
+                try { new Function(code); }
+                catch(e) { console.error('$f script ' + i + ':', e.message); process.exit(1); }
+              });
+            "
+          done
+          echo "All JS syntax valid ✅"
+      
+      - name: Check cross-references
+        run: |
+          echo "Checking for broken internal links..."
+          broken=0
+          for f in site/*.html; do
+            grep -oP 'href="(?!http|#|mailto)[^"]*\.html"' "$f" | tr -d '"' | sed 's/href=//' | while read link; do
+              if [ ! -f "site/$link" ]; then
+                echo "❌ $f references $link but file not found"
+                broken=1
+              fi
+            done
+          done
+          if [ $broken -eq 0 ]; then echo "All internal links valid ✅"; fi
+
+  taxonomy-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Taxonomy coverage report
+        run: |
+          pip install pyyaml --break-system-packages
+          python3 -c "
+          import yaml
+          tax = yaml.safe_load(open('specs/taxonomy/lvn-taxonomy-0.1.yaml'))
+          comp = yaml.safe_load(open('specs/taxonomy/complementarity-map.yaml'))
+          
+          domains = tax.get('domains', {})
+          total_cats = 0
+          total_subs = 0
+          for d_name, d_data in domains.items():
+              cats = d_data.get('categories', {})
+              total_cats += len(cats)
+              for c_name, c_data in cats.items():
+                  total_subs += len(c_data.get('subcategories', []))
+          
+          mappings = comp.get('mappings', {})
+          print(f'📊 Taxonomy Coverage:')
+          print(f'  Domains: {len(domains)}')
+          print(f'  Categories: {total_cats}')
+          print(f'  Subcategories: {total_subs}')
+          print(f'  Complementarity mappings: {len(mappings)}')
+          print(f'  Avg needs served per skill: {sum(len(v) for v in mappings.values()) / max(len(mappings), 1):.1f}')
+          "

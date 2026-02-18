@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://latent-value-network.netlify.app/sitemap.xml

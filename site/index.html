@@ -399,6 +399,79 @@ footer a{color:rgba(255,255,255,.4)}
 .tl-tag.community { background: rgba(61,90,128,0.1); color: var(--slate, #3D5A80); }
 .tl-tag.infra { background: rgba(27,42,74,0.08); color: var(--navy, #1B2A4A); }
 
+
+/* ── FAQ Section ── */
+.faq { padding: 2rem 0; }
+.faq h2 {
+  font-family: var(--f-d, 'Cormorant Garamond', serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+.faq-item {
+  border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  transition: box-shadow 200ms;
+}
+.faq-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.faq-q {
+  padding: 1rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-card, white);
+  user-select: none;
+}
+.faq-q::after {
+  content: '+';
+  font-family: var(--f-m, monospace);
+  font-size: 1.1rem;
+  color: var(--teal, #2A9D8F);
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+.faq-item.open .faq-q::after { transform: rotate(45deg); }
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 400ms cubic-bezier(0.16, 1, 0.3, 1), padding 300ms;
+  padding: 0 1.2rem;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--mid, #5A6577);
+}
+.faq-item.open .faq-a {
+  max-height: 300px;
+  padding: 0 1.2rem 1rem;
+}
+.faq-compare {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}
+.faq-compare-col {
+  padding: 0.6rem;
+  border-radius: 6px;
+  background: var(--bg-subtle, #F0EDE8);
+}
+.faq-compare-col strong {
+  display: block;
+  font-size: 0.72rem;
+  margin-bottom: 0.3rem;
+  color: var(--teal, #2A9D8F);
+}
+@media (max-width: 768px) {
+  .faq-compare { grid-template-columns: 1fr; }
+}
+
 </style>
 <script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -841,6 +914,50 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ JOIN ═══ -->
+
+  
+  <section class="faq reveal stagger-3">
+    <div class="container">
+      <h2>Common Questions</h2>
+      
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How is this different from LinkedIn, Nextdoor, or a timebank?</div>
+        <div class="faq-a">
+          Those platforms require you to explicitly search for what you need. The LVN works in the opposite direction — your AI assistant already understands your context and can discover cooperative opportunities you'd never think to search for. You don't post a listing; connections surface ambientally. Plus, privacy is architectural (your data never leaves your device), not policy-based.
+          <div class="faq-compare">
+            <div class="faq-compare-col"><strong>Platforms</strong>You search for matches.<br>Your data on their servers.<br>Profit-driven.</div>
+            <div class="faq-compare-col"><strong>Timebanks</strong>You list services.<br>Hour-for-hour exchange.<br>Same community only.</div>
+            <div class="faq-compare-col"><strong>LVN</strong>Matches surface to you.<br>Data stays on your device.<br>Protocol, not platform.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">If my data never leaves my device, how does matching work?</div>
+        <div class="faq-a">Your AI assistant converts your context into abstract signal vectors — compressed, privacy-protected representations that reveal cooperative potential without exposing private details. These signals go through a community relay that finds complementary matches. If a match is found, you control exactly what to disclose through progressive disclosure: first anonymous categories, then scoped details, then identities — only with mutual consent at every step.</div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Doesn't this just recreate the "platform capture" problem?</div>
+        <div class="faq-a">No — and preventing that is a core design constraint. The LVN is a protocol (like email or HTTP), not a platform (like Facebook). Anyone can run a relay. The specifications are CC BY-SA 4.0. Anti-capture mechanisms include term limits on governance roles, forking rights, funding transparency (no single funder >30%), and the Ethics & Equity advisory veto. See WD-006 for the full governance framework.</div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Why "complementarity" instead of "similarity"?</div>
+        <div class="faq-a">Similarity matching connects you with people like you. Complementarity matching connects you with people who have what you need and need what you have. This is the fundamental insight: the most valuable cooperative connections cross social boundaries. The retired engineer and the first-generation business owner don't share demographics, interests, or social circles — but they have exactly what the other needs.</div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What stage is this project at?</div>
+        <div class="faq-a">Phase 0 (Foundation) is complete — 6 working documents, a cooperative taxonomy, a development plan with 12 work packages, and this website. Phase 1 (Standards & Community) is beginning: we're submitting protocol extensions to MCP and A2A, forming 5 working groups, and identifying pilot communities. Phase 2 (Build) targets June–October 2026. See PLAN.md for details.</div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How can I contribute?</div>
+        <div class="faq-a">We need people from many disciplines — not just engineers. Cryptographers, economists, ethicists, community organizers, librarians, social workers, and practitioners all have essential perspectives. Start by trying the demo, reading a provocation that interests you, and then opening an Introduction issue on GitHub or emailing latentvaluenetwork@proton.me. The most valuable contribution right now is telling us what's wrong with our approach.</div>
+      </div>
+    </div>
+  </section>
 
   <section class="whats-new reveal stagger-4">
     <div class="container">

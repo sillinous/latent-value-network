@@ -383,3 +383,34 @@ body::before {
 [data-theme="dark"] .pos-text { color: var(--text-secondary); }
 [data-theme="dark"] .prompt { color: var(--text-secondary); }
 [data-theme="dark"] .hero-canvas { opacity: 0.5; }
+
+/* ── Print Styles ── */
+@media print {
+  .lvn-nav, .hero-canvas, .skip-link, .lvn-nav-theme,
+  .resume-banner, .match-filters, .gh-stats, .journey-flow { display: none !important; }
+  body { padding-top: 0; background: white; color: black; }
+  .card, .provocation, .doc-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  a { color: #2A9D8F; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: 0.7em; color: #666; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* ── Scroll-Driven Lazy Reveal ── */
+@supports (content-visibility: auto) {
+  .lazy-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+}
+
+/* ── Focus Visible ── */
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Smooth Scroll Anchor Offset ── */
+[id] {
+  scroll-margin-top: calc(var(--nav-height) + 1rem);
+}

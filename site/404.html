@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found — The Latent Value Network</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.error-page {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+.error-content { max-width: 480px; }
+.error-code {
+  font-family: var(--font-display);
+  font-size: 6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--teal), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.error-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+}
+.error-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+.error-metaphor {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--teal);
+  padding: 1rem;
+  border-left: 3px solid var(--teal);
+  text-align: left;
+  margin-bottom: 1.5rem;
+  background: rgba(42,157,143,0.04);
+  border-radius: 0 8px 8px 0;
+}
+.error-links {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="lvn-nav" role="navigation" aria-label="Main navigation">
+  <div class="lvn-nav-inner">
+    <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <div class="lvn-nav-links">
+      <a href="index.html">Hub</a>
+      <a href="demo.html">Demo</a>
+      <a href="provocations.html">Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network" class="nav-gh">GitHub</a>
+      <button class="lvn-nav-theme" aria-label="Toggle dark mode" title="Toggle dark mode">☽</button>
+    </div>
+  </div>
+</nav>
+
+<main class="error-page" id="main-content">
+  <div class="error-content">
+    <div class="error-code">404</div>
+    <div class="error-title">This connection wasn't found</div>
+    <div class="error-metaphor">
+      Much like the cooperative connections the LVN aims to surface — 
+      sometimes what you're looking for exists, just not where you expected.
+    </div>
+    <div class="error-desc">
+      The page you're looking for doesn't exist or has moved. 
+      But there's plenty to explore.
+    </div>
+    <div class="error-links">
+      <a href="index.html" class="btn btn-primary">Go to Hub</a>
+      <a href="demo.html" class="btn btn-secondary">Try the Demo</a>
+      <a href="https://github.com/sillinous/latent-value-network" class="btn btn-ghost">View on GitHub</a>
+    </div>
+  </div>
+</main>
+
+<script src="shared.js"></script>
+</body>
+</html>
