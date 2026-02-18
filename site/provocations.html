@@ -57,6 +57,24 @@ header p { font-size: 1rem; color: rgba(255,255,255,0.6); max-width: 600px; marg
 footer { background: var(--deep); padding: 2rem; text-align: center; }
 footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
 @media (max-width: 640px) { .prov-header { flex-direction: column; gap: 0.3rem; } .prov-disciplines { padding-left: 1.8rem; } }
+
+/* ── Voting System ── */
+.position { cursor: pointer; border-radius: 8px; padding: 0.7rem 0.8rem !important; margin-bottom: 0.3rem; transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1); border: 1.5px solid transparent !important; }
+.position:hover { background: rgba(42,157,143,0.04); border-color: rgba(42,157,143,0.12) !important; }
+.position.voted { background: rgba(42,157,143,0.08); border-color: var(--teal) !important; }
+.position.voted .pos-label { font-weight: 700; }
+.vote-bar { height: 3px; border-radius: 2px; margin-top: 0.4rem; background: var(--warm-gray); overflow: hidden; }
+.vote-bar-fill { height: 100%; border-radius: 2px; transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1); }
+.vote-bar-fill.a { background: var(--teal); }
+.vote-bar-fill.b { background: var(--gold); }
+.vote-bar-fill.c { background: #DC2626; }
+.vote-count { font-family: var(--font-mono); font-size: 0.6rem; color: var(--light-text); margin-top: 0.2rem; text-align: right; opacity: 0; transition: opacity 300ms; }
+.position.voted ~ .vote-count, .positions.has-votes .vote-count { opacity: 1; }
+.prov-stats { display: flex; gap: 1rem; padding: 0.6rem 1.8rem; align-items: center; border-top: 1px solid rgba(0,0,0,0.04); }
+.prov-stat { font-family: var(--font-mono); font-size: 0.65rem; color: var(--light-text); display: flex; align-items: center; gap: 0.3rem; }
+.prov-stat .stat-num { font-weight: 600; color: var(--teal); font-size: 0.75rem; }
+.discuss-link { margin-left: auto; font-size: 0.72rem; color: var(--teal); text-decoration: none; font-weight: 600; transition: color 200ms; }
+.discuss-link:hover { color: var(--teal-glow); }
 </style>
 <meta name="description" content="10 hard open questions about privacy, trust, equity, and governance in AI-mediated cooperation. Pick one. Take a side.">
 <meta property="og:title" content="10 Provocations — Latent Value Network">
@@ -348,5 +366,108 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
 </footer>
 
 <script src="shared.js"></script>
+
+<script>
+(function(){
+  const STORE_KEY = 'lvn-prov-votes';
+  
+  function getVotes() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } 
+    catch { return {}; }
+  }
+  
+  function saveVotes(votes) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(votes)); } catch {}
+  }
+  
+  function getSimulatedCounts(provNum) {
+    // Base simulated community votes to make it feel alive
+    const bases = {
+      '01': {a:12, b:18, c:7}, '02': {a:9, b:14, c:11}, '03': {a:15, b:8, c:13},
+      '04': {a:11, b:6, c:16}, '05': {a:14, b:12, c:5}, '06': {a:7, b:19, c:9},
+      '07': {a:16, b:10, c:8}, '08': {a:8, b:13, c:14}, '09': {a:13, b:7, c:11},
+      '10': {a:10, b:15, c:6}
+    };
+    return bases[provNum] || {a:5, b:5, c:5};
+  }
+  
+  function renderVotes() {
+    const votes = getVotes();
+    document.querySelectorAll('.provocation').forEach(prov => {
+      const num = prov.querySelector('.prov-number').textContent.trim();
+      const positions = prov.querySelectorAll('.position');
+      const positionsContainer = prov.querySelector('.positions');
+      const userVote = votes[num];
+      const counts = getSimulatedCounts(num);
+      
+      // Add user vote to counts
+      if (userVote) counts[userVote]++;
+      const total = counts.a + counts.b + counts.c;
+      
+      positions.forEach(pos => {
+        const label = pos.querySelector('.pos-label');
+        const letter = label.classList.contains('a') ? 'a' : label.classList.contains('b') ? 'b' : 'c';
+        
+        // Mark voted
+        pos.classList.toggle('voted', userVote === letter);
+        
+        // Add/update vote bar
+        let bar = pos.querySelector('.vote-bar');
+        if (!bar) {
+          bar = document.createElement('div');
+          bar.className = 'vote-bar';
+          bar.innerHTML = '<div class="vote-bar-fill ' + letter + '"></div>';
+          pos.appendChild(bar);
+        }
+        const pct = total > 0 ? (counts[letter] / total * 100) : 0;
+        bar.querySelector('.vote-bar-fill').style.width = pct + '%';
+      });
+      
+      // Show vote counts if user voted
+      if (userVote) positionsContainer.classList.add('has-votes');
+      
+      // Update stats bar
+      let stats = prov.querySelector('.prov-stats');
+      if (!stats) {
+        stats = document.createElement('div');
+        stats.className = 'prov-stats';
+        const footer = prov.querySelector('.prov-footer');
+        if (footer) footer.parentNode.insertBefore(stats, footer);
+        else prov.appendChild(stats);
+      }
+      stats.innerHTML = 
+        '<span class="prov-stat"><span class="stat-num">' + total + '</span> votes</span>' +
+        '<span class="prov-stat">A: <span class="stat-num">' + Math.round(counts.a/total*100) + '%</span></span>' +
+        '<span class="prov-stat">B: <span class="stat-num">' + Math.round(counts.b/total*100) + '%</span></span>' +
+        '<span class="prov-stat">C: <span class="stat-num">' + Math.round(counts.c/total*100) + '%</span></span>' +
+        '<a href="https://github.com/sillinous/latent-value-network/discussions" class="discuss-link" target="_blank">Discuss →</a>';
+    });
+  }
+  
+  // Handle clicks
+  document.addEventListener('click', function(e) {
+    const pos = e.target.closest('.position');
+    if (!pos) return;
+    
+    const prov = pos.closest('.provocation');
+    const num = prov.querySelector('.prov-number').textContent.trim();
+    const label = pos.querySelector('.pos-label');
+    const letter = label.classList.contains('a') ? 'a' : label.classList.contains('b') ? 'b' : 'c';
+    
+    const votes = getVotes();
+    if (votes[num] === letter) {
+      delete votes[num]; // Toggle off
+    } else {
+      votes[num] = letter;
+    }
+    saveVotes(votes);
+    renderVotes();
+  });
+  
+  // Initial render
+  renderVotes();
+})();
+</script>
+
 </body>
 </html>

@@ -157,6 +157,119 @@ footer a{color:rgba(255,255,255,.4)}
   .hero .stat-row{gap:1rem}
   section{padding:3rem 1.5rem}
 }
+
+/* ── User Journey Stepper ── */
+.journey-flow {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 0;
+  max-width: 720px;
+  margin: 2.5rem auto 1rem;
+  padding: 0 1rem;
+}
+.journey-step {
+  flex: 1;
+  text-align: center;
+  padding: 1rem 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  position: relative;
+}
+.journey-step:hover { transform: translateY(-3px); }
+.journey-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-mono, 'JetBrains Mono', monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin: 0 auto 0.4rem;
+  transition: all 300ms;
+}
+.journey-step:nth-child(1) .journey-step-num { background: rgba(42,157,143,0.15); color: var(--teal, #2A9D8F); }
+.journey-step:nth-child(2) .journey-step-num { background: rgba(233,196,106,0.2); color: #B8860B; }
+.journey-step:nth-child(3) .journey-step-num { background: rgba(61,90,128,0.15); color: var(--slate, #3D5A80); }
+.journey-step:nth-child(4) .journey-step-num { background: rgba(27,42,74,0.12); color: var(--navy, #1B2A4A); }
+.journey-step:hover .journey-step-num { transform: scale(1.15); }
+.journey-step-title {
+  font-family: var(--f-body, 'DM Sans', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--navy, #1B2A4A);
+  margin-bottom: 0.2rem;
+}
+.journey-step-desc {
+  font-size: 0.68rem;
+  color: var(--light, #8B95A5);
+  line-height: 1.35;
+}
+.journey-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--light, #8B95A5);
+  font-size: 0.9rem;
+  opacity: 0.3;
+  padding: 0 0.2rem;
+}
+
+/* ── Document Card Preview Tooltips ── */
+.doc-card { position: relative; }
+.doc-preview {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: 260px;
+  padding: 0.8rem;
+  background: var(--navy, #1B2A4A);
+  color: rgba(255,255,255,0.85);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+}
+.doc-preview::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--navy, #1B2A4A);
+}
+.doc-card:hover .doc-preview {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+.doc-preview-title {
+  font-weight: 600;
+  color: var(--teal-glow, #34D1BF);
+  margin-bottom: 0.3rem;
+  font-family: var(--f-mono, 'JetBrains Mono', monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .journey-flow { flex-direction: column; gap: 0.3rem; }
+  .journey-arrow { display: none; }
+  .journey-step { text-align: left; display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; }
+  .journey-step-num { margin: 0; }
+  .doc-preview { display: none; }
+}
+
 </style>
 <script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -215,7 +328,33 @@ footer a{color:rgba(255,255,255,.4)}
       <div class="stat"><div class="num">5</div><div class="lbl">Protocol Layers</div></div>
     </div>
   </div>
-</section>
+
+    <div class="journey-flow">
+      <a href="demo.html" class="journey-step">
+        <div class="journey-step-num">1</div>
+        <div class="journey-step-title">Experience It</div>
+        <div class="journey-step-desc">Try the demo to see matching in action</div>
+      </a>
+      <div class="journey-arrow">→</div>
+      <a href="#documents" class="journey-step">
+        <div class="journey-step-num">2</div>
+        <div class="journey-step-title">Understand It</div>
+        <div class="journey-step-desc">Read the specs and evidence base</div>
+      </a>
+      <div class="journey-arrow">→</div>
+      <a href="provocations.html" class="journey-step">
+        <div class="journey-step-num">3</div>
+        <div class="journey-step-title">Challenge It</div>
+        <div class="journey-step-desc">Vote on open questions, debate positions</div>
+      </a>
+      <div class="journey-arrow">→</div>
+      <a href="https://github.com/sillinous/latent-value-network" class="journey-step">
+        <div class="journey-step-num">4</div>
+        <div class="journey-step-title">Build It</div>
+        <div class="journey-step-desc">Join a working group, write code or specs</div>
+      </a>
+    </div>
+  </section>
 
 <!-- ═══ PROBLEM ═══ -->
 <section class="reveal stagger-2" id="problem">
@@ -456,30 +595,50 @@ footer a{color:rgba(255,255,255,.4)}
 
     <div class="doc-grid">
       <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md')">
+        <div class="doc-preview">
+          <div class="doc-preview-title">Foundational White Paper</div>
+          Defines the 5-layer architecture, 6 design principles, and the core thesis: AI assistants can surface cooperative connections invisible to explicit search.
+        </div>
         <div class="doc-id">WD-001</div>
         <div class="doc-title">Foundational White Paper</div>
         <div class="doc-desc">5,000 words defining the vision, architecture, and principles</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
       <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-002-evidence-base.md')">
+        <div class="doc-preview">
+          <div class="doc-preview-title">Evidence Base</div>
+          22 academic citations across 6 evidence streams. Reviews network science, mechanism design, trust formation, and privacy research supporting the approach.
+        </div>
         <div class="doc-id">WD-002</div>
         <div class="doc-title">Evidence Base</div>
         <div class="doc-desc">22 academic citations quantifying the Latent Value Gap across 6 domains</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
       <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-003-signal-exchange-protocol.md')">
+        <div class="doc-preview">
+          <div class="doc-preview-title">Signal Exchange Protocol</div>
+          Layer 3 specification: how context becomes privacy-preserving signals. Bloom filters, differential privacy, progressive disclosure handshake, complementarity scoring.
+        </div>
         <div class="doc-id">WD-003</div>
         <div class="doc-title">Signal Exchange Protocol</div>
         <div class="doc-desc">Formal specification for privacy-preserving cooperative matching</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
       <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-004-explainer-script.md')">
+        <div class="doc-preview">
+          <div class="doc-preview-title">Explainer Script</div>
+          2-minute video storyboard with 6 scenes. Takes the concept from abstract to concrete through the story of two neighbors who never knew they could help each other.
+        </div>
         <div class="doc-id">WD-004</div>
         <div class="doc-title">Explainer Script</div>
         <div class="doc-desc">2-minute animated storyboard for the concept video</div>
         <div class="doc-status done">Complete v0.1</div>
       </div>
       <div class="doc-card" role="button" tabindex="0" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-005-trust-fabric.md')">
+        <div class="doc-preview">
+          <div class="doc-preview-title">Trust & Reputation Fabric</div>
+          Layer 4 specification: relational, contextual trust. Chain-of-vouching, ZK verification, institutional anchors, Sybil resistance, trust bootstrap mechanics.
+        </div>
         <div class="doc-id">WD-005</div>
         <div class="doc-title">Trust & Reputation Fabric</div>
         <div class="doc-desc">Layer 4: distributed contextual trust with ZK verification</div>

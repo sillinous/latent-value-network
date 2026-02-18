@@ -790,6 +790,89 @@ footer .f-logo span { color: var(--teal); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+
+/* ── Match Filters ── */
+.match-filters {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.2rem;
+  padding: 0.8rem;
+  background: var(--warm-gray, #F0EDE8);
+  border-radius: 10px;
+}
+.filter-btn {
+  padding: 0.35rem 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: 1.5px solid rgba(0,0,0,0.08);
+  border-radius: 20px;
+  background: white;
+  color: var(--mid-text, #5A6577);
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.filter-btn:hover { border-color: var(--teal); color: var(--teal); }
+.filter-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+.sort-select {
+  padding: 0.35rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  border: 1.5px solid rgba(0,0,0,0.08);
+  border-radius: 20px;
+  background: white;
+  color: var(--mid-text, #5A6577);
+  cursor: pointer;
+  margin-left: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 1.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A6577' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.4rem center;
+}
+
+/* ── Resume Banner ── */
+.resume-banner {
+  display: none;
+  padding: 0.8rem 1.2rem;
+  background: linear-gradient(135deg, rgba(42,157,143,0.08), rgba(233,196,106,0.08));
+  border: 1.5px solid rgba(42,157,143,0.15);
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  gap: 0.8rem;
+}
+.resume-banner.show { display: flex; }
+.resume-banner-text {
+  flex: 1;
+  font-size: 0.82rem;
+  color: var(--mid-text, #5A6577);
+}
+.resume-banner-text strong { color: var(--teal); }
+.resume-btn {
+  padding: 0.4rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 200ms;
+}
+.resume-btn:hover { background: var(--teal-glow, #34D1BF); }
+.resume-dismiss {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--light-text, #8B95A5);
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
 </style>
 <meta name="description" content="Experience the Latent Value Gap firsthand. Discover cooperative connections you didn't know existed in a simulated community.">
 <meta property="og:title" content="Interactive Demo — Latent Value Network">
@@ -839,6 +922,11 @@ footer .f-logo span { color: var(--teal); }
 <!-- SCREEN 1: THE STORY -->
 <!-- ═══════════════════════════════════════ -->
 <div id="screen-intro" class="screen active">
+    <div class="resume-banner" id="resume-banner">
+      <div class="resume-banner-text">You have <strong>saved progress</strong> from a previous visit.</div>
+      <button class="resume-btn" onclick="resumeProgress()">Resume</button>
+      <button class="resume-dismiss" onclick="dismissResume()" aria-label="Dismiss">×</button>
+    </div>
   <div class="container">
     <div class="intro-hero">
       <h1>What if the help you need<br>is <em>already nearby?</em></h1>
@@ -1745,5 +1833,174 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script src="shared.js"></script>
+
+<script>
+// ── Item 15: Match Filtering/Sorting ──
+(function(){
+  // We inject filter controls when results are shown
+  const origShowScreen = window.showScreen;
+  
+  // Wrap results rendering to add filters
+  const origShowResults = window.showResults;
+  if (typeof window.showResults === 'function') {
+    // Monkey-patch is fragile, use MutationObserver instead
+  }
+  
+  // Watch for results screen activation
+  const observer = new MutationObserver(() => {
+    const resultsScreen = document.getElementById('screen-results');
+    if (!resultsScreen) return;
+    if (resultsScreen.classList.contains('active') && !document.getElementById('match-filters')) {
+      injectFilters();
+    }
+  });
+  observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  
+  function injectFilters() {
+    const resultsScreen = document.getElementById('screen-results');
+    const matchList = resultsScreen.querySelector('[id*="match"], .match-list, div[style*="margin-top"]');
+    // Find the first match card container
+    const allDivs = resultsScreen.querySelectorAll('div');
+    let container = null;
+    for (const d of allDivs) {
+      if (d.querySelector('.match-type') || d.children.length > 2) {
+        const hasCards = d.querySelector('[style*="border-radius"]');
+        if (hasCards && d.children.length >= 2) { container = d; break; }
+      }
+    }
+    if (!container) return;
+    
+    const filters = document.createElement('div');
+    filters.className = 'match-filters';
+    filters.id = 'match-filters';
+    filters.innerHTML = `
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="you-offer">You can help</button>
+      <button class="filter-btn" data-filter="you-need">They can help</button>
+      <button class="filter-btn" data-filter="mutual">Mutual exchange</button>
+      <select class="sort-select" id="match-sort">
+        <option value="score">Sort: Best match</option>
+        <option value="name">Sort: Name A-Z</option>
+      </select>
+    `;
+    container.parentNode.insertBefore(filters, container);
+    
+    // Filter logic
+    filters.addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      
+      const cards = container.children;
+      for (const card of cards) {
+        if (filter === 'all') { card.style.display = ''; continue; }
+        const types = card.querySelectorAll('.match-type');
+        let hasType = false;
+        types.forEach(t => { if (t.classList.contains(filter) || t.textContent.toLowerCase().includes(filter.replace('-', ' '))) hasType = true; });
+        // Also check for text content
+        const text = card.textContent.toLowerCase();
+        if (filter === 'you-offer' && (text.includes('you offer') || text.includes('you can help'))) hasType = true;
+        if (filter === 'you-need' && (text.includes('they offer') || text.includes('they can help'))) hasType = true;
+        if (filter === 'mutual' && text.includes('mutual')) hasType = true;
+        card.style.display = hasType ? '' : 'none';
+      }
+    });
+    
+    // Sort logic
+    document.getElementById('match-sort').addEventListener('change', function() {
+      const cards = [...container.children];
+      cards.sort((a, b) => {
+        if (this.value === 'name') {
+          const nameA = (a.querySelector('strong, h3, [style*="font-weight:700"]') || a).textContent;
+          const nameB = (b.querySelector('strong, h3, [style*="font-weight:700"]') || b).textContent;
+          return nameA.localeCompare(nameB);
+        }
+        return 0; // Default order = by score
+      });
+      cards.forEach(c => container.appendChild(c));
+    });
+  }
+})();
+
+// ── Item 18: Save/Resume Progress ──
+(function(){
+  const PROGRESS_KEY = 'lvn-demo-progress';
+  
+  window.saveProgress = function() {
+    const activeScreen = document.querySelector('.screen.active');
+    if (!activeScreen) return;
+    const data = {
+      screen: activeScreen.id,
+      timestamp: Date.now(),
+      // Save chip selections
+      chips: [...document.querySelectorAll('.chip[aria-checked="true"]')].map(c => c.dataset.v),
+      // Save text inputs
+      inputs: {}
+    };
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+      if (el.id || el.name) data.inputs[el.id || el.name] = el.value;
+    });
+    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(data)); } catch {}
+  };
+  
+  window.resumeProgress = function() {
+    try {
+      const data = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+      if (!data || !data.screen) return;
+      
+      // Restore chip selections
+      if (data.chips) {
+        data.chips.forEach(v => {
+          const chip = document.querySelector('.chip[data-v="' + v + '"]');
+          if (chip) { chip.setAttribute('aria-checked', 'true'); chip.classList.add('selected'); }
+        });
+      }
+      
+      // Restore text inputs
+      if (data.inputs) {
+        Object.entries(data.inputs).forEach(([key, val]) => {
+          const el = document.getElementById(key) || document.querySelector('[name="' + key + '"]');
+          if (el) el.value = val;
+        });
+      }
+      
+      // Navigate to saved screen
+      if (typeof showScreen === 'function') showScreen(data.screen);
+      dismissResume();
+    } catch {}
+  };
+  
+  window.dismissResume = function() {
+    const banner = document.getElementById('resume-banner');
+    if (banner) banner.classList.remove('show');
+  };
+  
+  // Auto-save on screen changes
+  const origShow = window.showScreen;
+  if (origShow) {
+    const wrappedShow = function(id) {
+      origShow(id);
+      setTimeout(saveProgress, 100);
+    };
+    // We can't easily replace showScreen since it's called inline, 
+    // so use a periodic save instead
+  }
+  setInterval(() => { if (document.querySelector('.screen.active:not(#screen-intro)')) saveProgress(); }, 5000);
+  
+  // Check for saved progress on load
+  try {
+    const data = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+    if (data && data.screen && data.screen !== 'screen-intro') {
+      const age = Date.now() - (data.timestamp || 0);
+      if (age < 7 * 24 * 60 * 60 * 1000) { // Less than 7 days old
+        const banner = document.getElementById('resume-banner');
+        if (banner) banner.classList.add('show');
+      }
+    }
+  } catch {}
+})();
+</script>
 </body>
 </html>
