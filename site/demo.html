@@ -117,6 +117,10 @@ body::before{opacity:.008!important}
 .insight-callout p{font-size:.82rem;color:var(--text);line-height:1.6}
 
 
+
+/* ── Drag Interaction ── */
+.network-stage canvas{touch-action:none}
+.network-stage.dragging{cursor:grabbing!important}
 /* ── Canvas Tooltip ── */
 .canvas-tooltip{position:absolute;pointer-events:none;opacity:0;transition:opacity 200ms;
   background:rgba(13,19,33,.95);border:1px solid rgba(42,157,143,.3);border-radius:8px;
@@ -396,13 +400,102 @@ function resizeCanvas(){
 
 function initNodes(){
   const w=W/dpr,h=H/dpr,cx=w/2,cy=h/2;
-  nodes=[{x:cx,y:cy,vx:0,vy:0,r:16,type:'you',label:'You',idx:-1}];
+  nodes=[{x:cx,y:cy,vx:0,vy:0,r:16,type:'you',label:'You',idx:-1,fx:null,fy:null,hx:cx,hy:cy,mass:3}];
   members.forEach((m,i)=>{
     const a=(i/members.length)*Math.PI*2-Math.PI/2;
     const orbit=Math.min(w,h)*.32+(i%3)*20;
-    nodes.push({x:cx+Math.cos(a)*orbit+(Math.random()-.5)*15,y:cy+Math.sin(a)*orbit+(Math.random()-.5)*15,
-      vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,r:8+Math.random()*4,type:'community',
-      label:m.name,emoji:m.emoji,idx:i,pulse:Math.random()*Math.PI*2});
+    const px=cx+Math.cos(a)*orbit+(Math.random()-.5)*15;
+    const py=cy+Math.sin(a)*orbit+(Math.random()-.5)*15;
+    nodes.push({x:px,y:py,vx:0,vy:0,r:8+Math.random()*4,type:'community',
+      label:m.name,emoji:m.emoji,idx:i,pulse:Math.random()*Math.PI*2,
+      fx:null,fy:null,hx:px,hy:py,mass:1});
+  });
+}
+
+// ═══ FORCE-DIRECTED SIMULATION ═══
+const SIM = {
+  repulsion: 800,       // charge repulsion between all nodes
+  springLen: 120,       // rest length for matched connections
+  springK: 0.003,       // spring stiffness for connections
+  homeK: 0.005,         // pull back toward home position
+  damping: 0.92,        // velocity damping (lower = more drag)
+  maxSpeed: 3,          // terminal velocity
+  centerGravity: 0.001, // gentle pull toward canvas center
+};
+
+function simulate(){
+  const w=W/dpr, h=H/dpr, cx=w/2, cy=h/2;
+
+  // --- Forces ---
+  for(let i=0;i<nodes.length;i++){
+    const a=nodes[i];
+    if(a.fx!==null){a.vx=0;a.vy=0;continue;} // pinned (being dragged)
+
+    let fxSum=0, fySum=0;
+
+    // 1) Repulsion (all pairs — Coulomb)
+    for(let j=0;j<nodes.length;j++){
+      if(i===j)continue;
+      const b=nodes[j];
+      let dx=a.x-b.x, dy=a.y-b.y;
+      let dist=Math.sqrt(dx*dx+dy*dy)||1;
+      if(dist>250)continue; // cull far pairs
+      const force=SIM.repulsion/(dist*dist);
+      fxSum+=dx/dist*force;
+      fySum+=dy/dist*force;
+    }
+
+    // 2) Spring attraction to matched connections
+    if(revealProgress>0){
+      const youNode=nodes[0];
+      if(a.type==='community'&&matchedSet.has(a.idx)){
+        let dx=youNode.x-a.x, dy=youNode.y-a.y;
+        let dist=Math.sqrt(dx*dx+dy*dy)||1;
+        const displacement=dist-SIM.springLen;
+        fxSum+=dx/dist*displacement*SIM.springK;
+        fySum+=dy/dist*displacement*SIM.springK;
+      }
+      if(a.type==='you'){
+        nodes.forEach(b=>{
+          if(b.type!=='community'||!matchedSet.has(b.idx))return;
+          let dx=b.x-a.x, dy=b.y-a.y;
+          let dist=Math.sqrt(dx*dx+dy*dy)||1;
+          const displacement=dist-SIM.springLen;
+          fxSum+=dx/dist*displacement*SIM.springK;
+          fySum+=dy/dist*displacement*SIM.springK;
+        });
+      }
+    }
+
+    // 3) Home position pull (gentle gravity to initial layout)
+    fxSum+=(a.hx-a.x)*SIM.homeK;
+    fySum+=(a.hy-a.y)*SIM.homeK;
+
+    // 4) Center gravity
+    fxSum+=(cx-a.x)*SIM.centerGravity;
+    fySum+=(cy-a.y)*SIM.centerGravity;
+
+    // Apply force / mass
+    a.vx+=fxSum/a.mass;
+    a.vy+=fySum/a.mass;
+  }
+
+  // --- Integrate ---
+  nodes.forEach(n=>{
+    if(n.fx!==null){n.x=n.fx;n.y=n.fy;return;}
+    n.vx*=SIM.damping;
+    n.vy*=SIM.damping;
+    const speed=Math.sqrt(n.vx*n.vx+n.vy*n.vy);
+    if(speed>SIM.maxSpeed){n.vx*=SIM.maxSpeed/speed;n.vy*=SIM.maxSpeed/speed;}
+    n.x+=n.vx;
+    n.y+=n.vy;
+    // Boundary
+    const pad=20;
+    if(n.x<pad){n.x=pad;n.vx*=-.5;}
+    if(n.x>w-pad){n.x=w-pad;n.vx*=-.5;}
+    if(n.y<pad){n.y=pad;n.vy*=-.5;}
+    if(n.y>h-pad){n.y=h-pad;n.vy*=-.5;}
+    n.pulse+=.02;
   });
 }
 
@@ -412,9 +505,8 @@ function draw(){
   cx2d.strokeStyle='rgba(42,157,143,.03)';cx2d.lineWidth=.5;
   for(let x=0;x<w;x+=40){cx2d.beginPath();cx2d.moveTo(x,0);cx2d.lineTo(x,h);cx2d.stroke()}
   for(let y=0;y<h;y+=40){cx2d.beginPath();cx2d.moveTo(0,y);cx2d.lineTo(w,y);cx2d.stroke()}
-  // Drift
-  nodes.forEach(n=>{if(n.type==='you')return;n.x+=n.vx;n.y+=n.vy;n.pulse+=.02;
-    if(n.x<30||n.x>w-30)n.vx*=-1;if(n.y<30||n.y>h-30)n.vy*=-1});
+  // Force simulation
+  simulate();
   // Edges
   if(revealProgress>0)nodes.forEach(n=>{
     if(n.type!=='community'||!matchedSet.has(n.idx))return;
@@ -569,80 +661,145 @@ let hoveredNode = null;
 const ttEl = document.getElementById('canvas-tooltip');
 const stageEl = document.getElementById('network-stage');
 
-stageEl.addEventListener('mousemove', function(e) {
+// ═══ DRAG + HOVER + CLICK — UNIFIED POINTER SYSTEM ═══
+let dragNode = null, dragOffset = {x:0,y:0}, isDragging = false, dragStartTime = 0;
+
+function getPointerPos(e) {
   const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-  
+  const touch = e.touches ? e.touches[0] : e;
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+function findNodeAt(px, py) {
   let closest = null, closestDist = Infinity;
-  nodes.forEach(n => {
-    if (n.type === 'you') return;
-    const d = Math.hypot(n.x - mx, n.y - my);
-    if (d < (n.r + 15) && d < closestDist) { closest = n; closestDist = d; }
-  });
-  
-  if (closest && closest.idx >= 0) {
-    hoveredNode = closest;
-    const m = members[closest.idx];
-    const isMatched = matchedSet.has(closest.idx);
-    
+  // Check all nodes including 'you'
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const n = nodes[i];
+    const d = Math.hypot(n.x - px, n.y - py);
+    const hitR = n.r + 12; // generous hit area
+    if (d < hitR && d < closestDist) { closest = n; closestDist = d; }
+  }
+  return closest;
+}
+
+// --- Pointer Down (start drag) ---
+function onPointerDown(e) {
+  const pos = getPointerPos(e);
+  const hit = findNodeAt(pos.x, pos.y);
+  if (hit) {
+    dragNode = hit;
+    dragOffset.x = hit.x - pos.x;
+    dragOffset.y = hit.y - pos.y;
+    isDragging = false;
+    dragStartTime = Date.now();
+    // Pin the node
+    hit.fx = hit.x;
+    hit.fy = hit.y;
+    hit.vx = 0;
+    hit.vy = 0;
+    stageEl.style.cursor = 'grabbing';
+    // Prevent page scroll on touch
+    if (e.touches) e.preventDefault();
+  }
+}
+
+// --- Pointer Move (drag or hover) ---
+function onPointerMove(e) {
+  const pos = getPointerPos(e);
+
+  if (dragNode) {
+    // Dragging
+    isDragging = true;
+    dragNode.fx = pos.x + dragOffset.x;
+    dragNode.fy = pos.y + dragOffset.y;
+    // Clamp to canvas
+    const w = W/dpr, h = H/dpr;
+    dragNode.fx = Math.max(15, Math.min(w-15, dragNode.fx));
+    dragNode.fy = Math.max(15, Math.min(h-15, dragNode.fy));
+    dragNode.x = dragNode.fx;
+    dragNode.y = dragNode.fy;
+    // Hide tooltip while dragging
+    ttEl.classList.remove('show');
+    if (e.touches) e.preventDefault();
+    return;
+  }
+
+  // Hover (no drag)
+  const hit = findNodeAt(pos.x, pos.y);
+  if (hit && hit.idx >= 0) {
+    hoveredNode = hit;
+    const m = members[hit.idx];
     ttEl.querySelector('.ct-name').textContent = m.emoji + ' ' + m.name + ', ' + m.age;
     ttEl.querySelector('.ct-role').textContent = m.role + ' · ' + m.dist;
-    
     const skillsHtml = m.skills.map(s => '<span class="ct-skill">' + s.replace(/-/g,' ') + '</span>').join('');
     const needsHtml = m.needs.map(n => '<span class="ct-need">' + n.replace(/-/g,' ') + '</span>').join('');
     ttEl.querySelector('.ct-skills').innerHTML = skillsHtml + needsHtml;
-    
-    if (isMatched && revealProgress > 0.5) {
-      const match = state.matches.find(x => x.idx === closest.idx);
+    if (matchedSet.has(hit.idx) && revealProgress > 0.5) {
+      const match = state.matches.find(x => x.idx === hit.idx);
       if (match) {
         const parts = [];
         if (match.youHelp.length) parts.push('You can help with: ' + match.youHelp.join(', '));
         if (match.theyHelp.length) parts.push('They offer: ' + match.theyHelp.join(', '));
         ttEl.querySelector('.ct-dim').textContent = '✦ ' + parts.join(' · ');
-      } else {
-        ttEl.querySelector('.ct-dim').textContent = '';
-      }
+      } else ttEl.querySelector('.ct-dim').textContent = '';
     } else if (revealProgress < 0.1) {
       ttEl.querySelector('.ct-dim').textContent = 'Connection unknown — run discovery to reveal';
-    } else {
-      ttEl.querySelector('.ct-dim').textContent = '';
-    }
-    
-    // Position tooltip
-    let tx = e.clientX - rect.left + 16;
-    let ty = e.clientY - rect.top - 10;
-    if (tx + 220 > rect.width) tx = e.clientX - rect.left - 230;
+    } else ttEl.querySelector('.ct-dim').textContent = '';
+    let tx = pos.x + 16, ty = pos.y - 10;
+    const rect = canvas.getBoundingClientRect();
+    if (tx + 220 > rect.width) tx = pos.x - 230;
     if (ty < 10) ty = 10;
-    ttEl.style.left = tx + 'px';
-    ttEl.style.top = ty + 'px';
+    ttEl.style.left = tx + 'px'; ttEl.style.top = ty + 'px';
     ttEl.classList.add('show');
-    stageEl.style.cursor = 'pointer';
+    stageEl.style.cursor = 'grab';
+  } else if (hit && hit.type === 'you') {
+    hoveredNode = null;
+    ttEl.classList.remove('show');
+    stageEl.style.cursor = 'grab';
   } else {
     hoveredNode = null;
     ttEl.classList.remove('show');
     stageEl.style.cursor = 'default';
   }
-});
+}
+
+// --- Pointer Up (release drag or click) ---
+function onPointerUp(e) {
+  if (dragNode) {
+    const wasDrag = isDragging && (Date.now() - dragStartTime > 150);
+    // Release pin — give it a little velocity from last movement
+    dragNode.fx = null;
+    dragNode.fy = null;
+    // If it was a short tap (not a drag), treat as click
+    if (!wasDrag && dragNode.idx >= 0) {
+      const m = members[dragNode.idx];
+      document.querySelectorAll('.match-card').forEach(card => {
+        card.classList.remove('highlighted');
+        if (card.querySelector('.match-name') && card.querySelector('.match-name').textContent.includes(m.name)) {
+          card.classList.add('highlighted');
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => card.classList.remove('highlighted'), 2500);
+        }
+      });
+    }
+    dragNode = null;
+    isDragging = false;
+    stageEl.style.cursor = 'default';
+  }
+}
+
+// Mouse events
+stageEl.addEventListener('mousedown', onPointerDown);
+window.addEventListener('mousemove', onPointerMove);
+window.addEventListener('mouseup', onPointerUp);
+
+// Touch events (mobile drag)
+stageEl.addEventListener('touchstart', onPointerDown, {passive:false});
+window.addEventListener('touchmove', onPointerMove, {passive:false});
+window.addEventListener('touchend', onPointerUp);
 
 stageEl.addEventListener('mouseleave', () => {
-  hoveredNode = null;
-  ttEl.classList.remove('show');
-});
-
-// ═══ CLICK NODE → SCROLL TO MATCH CARD ═══
-stageEl.addEventListener('click', function(e) {
-  if (!hoveredNode || hoveredNode.idx < 0) return;
-  const m = members[hoveredNode.idx];
-  const cards = document.querySelectorAll('.match-card');
-  cards.forEach(card => {
-    card.classList.remove('highlighted');
-    if (card.querySelector('.match-name') && card.querySelector('.match-name').textContent.includes(m.name)) {
-      card.classList.add('highlighted');
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(() => card.classList.remove('highlighted'), 2500);
-    }
-  });
+  if (!dragNode) { hoveredNode = null; ttEl.classList.remove('show'); }
 });
 
 // ═══ ENHANCED CHIP FEEDBACK ═══
