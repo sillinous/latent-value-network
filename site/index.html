@@ -150,6 +150,56 @@ footer .f-logo span{color:var(--teal-glow)}
 footer p{font-size:.7rem;color:rgba(255,255,255,.25);line-height:1.6}
 footer a{color:rgba(255,255,255,.4)}
 
+
+/* ── Why Section ── */
+.why-threads{display:grid;grid-template-columns:1fr;gap:2rem;margin:2.5rem 0}
+.why-thread{padding:1.5rem;background:linear-gradient(135deg,rgba(42,157,143,.03),rgba(233,196,106,.02));
+  border:1px solid rgba(42,157,143,.08);border-radius:14px;position:relative;overflow:hidden}
+.why-thread::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:2px}
+.why-thread.psych::before{background:var(--teal)}
+.why-thread.socio::before{background:var(--gold)}
+.why-thread.econ::before{background:var(--slate,#3D5A80)}
+.why-thread.philo::before{background:#E76F51}
+.why-thread.evol::before{background:#8B5CF6}
+.why-label{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5rem}
+.why-label.psych{color:var(--teal)}
+.why-label.socio{color:var(--gold)}
+.why-label.econ{color:var(--slate,#3D5A80)}
+.why-label.philo{color:#E76F51}
+.why-label.evol{color:#8B5CF6}
+.why-thread h3{font-family:var(--f-display);font-size:1.25rem;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:.5rem}
+.why-thread p{font-size:.88rem;color:var(--mid);line-height:1.7;margin-bottom:.5rem}
+.why-thread .why-cite{font-family:var(--f-mono);font-size:.65rem;color:var(--light-text,#8B95A5);margin-top:.4rem}
+.why-thread blockquote{margin:.8rem 0;padding:.6rem 1rem;border-left:2px solid rgba(42,157,143,.2);
+  font-style:italic;font-size:.84rem;color:var(--mid);line-height:1.6;background:rgba(42,157,143,.02);border-radius:0 8px 8px 0}
+
+/* ── Thesis banner ── */
+.thesis-banner{margin:2.5rem 0;padding:2rem;background:var(--navy,#0F1A2E);color:white;border-radius:14px;
+  position:relative;overflow:hidden}
+.thesis-banner::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(42,157,143,.1),transparent);pointer-events:none}
+.thesis-banner .thesis-label{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--teal-glow,#34D1BF);margin-bottom:.8rem}
+.thesis-banner h3{font-family:var(--f-display);font-size:clamp(1.3rem,3vw,1.8rem);font-weight:700;line-height:1.3;margin-bottom:.8rem}
+.thesis-banner p{font-size:.9rem;color:rgba(255,255,255,.65);line-height:1.7}
+
+/* ── Cascade diagram ── */
+.cascade{display:grid;grid-template-columns:1fr;gap:0;margin:2rem 0;position:relative;padding-left:2rem}
+.cascade::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--teal),var(--gold),#E76F51)}
+.cascade-step{position:relative;padding:.8rem 0 .8rem 1.5rem}
+.cascade-step::before{content:'';position:absolute;left:-2rem;top:1.1rem;width:12px;height:12px;border-radius:50%;border:2px solid var(--teal);background:white}
+.cascade-step:nth-child(2)::before{border-color:var(--gold)}
+.cascade-step:nth-child(3)::before{border-color:var(--slate,#3D5A80)}
+.cascade-step:nth-child(4)::before{border-color:#E76F51}
+.cascade-step:nth-child(5)::before{border-color:#8B5CF6}
+.cascade-step strong{color:var(--navy);font-size:.92rem}
+.cascade-step p{font-size:.82rem;color:var(--mid);line-height:1.5;margin-top:.2rem}
+
+@media(max-width:768px){
+  .why-threads{gap:1.5rem}
+  .cascade{padding-left:1.5rem}
+  .cascade::before{left:8px}
+  .cascade-step{padding-left:1rem}
+}
+
 /* ── Responsive ── */
 @media(max-width:768px){
   nav .links{display:none}
@@ -529,6 +579,7 @@ footer a{color:rgba(255,255,255,.4)}
     <button class="mobile-menu" onclick="document.querySelector('.links').classList.toggle('open')">☰</button>
     <div class="links">
       <a href="#problem">The Problem</a>
+      <a href="#why">The Why</a>
       <a href="#how">How It Works</a>
       <a href="#evidence">Evidence</a>
       <a href="#documents">Documents</a>
@@ -545,9 +596,14 @@ footer a{color:rgba(255,255,255,.4)}
   <div class="container">
     <div class="eyebrow hero-reveal">Open Cooperative Infrastructure for the AI Era</div>
     <h1>What if the help you need<br>is <em>already nearby?</em></h1>
-    <p class="lead">
+    <p class="lead hero-reveal">
       Every day, millions of cooperative connections fail — not because people are unwilling,
-      but because neither party knows the other exists. We're designing the protocol to change that.
+      but because neither party knows the other exists. The retired accountant three blocks from the struggling 
+      freelancer. The idle kitchen next to the neighborhood with no gathering space. The bilingual nurse 
+      whose translation skills could help dozens of families — if anyone knew to ask.
+    </p>
+    <p class="lead hero-reveal" style="font-size:.92rem;color:var(--mid);margin-top:-.5rem">
+      This isn't a technology problem. It's a <em>perception</em> problem — and it's costing humanity trillions.
     </p>
     <div class="btns">
       <a href="demo.html" class="btn btn-p" role="link">Try the Interactive Demo</a>
@@ -626,6 +682,165 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ HOW IT WORKS ═══ -->
+
+<!-- ═══ THE DEEPER WHY ═══ -->
+<section class="reveal stagger-2" id="why">
+  <div class="section-container">
+    <div class="section-eyebrow">The Deeper Question</div>
+    <h2 class="section-title">Why can't we see each other?</h2>
+    <p class="section-lead">
+      The latent value gap isn't a bug in our platforms. It's a consequence of how human cognition, 
+      social structure, economic systems, and institutional design interact to make cooperation invisible. 
+      Understanding <em>why</em> the gap exists is essential to designing something that actually closes it.
+    </p>
+
+    <div class="why-threads">
+
+      <div class="why-thread psych">
+        <div class="why-label psych">Psychology</div>
+        <h3>We don't know what we know — and we can't imagine what others need.</h3>
+        <p>
+          Psychologists call it the <strong>curse of knowledge</strong>: once you've internalized an expertise, 
+          you literally cannot remember what it was like not to have it. The retired accountant doesn't think of 
+          tax optimization as a skill because to her it's just... obvious. Simultaneously, the struggling freelancer 
+          can't articulate what he needs because he doesn't know what he doesn't know — a phenomenon called 
+          <strong>meta-ignorance</strong>.
+        </p>
+        <p>
+          These aren't character flaws. They're universal cognitive limitations. Dunning-Kruger works in reverse 
+          here: genuine experts systematically undervalue their rarest capabilities. The person most able to help 
+          is the person least likely to offer, and the person most in need is the person least likely to ask.
+        </p>
+        <blockquote>The skills that feel most natural to you are precisely the ones that are most invisible to you — and most valuable to someone else.</blockquote>
+        <div class="why-cite">Kruger & Dunning 1999; Camerer, Loewenstein & Weber 1989; Fischhoff 1975</div>
+      </div>
+
+      <div class="why-thread socio">
+        <div class="why-label socio">Sociology</div>
+        <h3>Our networks are silos, and social platforms reinforce them.</h3>
+        <p>
+          Mark Granovetter's foundational discovery — that <strong>weak ties</strong>, not strong ones, are the primary 
+          conduits for new opportunities — is now one of the most replicated findings in social science. 
+          Raj Chetty's team confirmed it at planetary scale: analyzing 21 billion Facebook friendships, they found that 
+          <strong>cross-class connection is the single strongest predictor of upward economic mobility</strong> — 
+          stronger than school quality, family structure, or local job markets.
+        </p>
+        <p>
+          But here's the cruel irony: every social platform we've built optimizes for <strong>homophily</strong> — 
+          connecting you with people like you. Recommendation algorithms maximize engagement by reinforcing existing 
+          patterns. The connections with the highest cooperative potential — the cross-boundary, complementary, 
+          unexpected ones — are systematically filtered out by the systems designed to "connect" us.
+        </p>
+        <blockquote>The most valuable connections in your community are the ones that would never appear in your feed, your search results, or your social graph. They exist in the space between networks — and nothing is designed to find them.</blockquote>
+        <div class="why-cite">Granovetter 1973; Rajkumar et al., Science 2022; Chetty et al., Nature 2022; McPherson et al. 2001</div>
+      </div>
+
+      <div class="why-thread econ">
+        <div class="why-label econ">Economics</div>
+        <h3>Markets are brilliant at pricing — and blind to everything else.</h3>
+        <p>
+          Market economies are extraordinary engines for matching supply with demand when both sides can be 
+          articulated and priced. But <strong>latent value defies articulation</strong>. You can't post a want-ad 
+          for "someone whose life experience maps to a problem I haven't identified yet." You can't price 
+          "the feeling of being useful again after retirement." There is no marketplace for complementarities 
+          that neither party recognizes.
+        </p>
+        <p>
+          Economists call these <strong>missing markets</strong> — situations where mutually beneficial exchanges 
+          don't happen because the transaction costs of discovering and arranging them exceed the expected returns. 
+          Nobel laureate Elinor Ostrom spent her career proving that communities routinely solve these problems 
+          through cooperative governance — but only when they can <em>see</em> each other. The question isn't 
+          whether cooperation works. It's whether we can make the invisible visible at scale.
+        </p>
+        <blockquote>The $1.3 trillion "latent value gap" isn't the value of goods that fail to trade. It's the value of cooperative relationships that fail to form — because markets have no mechanism for discovering them.</blockquote>
+        <div class="why-cite">Ostrom 1990; Coase 1960; Akerlof 1970; Arrow 1962</div>
+      </div>
+
+      <div class="why-thread philo">
+        <div class="why-label philo">Philosophy</div>
+        <h3>We've confused connection with cooperation.</h3>
+        <p>
+          We live in the most "connected" era in human history. Average social media users maintain hundreds of 
+          digital connections. Yet loneliness, civic disengagement, and institutional distrust are at record levels. 
+          Robert Putnam's <em>Bowling Alone</em> thesis has only accelerated: we have more contacts and less community.
+        </p>
+        <p>
+          The distinction matters. <strong>Connection</strong> is a link between two nodes. <strong>Cooperation</strong> is 
+          a mutually beneficial exchange that creates value neither party could create alone. Every social platform 
+          we've built optimizes for connections — follows, friends, endorsements. None optimizes for the asymmetric, 
+          complementary, cross-boundary relationships where cooperative value actually lives. We've been building 
+          the wrong thing.
+        </p>
+        <blockquote>Six billion people carry smartphones, each one a node in a planetary network. But a network of nodes is not a community. A community is a network of <em>capabilities and needs</em> — and that network is almost entirely unmapped.</blockquote>
+        <div class="why-cite">Putnam 2000; Turkle 2011; Sennett 2012; Arendt 1958</div>
+      </div>
+
+      <div class="why-thread evol">
+        <div class="why-label evol">Evolutionary Biology</div>
+        <h3>We're wired for reciprocity — at a scale our biology can't handle.</h3>
+        <p>
+          Humans evolved extraordinary capacities for cooperation — far beyond what any other primate achieves. 
+          Direct reciprocity, indirect reciprocity, group selection, and kin selection together created a species 
+          that builds civilizations through cooperative behavior. But these mechanisms evolved for groups of 
+          50–150 individuals (Dunbar's number). We could track who helped whom, who cheated, who had what skills.
+        </p>
+        <p>
+          Modern communities contain thousands to millions of people. Our cooperative instincts are intact but our 
+          <strong>cooperative perception</strong> is overwhelmed. We <em>want</em> to help. We <em>want</em> to 
+          reciprocate. We simply cannot see the cooperative opportunities that surround us at scale. The LVN 
+          is, fundamentally, a <strong>prosthetic for cooperative perception</strong> — extending our biological 
+          capacity for reciprocity into communities too large for our evolved senses to navigate.
+        </p>
+        <blockquote>The question isn't "are humans cooperative?" — we demonstrably are. The question is: "what happens when cooperative creatures are embedded in networks too vast for their perceptual systems to navigate?" The answer is what we see around us: willing cooperators, failing to cooperate.</blockquote>
+        <div class="why-cite">Nowak 2006; Dunbar 1992; Tomasello 2009; Bowles & Gintis 2011</div>
+      </div>
+
+    </div>
+
+    <div class="thesis-banner">
+      <div class="thesis-label">The Core Thesis</div>
+      <h3>The cooperative capacity of humanity vastly exceeds its cooperative performance — and the gap is perceptual, not motivational.</h3>
+      <p>
+        People aren't failing to cooperate because they're selfish, or lazy, or don't care. They're failing to cooperate 
+        because the cognitive, social, economic, and institutional systems they inhabit make cooperation <em>invisible</em>. 
+        The LVN doesn't try to make people more cooperative. It tries to make the cooperative opportunities that already 
+        exist <em>perceptible</em> — using AI as a prosthetic for the social cognition that evolution optimized for 
+        150-person bands, not million-person cities.
+      </p>
+    </div>
+
+    <div style="margin-top:2rem">
+      <div class="section-eyebrow" style="margin-bottom:.6rem">The Failure Cascade</div>
+      <p style="font-size:.88rem;color:var(--mid);line-height:1.6;margin-bottom:1rem">
+        Each level compounds the others. You can't fix the gap by addressing any single layer alone.
+      </p>
+      <div class="cascade">
+        <div class="cascade-step">
+          <strong>Cognitive blindness</strong>
+          <p>Experts can't see their own expertise → latent capacity goes unrecognized</p>
+        </div>
+        <div class="cascade-step">
+          <strong>Network homophily</strong>
+          <p>We cluster with similar people → complementary matches never form</p>
+        </div>
+        <div class="cascade-step">
+          <strong>Market failure</strong>
+          <p>Unarticulated needs can't enter any marketplace → no price signal, no discovery</p>
+        </div>
+        <div class="cascade-step">
+          <strong>Institutional gaps</strong>
+          <p>No institution is designed to surface cooperative complementarity → the gap is nobody's job</p>
+        </div>
+        <div class="cascade-step">
+          <strong>Scale mismatch</strong>
+          <p>Cooperative instincts evolved for 150 people → modern communities overwhelm perception</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <section class="reveal stagger-3" id="how">
   <div class="section-container">
     <div class="section-eyebrow">The Architecture</div>
@@ -680,6 +895,11 @@ footer a{color:rgba(255,255,255,.4)}
   <div class="section-container">
     <div class="section-eyebrow">The Research</div>
     <h2 class="section-title">This isn't speculation. It's quantified.</h2>
+    <p class="section-lead">
+      The evidence base spans social network science, labor economics, organizational psychology, 
+      and community development research. Across disciplines, the finding is consistent: 
+      the cooperative potential that goes unrealized dwarfs what any platform has captured.
+    </p>
 
     <div class="evidence-grid">
       <div class="evidence-card">
@@ -1001,9 +1221,14 @@ footer a{color:rgba(255,255,255,.4)}
   <section class="reveal stagger-5" id="join">
   <h2>The hardest problems are open by design.</h2>
   <p>
-    We're building this as an open protocol — not a company, not a platform.
-    We need cryptographers, economists, ethicists, engineers, organizers, and people who know
-    what cooperation looks like on the ground.
+    The gap between humanity's cooperative capacity and cooperative performance is the defining 
+    infrastructure challenge of our era. We're designing an open protocol to close it — not a company, 
+    not a platform. We need cryptographers, economists, ethicists, engineers, organizers, 
+    librarians, social workers, and anyone who knows what cooperation looks like on the ground.
+  </p>
+  <p style="font-size:.88rem;color:var(--mid);margin-top:.6rem">
+    The most important thing you can do right now isn't build — it's <strong>challenge</strong>. 
+    Tell us what's wrong with this approach. The protocol gets stronger every time someone finds a flaw.
   </p>
   <div class="btns">
     <a href="https://github.com/sillinous/latent-value-network" class="btn btn-p" role="link" style="text-decoration:none">Join on GitHub</a>
