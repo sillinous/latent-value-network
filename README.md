@@ -65,61 +65,56 @@ These are constraints, not preferences. They cannot be traded away.
 ## Repository Structure
 
 ```
-lvn/
-├── docs/
-│   ├── white-paper/           # Foundational white paper (v0.1)
-│   ├── architecture/          # Conceptual architecture documents
-│   ├── research/              # Research synthesis and literature review
-│   └── meeting-notes/         # Working group meeting notes
-├── specs/
-│   ├── signal-protocol/       # Signal Exchange Protocol specification
-│   ├── context-engine/        # Personal Context Engine specification
-│   ├── trust-fabric/          # Trust & Reputation Fabric specification
-│   └── governance/            # Governance framework specification
-├── research/
-│   ├── latent-value-gap/      # Quantifying the problem
-│   ├── privacy-preserving/    # Cryptographic approaches
-│   ├── network-topology/      # Network science research
-│   └── ethical-analysis/      # Ethical red-teaming
-├── references/
-│   ├── related-work/          # Adjacent projects and literature
-│   ├── prior-art/             # Existing approaches and their limitations
-│   └── theoretical-foundations/ # Key academic references
-├── community/
-│   ├── CONTRIBUTING.md        # How to contribute
-│   ├── CODE_OF_CONDUCT.md     # Community standards
-│   ├── working-groups/        # Working group charters
-│   └── discussions/           # Structured discussion topics
-├── website/                   # Project hub website
-└── README.md                  # This file
+latent-value-network/
+├── PLAN.md                  # Development plan — work packages, timelines, dependencies
+├── ROADMAP.md               # Project phases and milestones
+├── CONTRIBUTING.md           # How to contribute
+├── docs/                    # Working documents and strategy
+│   ├── WD-001 through WD-006  # Core specifications
+│   ├── protocol-integration-strategy.md  # MCP/A2A/CIP standards path
+│   ├── reference-implementation.md       # MVP pseudocode architecture
+│   └── research-landscape.md             # Related work
+├── specs/                   # Formal protocol specifications
+│   ├── taxonomy/              # Cooperative taxonomy + complementarity maps
+│   ├── mcp-sep/               # MCP Spec Enhancement Proposal
+│   ├── a2a-extension/         # A2A Agent Card extension
+│   └── cip/                   # Cooperative Intelligence Protocol
+├── src/                     # Implementation (MCP server, A2A agents, relay)
+├── community/               # Working groups, charter, pilot materials
+│   ├── working-groups/        # 5 group charters
+│   ├── pilot/                 # Pilot community assessment and materials
+│   └── CHARTER.md             # Community decision-making processes
+└── site/                    # Project website (hub, demo, provocations, architecture)
 ```
 
-## Roadmap
+## Roadmap & Development Plan
 
 ### Current Status: Phase 0 Complete, Entering Phase 1
 
-See [ROADMAP.md](ROADMAP.md) for the full 4-phase plan.
+See [ROADMAP.md](ROADMAP.md) for the project phases and **[PLAN.md](PLAN.md)** for the detailed development plan with work packages, timelines, and dependencies.
 
-**Completed:**
-- [x] WD-001: Foundational White Paper (v0.1)
-- [x] WD-002: Evidence Base (22 academic citations, 6 evidence streams)
-- [x] WD-003: Signal Exchange Protocol Specification (Layer 3)
-- [x] WD-004: Explainer Video Script/Storyboard (2 min, 6 scenes)
-- [x] WD-005: Trust & Reputation Fabric Specification (Layer 4)
-- [x] WD-006: Governance Framework (Layer 5)
-- [x] Reference Implementation Outline (MVP pseudocode architecture)
-- [x] Research Landscape (related work and positioning)
-- [x] Interactive concept demo
-- [x] 10 Provocations discussion document
-- [x] Architecture diagram
+**Phase 0 — Complete:**
+- [x] WD-001 through WD-006: All 6 working documents (White Paper, Evidence Base, Signal Exchange Protocol, Explainer Script, Trust Fabric, Governance Framework)
+- [x] Protocol Integration Strategy (MCP/A2A/CIP standards path)
+- [x] Reference Implementation Outline (MVP pseudocode)
+- [x] Cooperative Taxonomy v0.1 (170+ entries with complementarity mappings)
+- [x] Interactive concept demo, 10 provocations, architecture diagram
 - [x] GitHub repository with issue templates and 11 seeded discussions
 - [x] 6 audience-specific outreach posts
 - [x] Unified project hub website
 
-**Next:**
-- [ ] Working group formation (5 groups, see ROADMAP.md)
-- [ ] Community outreach to target audiences
-- [ ] First pilot community identification
+**Phase 1 — In Progress (March-May 2026):**
+- [ ] MCP Spec Enhancement Proposal for `cooperative_context` resource type
+- [ ] A2A Agent Card extension for cooperative capability discovery
+- [ ] CIP (Cooperative Intelligence Protocol) specification v0.1
+- [ ] Working group formation (5 groups — [join here](community/working-groups/README.md))
+- [ ] Pilot community identification (primary target: Newton, IL)
+
+**Phase 2 — Build (June-October 2026):**
+- [ ] MCP server reference implementation
+- [ ] A2A cooperative discovery agents
+- [ ] Community relay service
+- [ ] Privacy audit and pilot deployment
 
 ## Contributing
 

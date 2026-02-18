@@ -1,0 +1,336 @@
+# LVN Complementarity Map v0.1
+#
+# This file defines which skills serve which needs.
+# This is the core innovation: COMPLEMENTARITY, not similarity.
+#
+# Format: skill_path → [need_paths]
+# Weight: 1.0 = direct match, 0.5 = partial/indirect match
+#
+# The matching engine uses these mappings to score potential connections.
+# A high complementarity score means: "what you can do is exactly what they need."
+
+version: "0.1.0"
+taxonomy_version: "0.1.0"
+
+mappings:
+
+  # ══════════════════════════════════════════════
+  # PRACTICAL → NEEDS
+  # ══════════════════════════════════════════════
+
+  practical.home-repair.plumbing:
+    - { need: housing.maintenance, weight: 1.0 }
+    - { need: housing.improvement, weight: 0.5 }
+
+  practical.home-repair.electrical:
+    - { need: housing.maintenance, weight: 1.0 }
+    - { need: housing.improvement, weight: 0.7 }
+    - { need: housing.energy-efficiency, weight: 0.5 }
+
+  practical.home-repair.structural:
+    - { need: housing.maintenance, weight: 1.0 }
+    - { need: housing.improvement, weight: 0.8 }
+    - { need: housing.accessibility-modification, weight: 0.6 }
+
+  practical.home-repair.general-maintenance:
+    - { need: housing.maintenance, weight: 0.8 }
+    - { need: housing.improvement, weight: 0.4 }
+
+  practical.home-repair.hvac:
+    - { need: housing.maintenance, weight: 0.9 }
+    - { need: housing.energy-efficiency, weight: 0.7 }
+
+  practical.agriculture.crop-management:
+    - { need: health.nutrition, weight: 0.5 }
+    - { need: community.inclusion, weight: 0.3 }
+    - { need: personal.learning, weight: 0.4 }
+
+  practical.agriculture.organic-methods:
+    - { need: health.nutrition, weight: 0.6 }
+    - { need: personal.learning, weight: 0.5 }
+
+  practical.food.cooking:
+    - { need: health.nutrition, weight: 0.7 }
+    - { need: family.activities, weight: 0.4 }
+    - { need: community.event-support, weight: 0.5 }
+    - { need: personal.social-connection, weight: 0.3 }
+
+  practical.food.preservation-canning:
+    - { need: health.nutrition, weight: 0.5 }
+    - { need: personal.learning, weight: 0.6 }
+
+  practical.food.nutrition-planning:
+    - { need: health.nutrition, weight: 1.0 }
+    - { need: health.chronic-management, weight: 0.5 }
+    - { need: health.fitness, weight: 0.6 }
+
+  practical.transportation.driving:
+    - { need: housing.moving, weight: 0.6 }
+    - { need: health.navigation, weight: 0.3 }
+    - { need: family.activities, weight: 0.3 }
+
+  practical.transportation.vehicle-maintenance:
+    - { need: financial.budgeting, weight: 0.3 }
+    - { need: personal.learning, weight: 0.4 }
+
+  practical.crafts.woodworking:
+    - { need: housing.improvement, weight: 0.6 }
+    - { need: personal.creative-expression, weight: 0.5 }
+    - { need: personal.learning, weight: 0.5 }
+
+  practical.crafts.electronics-repair:
+    - { need: housing.maintenance, weight: 0.4 }
+    - { need: financial.budgeting, weight: 0.3 }
+
+  practical.outdoor.landscaping:
+    - { need: housing.improvement, weight: 0.6 }
+    - { need: community.outreach, weight: 0.3 }
+
+  # ══════════════════════════════════════════════
+  # PROFESSIONAL → NEEDS
+  # ══════════════════════════════════════════════
+
+  professional.technology.programming:
+    - { need: business.technology-setup, weight: 1.0 }
+    - { need: business.web-presence, weight: 0.7 }
+    - { need: career.skill-development, weight: 0.5 }
+    - { need: personal.digital-literacy, weight: 0.4 }
+
+  professional.technology.web-development:
+    - { need: business.web-presence, weight: 1.0 }
+    - { need: business.marketing, weight: 0.5 }
+    - { need: community.outreach, weight: 0.4 }
+
+  professional.technology.data-analysis:
+    - { need: business.operations, weight: 0.6 }
+    - { need: community.grant-applications, weight: 0.5 }
+    - { need: career.skill-development, weight: 0.4 }
+
+  professional.technology.tech-support:
+    - { need: personal.digital-literacy, weight: 1.0 }
+    - { need: business.technology-setup, weight: 0.8 }
+
+  professional.finance.accounting:
+    - { need: financial.tax, weight: 0.8 }
+    - { need: financial.budgeting, weight: 0.7 }
+    - { need: business.compliance, weight: 0.6 }
+
+  professional.finance.tax-planning:
+    - { need: financial.tax, weight: 1.0 }
+    - { need: business.compliance, weight: 0.5 }
+    - { need: career.freelance-setup, weight: 0.4 }
+
+  professional.finance.budgeting:
+    - { need: financial.budgeting, weight: 1.0 }
+    - { need: financial.debt, weight: 0.6 }
+    - { need: family.education, weight: 0.3 }
+
+  professional.finance.grant-writing:
+    - { need: community.grant-applications, weight: 1.0 }
+    - { need: business.marketing, weight: 0.3 }
+    - { need: financial.business-startup, weight: 0.5 }
+
+  professional.finance.small-business-finance:
+    - { need: financial.business-startup, weight: 1.0 }
+    - { need: business.operations, weight: 0.6 }
+    - { need: career.freelance-setup, weight: 0.7 }
+
+  professional.legal.contracts:
+    - { need: business.compliance, weight: 0.8 }
+    - { need: career.freelance-setup, weight: 0.5 }
+
+  professional.legal.tenant-rights:
+    - { need: housing.maintenance, weight: 0.4 }
+    - { need: financial.benefits-navigation, weight: 0.3 }
+
+  professional.legal.small-business:
+    - { need: business.compliance, weight: 1.0 }
+    - { need: financial.business-startup, weight: 0.7 }
+
+  professional.legal.estate-planning:
+    - { need: family.elder-care, weight: 0.5 }
+    - { need: financial.insurance, weight: 0.4 }
+
+  professional.healthcare.system-navigation:
+    - { need: health.navigation, weight: 1.0 }
+    - { need: financial.benefits-navigation, weight: 0.5 }
+    - { need: financial.insurance, weight: 0.4 }
+
+  professional.healthcare.elder-care:
+    - { need: health.elder-care-planning, weight: 1.0 }
+    - { need: family.elder-care, weight: 0.8 }
+
+  professional.healthcare.mental-health:
+    - { need: health.mental-health, weight: 1.0 }
+    - { need: personal.life-transition, weight: 0.4 }
+
+  professional.healthcare.health-literacy:
+    - { need: health.chronic-management, weight: 0.6 }
+    - { need: health.navigation, weight: 0.5 }
+    - { need: personal.learning, weight: 0.3 }
+
+  professional.education.tutoring:
+    - { need: family.education, weight: 1.0 }
+    - { need: career.skill-development, weight: 0.7 }
+    - { need: personal.learning, weight: 0.8 }
+
+  professional.education.mentoring:
+    - { need: career.transition, weight: 0.8 }
+    - { need: career.networking, weight: 0.5 }
+    - { need: personal.life-transition, weight: 0.4 }
+
+  professional.education.language-teaching:
+    - { need: personal.language, weight: 1.0 }
+    - { need: career.skill-development, weight: 0.4 }
+    - { need: community.inclusion, weight: 0.5 }
+
+  professional.education.special-needs:
+    - { need: family.special-needs, weight: 1.0 }
+    - { need: family.education, weight: 0.6 }
+
+  professional.business.marketing:
+    - { need: business.marketing, weight: 1.0 }
+    - { need: business.web-presence, weight: 0.5 }
+    - { need: community.outreach, weight: 0.4 }
+
+  professional.business.project-management:
+    - { need: business.operations, weight: 0.7 }
+    - { need: community.event-support, weight: 0.5 }
+    - { need: community.volunteer-management, weight: 0.4 }
+
+  professional.design.graphic-design:
+    - { need: business.marketing, weight: 0.7 }
+    - { need: business.web-presence, weight: 0.5 }
+    - { need: community.outreach, weight: 0.5 }
+    - { need: personal.creative-expression, weight: 0.3 }
+
+  professional.media.writing-editing:
+    - { need: business.marketing, weight: 0.5 }
+    - { need: community.grant-applications, weight: 0.6 }
+    - { need: career.job-search, weight: 0.4 }
+    - { need: personal.creative-expression, weight: 0.4 }
+
+  professional.media.photography:
+    - { need: business.marketing, weight: 0.5 }
+    - { need: community.event-support, weight: 0.6 }
+    - { need: personal.creative-expression, weight: 0.5 }
+
+  # ══════════════════════════════════════════════
+  # RELATIONAL → NEEDS
+  # ══════════════════════════════════════════════
+
+  relational.community.organizing:
+    - { need: community.event-support, weight: 0.8 }
+    - { need: community.volunteer-management, weight: 0.7 }
+    - { need: community.outreach, weight: 0.6 }
+
+  relational.community.event-planning:
+    - { need: community.event-support, weight: 1.0 }
+    - { need: family.activities, weight: 0.4 }
+    - { need: personal.social-connection, weight: 0.3 }
+
+  relational.community.conflict-resolution:
+    - { need: community.inclusion, weight: 0.6 }
+    - { need: personal.life-transition, weight: 0.3 }
+
+  relational.community.fundraising:
+    - { need: community.grant-applications, weight: 0.7 }
+    - { need: financial.business-startup, weight: 0.3 }
+
+  relational.care.childcare:
+    - { need: family.childcare, weight: 1.0 }
+    - { need: family.activities, weight: 0.4 }
+
+  relational.care.elder-companionship:
+    - { need: family.elder-care, weight: 0.8 }
+    - { need: personal.social-connection, weight: 0.6 }
+
+  relational.care.crisis-support:
+    - { need: health.mental-health, weight: 0.5 }
+    - { need: personal.life-transition, weight: 0.6 }
+
+  relational.care.respite-care:
+    - { need: family.childcare, weight: 0.6 }
+    - { need: family.elder-care, weight: 0.6 }
+    - { need: family.special-needs, weight: 0.7 }
+
+  relational.communication.translation:
+    - { need: personal.language, weight: 0.8 }
+    - { need: health.navigation, weight: 0.5 }
+    - { need: community.inclusion, weight: 0.7 }
+
+  relational.communication.mediation:
+    - { need: community.inclusion, weight: 0.5 }
+    - { need: business.hiring, weight: 0.3 }
+
+  relational.cultural.music:
+    - { need: personal.creative-expression, weight: 0.8 }
+    - { need: community.event-support, weight: 0.4 }
+    - { need: personal.social-connection, weight: 0.3 }
+
+  relational.cultural.art-instruction:
+    - { need: personal.creative-expression, weight: 1.0 }
+    - { need: personal.learning, weight: 0.5 }
+    - { need: family.activities, weight: 0.4 }
+
+  # ══════════════════════════════════════════════
+  # SITUATIONAL → NEEDS
+  # ══════════════════════════════════════════════
+
+  situational.space.workshop:
+    - { need: housing.improvement, weight: 0.4 }
+    - { need: personal.creative-expression, weight: 0.5 }
+    - { need: personal.learning, weight: 0.4 }
+
+  situational.space.kitchen:
+    - { need: community.event-support, weight: 0.5 }
+    - { need: financial.business-startup, weight: 0.4 }
+    - { need: personal.social-connection, weight: 0.3 }
+
+  situational.space.meeting-room:
+    - { need: community.event-support, weight: 0.6 }
+    - { need: business.operations, weight: 0.3 }
+
+  situational.space.garden-plot:
+    - { need: health.nutrition, weight: 0.5 }
+    - { need: personal.learning, weight: 0.4 }
+
+  situational.equipment.tools:
+    - { need: housing.maintenance, weight: 0.5 }
+    - { need: housing.improvement, weight: 0.5 }
+
+  situational.equipment.vehicle:
+    - { need: housing.moving, weight: 0.7 }
+    - { need: community.event-support, weight: 0.3 }
+
+  situational.access.professional-network:
+    - { need: career.networking, weight: 1.0 }
+    - { need: career.job-search, weight: 0.6 }
+    - { need: business.hiring, weight: 0.5 }
+
+  situational.access.institutional-access:
+    - { need: community.grant-applications, weight: 0.4 }
+    - { need: career.certification, weight: 0.3 }
+
+  situational.time.flexible-schedule:
+    - { need: family.childcare, weight: 0.4 }
+    - { need: family.elder-care, weight: 0.4 }
+    - { need: community.volunteer-management, weight: 0.5 }
+
+  situational.time.emergency-response:
+    - { need: housing.maintenance, weight: 0.5 }
+    - { need: family.childcare, weight: 0.3 }
+
+  situational.knowledge.local-knowledge:
+    - { need: housing.improvement, weight: 0.3 }
+    - { need: community.outreach, weight: 0.5 }
+    - { need: personal.social-connection, weight: 0.4 }
+
+  situational.knowledge.regulatory-knowledge:
+    - { need: business.compliance, weight: 0.7 }
+    - { need: financial.benefits-navigation, weight: 0.5 }
+
+# Total mappings: 150+
+# Average needs served per skill: 2.5
+# Maximum needs served per skill: 4
+# Cross-domain mappings: ~60% of all mappings cross domain boundaries

@@ -1,0 +1,293 @@
+# LVN Cooperative Taxonomy v0.1
+# 
+# This taxonomy defines the shared vocabulary for human cooperative potential.
+# It is designed for COMPLEMENTARITY matching (what you offer meets what I need),
+# not SIMILARITY matching (we have the same skills).
+#
+# Structure: domain → category → subcategories[]
+# Complementarity: defined separately in complementarity-map.yaml
+#
+# Governance: See TAXONOMY-GOVERNANCE.md
+# Version: 0.1.0 (semver)
+# License: CC BY-SA 4.0
+
+version: "0.1.0"
+released: "2026-02-18"
+
+domains:
+
+  practical:
+    description: "Hands-on skills involving physical work, tools, or tangible outputs"
+    categories:
+      home-repair:
+        subcategories:
+          - plumbing
+          - electrical
+          - structural
+          - appliance-repair
+          - general-maintenance
+          - painting-finishing
+          - hvac
+      agriculture:
+        subcategories:
+          - crop-management
+          - irrigation
+          - livestock
+          - soil-science
+          - equipment-operation
+          - organic-methods
+          - food-forest
+      food:
+        subcategories:
+          - cooking
+          - baking
+          - preservation-canning
+          - nutrition-planning
+          - commercial-kitchen
+          - dietary-specialization
+          - fermentation
+      transportation:
+        subcategories:
+          - driving
+          - logistics
+          - vehicle-maintenance
+          - route-planning
+      crafts:
+        subcategories:
+          - woodworking
+          - sewing-textiles
+          - metalwork
+          - ceramics
+          - electronics-repair
+      outdoor:
+        subcategories:
+          - landscaping
+          - tree-care
+          - pest-management
+          - water-management
+          - composting
+
+  professional:
+    description: "Knowledge-based skills typically associated with professional work"
+    categories:
+      technology:
+        subcategories:
+          - programming
+          - web-development
+          - database
+          - networking
+          - tech-support
+          - data-analysis
+          - cybersecurity
+          - ai-ml
+      finance:
+        subcategories:
+          - accounting
+          - tax-planning
+          - budgeting
+          - investment
+          - insurance-navigation
+          - grant-writing
+          - small-business-finance
+      legal:
+        subcategories:
+          - contracts
+          - property
+          - employment
+          - small-business
+          - immigration
+          - tenant-rights
+          - estate-planning
+      healthcare:
+        subcategories:
+          - clinical-knowledge
+          - system-navigation
+          - elder-care
+          - mental-health
+          - health-literacy
+          - first-aid
+          - chronic-condition
+      education:
+        subcategories:
+          - curriculum-design
+          - tutoring
+          - mentoring
+          - skill-assessment
+          - language-teaching
+          - special-needs
+          - adult-learning
+      business:
+        subcategories:
+          - marketing
+          - sales
+          - operations
+          - human-resources
+          - project-management
+          - strategy
+          - customer-service
+      design:
+        subcategories:
+          - graphic-design
+          - ux-ui
+          - interior-design
+          - product-design
+          - branding
+      media:
+        subcategories:
+          - photography
+          - videography
+          - writing-editing
+          - audio-production
+          - social-media
+          - public-relations
+
+  relational:
+    description: "Skills involving human connection, care, and community"
+    categories:
+      community:
+        subcategories:
+          - organizing
+          - event-planning
+          - conflict-resolution
+          - volunteer-coordination
+          - fundraising
+          - advocacy
+      care:
+        subcategories:
+          - childcare
+          - elder-companionship
+          - pet-care
+          - crisis-support
+          - disability-assistance
+          - respite-care
+      communication:
+        subcategories:
+          - translation
+          - writing
+          - public-speaking
+          - mediation
+          - counseling
+          - active-listening
+      cultural:
+        subcategories:
+          - music
+          - art-instruction
+          - cultural-heritage
+          - storytelling
+          - dance
+          - spiritual-practice
+
+  situational:
+    description: "Resources, access, and situational assets (not skills, but cooperative capacity)"
+    categories:
+      space:
+        subcategories:
+          - workshop
+          - kitchen
+          - meeting-room
+          - garden-plot
+          - storage
+          - studio
+      equipment:
+        subcategories:
+          - tools
+          - vehicle
+          - computing
+          - specialized-equipment
+          - musical-instruments
+      access:
+        subcategories:
+          - professional-network
+          - institutional-access
+          - supplier-relationships
+          - wholesale-pricing
+          - certification
+      time:
+        subcategories:
+          - flexible-schedule
+          - weekend-availability
+          - seasonal-availability
+          - emergency-response
+      knowledge:
+        subcategories:
+          - local-knowledge
+          - industry-expertise
+          - regulatory-knowledge
+          - historical-knowledge
+          - research-skills
+
+# Need categories mirror skills but represent the demand side
+# The complementarity-map.yaml defines which skills serve which needs
+# Needs use the same taxonomy IDs with a "need." prefix
+# e.g., "practical.home-repair.plumbing" (skill) serves "need.housing.maintenance.plumbing" (need)
+
+needs:
+  housing:
+    subcategories:
+      - maintenance
+      - improvement
+      - energy-efficiency
+      - accessibility-modification
+      - moving
+  financial:
+    subcategories:
+      - tax
+      - debt
+      - budgeting
+      - insurance
+      - benefits-navigation
+      - business-startup
+  health:
+    subcategories:
+      - navigation
+      - chronic-management
+      - mental-health
+      - elder-care-planning
+      - fitness
+      - nutrition
+  career:
+    subcategories:
+      - transition
+      - skill-development
+      - job-search
+      - freelance-setup
+      - certification
+      - networking
+  family:
+    subcategories:
+      - childcare
+      - elder-care
+      - education
+      - activities
+      - special-needs
+  business:
+    subcategories:
+      - marketing
+      - web-presence
+      - compliance
+      - hiring
+      - operations
+      - technology-setup
+  community:
+    subcategories:
+      - event-support
+      - volunteer-management
+      - grant-applications
+      - outreach
+      - inclusion
+  personal:
+    subcategories:
+      - learning
+      - creative-expression
+      - social-connection
+      - life-transition
+      - language
+      - digital-literacy
+
+# Statistics
+# Domains: 4
+# Skill categories: 21
+# Skill subcategories: 123
+# Need categories: 8
+# Need subcategories: 47
+# Total taxonomy entries: 170+
