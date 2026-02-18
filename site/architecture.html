@@ -125,6 +125,33 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
 .diagram-legend span { display: flex; align-items: center; gap: 0.3rem; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
+
+/* ── Protocol Flow Visualization ── */
+.proto-viz {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  margin: 1.5rem auto 2rem;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(42,157,143,0.15);
+}
+.proto-viz canvas {
+  width: 100%;
+  height: 100%;
+}
+.proto-viz-label {
+  position: absolute;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  pointer-events: none;
+}
+
 </style>
 <meta name="description" content="Five-layer protocol architecture for privacy-preserving ambient human cooperation, with integration points for MCP, A2A, and UCP.">
 <meta property="og:title" content="Architecture Diagram — Latent Value Network">
@@ -142,6 +169,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
 <nav class="lvn-nav" role="navigation" aria-label="Main navigation">
   <div class="lvn-nav-inner">
     <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <button class="lvn-nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
     <div class="lvn-nav-links">
       <a href="index.html">Hub</a>
       <a href="demo.html">Demo</a>
@@ -226,6 +254,12 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
     <span><div class="legend-dot" style="background:#3D5A80"></div>Governance</span>
     <span>Click any layer to expand details below ↓</span>
   </div>
+</div>
+
+
+<div class="proto-viz">
+  <canvas id="proto-canvas"></canvas>
+  <div class="proto-viz-label" style="top:12px;left:50%;transform:translateX(-50%)">live protocol flow</div>
 </div>
 
 <div class="layers">
@@ -433,5 +467,155 @@ document.querySelectorAll('.layer').forEach(l => {
 });
 </script>
 <script src="shared.js"></script>
+<footer class="lvn-footer-full">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">Latent <span>Value</span> Network</div>
+      <p>An open collaborative initiative designing the cooperative intelligence protocol. Not a company. Not a platform. A protocol for human cooperation.</p>
+      <p style="color:rgba(255,255,255,0.25);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.4)">CC BY-SA 4.0</a></p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="demo.html">Interactive Demo</a>
+      <a href="provocations.html">10 Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/PLAN.md">Development Plan</a>
+    </div>
+    <div class="footer-col">
+      <h4>Specifications</h4>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md">White Paper</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-003-signal-exchange-protocol.md">Signal Protocol</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-005-trust-fabric.md">Trust Fabric</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/protocol-integration-strategy.md">MCP/A2A Strategy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contribute</h4>
+      <a href="https://github.com/sillinous/latent-value-network">GitHub Repository</a>
+      <a href="https://github.com/sillinous/latent-value-network/discussions">Discussions</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/CONTRIBUTING.md">Contributing Guide</a>
+      <a href="mailto:latentvaluenetwork@proton.me">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Inspired by the work of Elinor Ostrom, Mark Granovetter, Raj Chetty, and everyone who believes cooperation doesn't need to be this hard.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('proto-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], frame = 0;
+  
+  const NODES = [
+    { label: 'User A', x: 0.12, y: 0.5, color: [233,196,106], r: 14 },
+    { label: 'Context', x: 0.28, y: 0.35, color: [42,157,143], r: 10 },
+    { label: 'Signal', x: 0.42, y: 0.5, color: [42,157,143], r: 10 },
+    { label: 'Relay', x: 0.56, y: 0.5, color: [61,90,128], r: 12 },
+    { label: 'Match', x: 0.70, y: 0.5, color: [42,157,143], r: 10 },
+    { label: 'Context', x: 0.70, y: 0.35, color: [42,157,143], r: 10 },
+    { label: 'User B', x: 0.88, y: 0.5, color: [233,196,106], r: 14 },
+    { label: 'Trust', x: 0.56, y: 0.25, color: [61,90,128], r: 8 },
+    { label: 'Governance', x: 0.56, y: 0.8, color: [61,90,128], r: 8 },
+  ];
+  
+  const EDGES = [
+    [0,1],[1,2],[2,3],[3,4],[4,5],[5,6], // main flow
+    [3,7],[3,8], // trust + governance
+    [7,1],[7,5], // trust connections
+  ];
+  
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    W = canvas.width = rect.width * dpr;
+    H = canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  
+  function draw() {
+    const w = W / (window.devicePixelRatio || 1);
+    const h = H / (window.devicePixelRatio || 1);
+    ctx.clearRect(0, 0, w, h);
+    frame++;
+    
+    // Draw edges
+    EDGES.forEach(([i, j]) => {
+      const a = NODES[i], b = NODES[j];
+      ctx.beginPath();
+      ctx.moveTo(a.x * w, a.y * h);
+      ctx.lineTo(b.x * w, b.y * h);
+      ctx.strokeStyle = 'rgba(42,157,143,0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+    
+    // Animate flowing particles along edges
+    if (frame % 30 === 0) {
+      const edge = EDGES[Math.floor(Math.random() * 6)]; // main flow only
+      particles.push({
+        from: edge[0], to: edge[1], t: 0,
+        color: NODES[edge[0]].color,
+        speed: 0.008 + Math.random() * 0.006
+      });
+    }
+    
+    particles = particles.filter(p => p.t <= 1);
+    particles.forEach(p => {
+      p.t += p.speed;
+      const a = NODES[p.from], b = NODES[p.to];
+      const x = (a.x + (b.x - a.x) * p.t) * w;
+      const y = (a.y + (b.y - a.y) * p.t) * h;
+      const alpha = p.t < 0.2 ? p.t * 5 : p.t > 0.8 ? (1 - p.t) * 5 : 1;
+      ctx.beginPath();
+      ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color.join(',')},${alpha * 0.7})`;
+      ctx.fill();
+      // Glow
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color.join(',')},${alpha * 0.15})`;
+      ctx.fill();
+    });
+    
+    // Draw nodes
+    NODES.forEach((n, i) => {
+      const x = n.x * w, y = n.y * h;
+      const pulse = 1 + Math.sin(frame * 0.02 + i) * 0.08;
+      
+      // Glow
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, n.r * 2.5 * pulse);
+      grad.addColorStop(0, `rgba(${n.color.join(',')},0.15)`);
+      grad.addColorStop(1, `rgba(${n.color.join(',')},0)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(x - n.r * 3, y - n.r * 3, n.r * 6, n.r * 6);
+      
+      // Node
+      ctx.beginPath();
+      ctx.arc(x, y, n.r * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${n.color.join(',')},0.8)`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${n.color.join(',')},0.3)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      // Label
+      ctx.font = '500 9px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = `rgba(255,255,255,0.6)`;
+      ctx.fillText(n.label, x, y + n.r + 14);
+    });
+    
+    requestAnimationFrame(draw);
+  }
+  
+  resize();
+  window.addEventListener('resize', resize);
+  draw();
+})();
+</script>
 </body>
 </html>

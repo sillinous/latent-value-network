@@ -92,6 +92,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
 <nav class="lvn-nav" role="navigation" aria-label="Main navigation">
   <div class="lvn-nav-inner">
     <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <button class="lvn-nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
     <div class="lvn-nav-links">
       <a href="index.html">Hub</a>
       <a href="demo.html">Demo</a>
@@ -364,8 +365,38 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 </div>
 
-<footer>
-  <p>The Latent Value Network · Open Collaborative Initiative · CC BY-SA 4.0</p>
+<footer class="lvn-footer-full">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">Latent <span>Value</span> Network</div>
+      <p>An open collaborative initiative designing the cooperative intelligence protocol. Not a company. Not a platform. A protocol for human cooperation.</p>
+      <p style="color:rgba(255,255,255,0.25);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.4)">CC BY-SA 4.0</a></p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="demo.html">Interactive Demo</a>
+      <a href="provocations.html">10 Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/PLAN.md">Development Plan</a>
+    </div>
+    <div class="footer-col">
+      <h4>Specifications</h4>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md">White Paper</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-003-signal-exchange-protocol.md">Signal Protocol</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-005-trust-fabric.md">Trust Fabric</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/protocol-integration-strategy.md">MCP/A2A Strategy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contribute</h4>
+      <a href="https://github.com/sillinous/latent-value-network">GitHub Repository</a>
+      <a href="https://github.com/sillinous/latent-value-network/discussions">Discussions</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/CONTRIBUTING.md">Contributing Guide</a>
+      <a href="mailto:latentvaluenetwork@proton.me">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Inspired by the work of Elinor Ostrom, Mark Granovetter, Raj Chetty, and everyone who believes cooperation doesn't need to be this hard.</p>
+  </div>
 </footer>
 
 <script src="shared.js"></script>

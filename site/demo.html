@@ -873,6 +873,65 @@ footer .f-logo span { color: var(--teal); }
   padding: 0.2rem;
 }
 
+
+/* ── Expandable Match Cards ── */
+.match-expand-btn {
+  display: block;
+  width: 100%;
+  padding: 0.4rem;
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.04);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: var(--teal, #2A9D8F);
+  cursor: pointer;
+  transition: all 200ms;
+}
+.match-expand-btn:hover { background: rgba(42,157,143,0.04); }
+.match-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0 0.8rem;
+}
+.match-details.open {
+  max-height: 300px;
+  opacity: 1;
+  padding: 0.8rem;
+}
+.match-details-section {
+  margin-bottom: 0.6rem;
+}
+.match-details-label {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--light-text, #8B95A5);
+  margin-bottom: 0.25rem;
+}
+.match-details-value {
+  font-size: 0.78rem;
+  color: var(--mid-text, #5A6577);
+  line-height: 1.5;
+}
+.match-trust-bar {
+  height: 4px;
+  background: var(--warm-gray, #F0EDE8);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 0.3rem;
+}
+.match-trust-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal, #2A9D8F), var(--gold, #E9C46A));
+  border-radius: 2px;
+  transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 </style>
 <meta name="description" content="Experience the Latent Value Gap firsthand. Discover cooperative connections you didn't know existed in a simulated community.">
 <meta property="og:title" content="Interactive Demo — Latent Value Network">
@@ -890,6 +949,7 @@ footer .f-logo span { color: var(--teal); }
 <nav class="lvn-nav" role="navigation" aria-label="Main navigation">
   <div class="lvn-nav-inner">
     <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <button class="lvn-nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
     <div class="lvn-nav-links">
       <a href="index.html">Hub</a>
       <a href="demo.html">Demo</a>
@@ -1209,9 +1269,38 @@ footer .f-logo span { color: var(--teal); }
   </div>
 </div>
 
-<footer>
-  <div class="f-logo">Latent <span>Value</span> Network</div>
-  <p>An open collaborative initiative · CC BY-SA 4.0<br>This is a concept demonstration, not a live service.</p>
+<footer class="lvn-footer-full">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">Latent <span>Value</span> Network</div>
+      <p>An open collaborative initiative designing the cooperative intelligence protocol. Not a company. Not a platform. A protocol for human cooperation.</p>
+      <p style="color:rgba(255,255,255,0.25);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.4)">CC BY-SA 4.0</a></p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="demo.html">Interactive Demo</a>
+      <a href="provocations.html">10 Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/PLAN.md">Development Plan</a>
+    </div>
+    <div class="footer-col">
+      <h4>Specifications</h4>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md">White Paper</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-003-signal-exchange-protocol.md">Signal Protocol</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-005-trust-fabric.md">Trust Fabric</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/protocol-integration-strategy.md">MCP/A2A Strategy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contribute</h4>
+      <a href="https://github.com/sillinous/latent-value-network">GitHub Repository</a>
+      <a href="https://github.com/sillinous/latent-value-network/discussions">Discussions</a>
+      <a href="https://github.com/sillinous/latent-value-network/blob/main/CONTRIBUTING.md">Contributing Guide</a>
+      <a href="mailto:latentvaluenetwork@proton.me">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Inspired by the work of Elinor Ostrom, Mark Granovetter, Raj Chetty, and everyone who believes cooperation doesn't need to be this hard.</p>
+  </div>
 </footer>
 
 <script>
@@ -2003,6 +2092,57 @@ document.addEventListener('keydown', function(e) {
       }
     }
   } catch {}
+})();
+</script>
+
+<script>
+// ── Match Card Expansion ──
+(function(){
+  const observer = new MutationObserver(() => {
+    const resultsScreen = document.getElementById('screen-results');
+    if (!resultsScreen || !resultsScreen.classList.contains('active')) return;
+    
+    // Find match cards that don't have expand buttons yet
+    resultsScreen.querySelectorAll('[style*="border-radius"][style*="border"]').forEach(card => {
+      if (card.querySelector('.match-expand-btn') || card.offsetHeight < 50) return;
+      
+      // Extract info from card
+      const name = (card.querySelector('strong, [style*="font-weight:700"]') || {}).textContent || '';
+      const tags = [...card.querySelectorAll('[style*="font-size:.68rem"]')].map(t => t.textContent);
+      const story = (card.querySelector('[style*="font-style:italic"]') || {}).textContent || '';
+      
+      // Create expandable details
+      const details = document.createElement('div');
+      details.className = 'match-details';
+      details.innerHTML = 
+        '<div class="match-details-section">' +
+          '<div class="match-details-label">Complementarity Analysis</div>' +
+          '<div class="match-details-value">' + (story || 'This match was surfaced because your skills and needs complement each other in ways that explicit search would never find.') + '</div>' +
+        '</div>' +
+        '<div class="match-details-section">' +
+          '<div class="match-details-label">Trust Path</div>' +
+          '<div class="match-details-value">Community-anchored · ' + Math.floor(Math.random() * 3 + 1) + ' shared connections</div>' +
+          '<div class="match-trust-bar"><div class="match-trust-fill" style="width:' + (60 + Math.floor(Math.random() * 30)) + '%"></div></div>' +
+        '</div>' +
+        '<div class="match-details-section">' +
+          '<div class="match-details-label">Handshake Status</div>' +
+          '<div class="match-details-value" style="color:var(--teal)">✦ Ready for first disclosure — both parties would need to opt in</div>' +
+        '</div>';
+      
+      const btn = document.createElement('button');
+      btn.className = 'match-expand-btn';
+      btn.textContent = 'Show details ↓';
+      btn.addEventListener('click', function() {
+        const isOpen = details.classList.toggle('open');
+        btn.textContent = isOpen ? 'Hide details ↑' : 'Show details ↓';
+      });
+      
+      card.appendChild(btn);
+      card.appendChild(details);
+    });
+  });
+  
+  observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
 })();
 </script>
 </body>
