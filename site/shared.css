@@ -356,3 +356,30 @@ body::before {
   text-decoration: none;
 }
 .lvn-footer a:hover { text-decoration: underline; }
+
+/* ── Dark Mode Deep Overrides ── */
+[data-theme="dark"] .provocation,
+[data-theme="dark"] .story-card,
+[data-theme="dark"] .chip-group {
+  background: var(--bg-card);
+  border-color: var(--border-subtle);
+}
+[data-theme="dark"] .stat-row .stat { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .prov-footer { background: var(--bg-subtle); }
+[data-theme="dark"] .stake { background: rgba(42,157,143,0.1); }
+[data-theme="dark"] .position:hover { background: rgba(42,157,143,0.08); }
+[data-theme="dark"] .layer { background: rgba(255,255,255,0.03); }
+[data-theme="dark"] .doc-card { background: var(--bg-card); border-color: var(--border-subtle); }
+[data-theme="dark"] .doc-card:hover { border-color: var(--teal); }
+[data-theme="dark"] header, [data-theme="dark"] .hero { background: #080E1A; }
+[data-theme="dark"] .conn-label { color: rgba(255,255,255,0.4); }
+[data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select {
+  background: var(--bg-subtle); color: var(--text-primary); border-color: var(--border-subtle);
+}
+[data-theme="dark"] .filter-btn { background: var(--bg-card); color: var(--text-secondary); border-color: var(--border-subtle); }
+[data-theme="dark"] .match-filters { background: var(--bg-subtle); }
+[data-theme="dark"] .intro, [data-theme="dark"] .intro-hero { border-color: var(--border-accent); }
+[data-theme="dark"] .prov-body p { color: var(--text-secondary); }
+[data-theme="dark"] .pos-text { color: var(--text-secondary); }
+[data-theme="dark"] .prompt { color: var(--text-secondary); }
+[data-theme="dark"] .hero-canvas { opacity: 0.5; }
