@@ -89,18 +89,21 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
 <meta property="og:description" content="Five-layer protocol architecture for privacy-preserving ambient human cooperation, with integration points for MCP, A2A, and UCP.">
 <meta property="og:type" content="website">
 <script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
-<a href="#main-content" style="position:absolute;left:-9999px;">Skip to main content</a>
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,26,46,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(42,157,143,.15);padding:0 1.5rem">
-  <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:50px">
-    <a href="index.html" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.05rem;font-weight:700;color:white;text-decoration:none">Latent <span style="color:#34D1BF">Value</span> Network</a>
-    <div style="display:flex;gap:1.2rem;align-items:center">
-      <a href="index.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Hub</a>
-      <a href="demo.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Demo</a>
-      <a href="provocations.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Provocations</a>
-      <a href="architecture.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Architecture</a>
-      <a href="https://github.com/sillinous/latent-value-network" style="font-size:.7rem;font-weight:600;color:white;background:#2A9D8F;padding:.3rem .8rem;border-radius:3px;text-decoration:none">GitHub</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="lvn-nav" role="navigation" aria-label="Main navigation">
+  <div class="lvn-nav-inner">
+    <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <div class="lvn-nav-links">
+      <a href="index.html">Hub</a>
+      <a href="demo.html">Demo</a>
+      <a href="provocations.html">Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network" class="nav-gh">GitHub</a>
+      <button class="lvn-nav-theme" aria-label="Toggle dark mode" title="Toggle dark mode">☽</button>
     </div>
   </div>
 </nav>
@@ -122,7 +125,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
 
 <!-- LAYER 5 -->
 <div class="layers">
-  <div class="layer" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="5">
+  <div class="layer reveal" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="5">
     <div class="layer-num">5</div>
     <div class="layer-main">
       <h3>Governance Layer</h3>
@@ -140,7 +143,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
   <div class="conn"><div class="conn-line"></div><span class="conn-label">governs parameters & disputes</span></div>
 
   <!-- LAYER 4 -->
-  <div class="layer" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="4">
+  <div class="layer reveal" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="4">
     <div class="layer-num">4</div>
     <div class="layer-main">
       <h3>Trust & Reputation Fabric</h3>
@@ -187,7 +190,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
   </div>
 
   <!-- LAYER 2 -->
-  <div class="layer" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="2">
+  <div class="layer reveal" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="2">
     <div class="layer-num">2</div>
     <div class="layer-main">
       <h3>Latent Capacity Discovery</h3>
@@ -205,7 +208,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
   <div class="conn"><div class="conn-line"></div><span class="conn-label">enriches context model</span></div>
 
   <!-- LAYER 1 -->
-  <div class="layer" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="1">
+  <div class="layer reveal" role="button" tabindex="0" onclick="toggleLayer(this)" data-layer="1">
     <div class="layer-num">1</div>
     <div class="layer-main">
       <h3>Personal Context Engine</h3>
@@ -289,5 +292,6 @@ function toggleLayer(el) {
   if (!wasActive) el.classList.add('active');
 }
 </script>
+<script src="shared.js"></script>
 </body>
 </html>

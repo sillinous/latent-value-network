@@ -63,22 +63,24 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
 <meta property="og:description" content="10 hard open questions about privacy, trust, equity, and governance in AI-mediated cooperation. Pick one. Take a side.">
 <meta property="og:type" content="website">
 <script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
-<a href="#main-content" style="position:absolute;left:-9999px;">Skip to main content</a>
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,26,46,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(42,157,143,.15);padding:0 1.5rem">
-  <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:50px">
-    <a href="index.html" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.05rem;font-weight:700;color:white;text-decoration:none">Latent <span style="color:#34D1BF">Value</span> Network</a>
-    <div style="display:flex;gap:1.2rem;align-items:center">
-      <a href="index.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Hub</a>
-      <a href="demo.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Demo</a>
-      <a href="provocations.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Provocations</a>
-      <a href="architecture.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Architecture</a>
-      <a href="https://github.com/sillinous/latent-value-network" style="font-size:.7rem;font-weight:600;color:white;background:#2A9D8F;padding:.3rem .8rem;border-radius:3px;text-decoration:none">GitHub</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="lvn-nav" role="navigation" aria-label="Main navigation">
+  <div class="lvn-nav-inner">
+    <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <div class="lvn-nav-links">
+      <a href="index.html">Hub</a>
+      <a href="demo.html">Demo</a>
+      <a href="provocations.html">Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network" class="nav-gh">GitHub</a>
+      <button class="lvn-nav-theme" aria-label="Toggle dark mode" title="Toggle dark mode">☽</button>
     </div>
   </div>
 </nav>
-
 
 <header>
   <div class="eyebrow">The Latent Value Network</div>
@@ -101,7 +103,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 1 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">01</div>
       <div class="prov-title">Should the embedding model be centralized or federated?</div>
@@ -124,7 +126,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 2 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">02</div>
       <div class="prov-title">Is privacy-preserving semantic matching actually possible?</div>
@@ -147,7 +149,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 3 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">03</div>
       <div class="prov-title">Does ambient matching inevitably become surveillance?</div>
@@ -170,7 +172,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 4 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">04</div>
       <div class="prov-title">How do you prevent the network from only serving the already-connected?</div>
@@ -193,7 +195,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 5 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">05</div>
       <div class="prov-title">Should matches include a price?</div>
@@ -216,7 +218,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 6 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">06</div>
       <div class="prov-title">Can you bootstrap trust without bootstrapping bias?</div>
@@ -239,7 +241,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 7 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">07</div>
       <div class="prov-title">Is "protocol, not platform" realistic or naive?</div>
@@ -262,7 +264,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 8 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">08</div>
       <div class="prov-title">What if AI assistants don't want to cooperate?</div>
@@ -285,7 +287,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 9 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">09</div>
       <div class="prov-title">Is the Latent Value Gap real, or is it just friction that markets haven't solved yet?</div>
@@ -308,7 +310,7 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   </div>
 
   <!-- PROVOCATION 10 -->
-  <div class="provocation">
+  <div class="provocation reveal">
     <div class="prov-header">
       <div class="prov-number">10</div>
       <div class="prov-title">Who should build this first?</div>
@@ -345,5 +347,6 @@ footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
   <p>The Latent Value Network · Open Collaborative Initiative · CC BY-SA 4.0</p>
 </footer>
 
+<script src="shared.js"></script>
 </body>
 </html>

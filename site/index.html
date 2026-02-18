@@ -159,9 +159,24 @@ footer a{color:rgba(255,255,255,.4)}
 }
 </style>
 <script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
-<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;focus:position:relative;left:auto;top:auto;width:auto;height:auto;overflow:visible;">Skip to main content</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="lvn-nav" role="navigation" aria-label="Main navigation">
+  <div class="lvn-nav-inner">
+    <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <div class="lvn-nav-links">
+      <a href="index.html">Hub</a>
+      <a href="demo.html">Demo</a>
+      <a href="provocations.html">Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network" class="nav-gh">GitHub</a>
+      <button class="lvn-nav-theme" aria-label="Toggle dark mode" title="Toggle dark mode">☽</button>
+    </div>
+  </div>
+</nav>
 
 <!-- ═══ NAV ═══ -->
 <nav>
@@ -203,7 +218,7 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ PROBLEM ═══ -->
-<section id="problem">
+<section class="reveal stagger-2" id="problem">
   <div class="section-container">
     <div class="section-eyebrow">The Invisible Crisis</div>
     <h2 class="section-title">The Latent Value Gap</h2>
@@ -240,7 +255,7 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ HOW IT WORKS ═══ -->
-<section id="how">
+<section class="reveal stagger-3" id="how">
   <div class="section-container">
     <div class="section-eyebrow">The Architecture</div>
     <h2 class="section-title">Five Layers of Cooperative Infrastructure</h2>
@@ -290,7 +305,7 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ EVIDENCE ═══ -->
-<section id="evidence">
+<section class="reveal stagger-4" id="evidence">
   <div class="section-container">
     <div class="section-eyebrow">The Research</div>
     <h2 class="section-title">This isn't speculation. It's quantified.</h2>
@@ -331,7 +346,7 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ AUDIENCES ═══ -->
-<section id="audiences">
+<section class="reveal stagger-5" id="audiences">
   <div class="section-container">
     <div class="section-eyebrow">Your Path In</div>
     <h2 class="section-title">We need different minds for different problems</h2>
@@ -433,7 +448,7 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ DOCUMENTS ═══ -->
-<section id="documents">
+<section class="reveal stagger-5" id="documents">
   <div class="section-container">
     <div class="section-eyebrow">The Working Documents</div>
     <h2 class="section-title">Everything is open. Everything is a draft.</h2>
@@ -487,7 +502,7 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ PROVOCATIONS PREVIEW ═══ -->
-<section id="provocations">
+<section class="reveal stagger-5" id="provocations">
   <div class="section-container">
     <div class="section-eyebrow">The Hard Questions</div>
     <h2 class="section-title">10 Provocations That Need Your Mind</h2>
@@ -509,7 +524,7 @@ footer a{color:rgba(255,255,255,.4)}
 </section>
 
 <!-- ═══ JOIN ═══ -->
-<section id="join">
+<section class="reveal stagger-5" id="join">
   <h2>The hardest problems are open by design.</h2>
   <p>
     We're building this as an open protocol — not a company, not a platform.
@@ -556,5 +571,6 @@ function showAudience(id) {
 }
 </script>
 
+<script src="shared.js"></script>
 </body>
 </html>

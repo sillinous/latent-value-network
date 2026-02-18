@@ -31,6 +31,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  padding-top: calc(var(--nav-height, 48px) + 36px);
 }
 
 /* ── Noise overlay ── */
@@ -713,29 +714,120 @@ footer .f-logo span { color: var(--teal); }
   .match-card { padding: 1.3rem; }
   .container { padding: 0 1rem; }
 }
+
+/* ── Screen-Level Progress ── */
+.screen-progress {
+  position: fixed;
+  top: var(--nav-height, 48px);
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(15,26,46,0.85);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: opacity var(--duration-normal, 250ms);
+}
+.screen-progress.hidden { opacity: 0; pointer-events: none; }
+.screen-step {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.65rem;
+  font-family: var(--font-body);
+  color: rgba(255,255,255,0.3);
+  transition: all 300ms;
+}
+.screen-step.active { color: var(--teal); }
+.screen-step.done { color: var(--gold); }
+.screen-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.screen-step.active .screen-step-dot { background: var(--teal); transform: scale(1.4); }
+.screen-step.done .screen-step-dot { background: var(--gold); }
+.screen-step-connector {
+  width: 24px;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 0.15rem;
+  transition: background 300ms;
+}
+.screen-step.done + .screen-step-connector,
+.screen-step.done ~ .screen-step-connector { background: var(--gold); }
+
+/* ── Back Button ── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--text-secondary, #5A6577);
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  transition: all 200ms;
+}
+.back-btn:hover { color: var(--teal); background: rgba(42,157,143,0.06); }
+.back-btn::before { content: '←'; font-size: 1rem; }
+
+/* ── Screen Transitions ── */
+.screen {
+  animation: screenFadeIn 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes screenFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 </style>
 <meta name="description" content="Experience the Latent Value Gap firsthand. Discover cooperative connections you didn't know existed in a simulated community.">
 <meta property="og:title" content="Interactive Demo — Latent Value Network">
 <meta property="og:description" content="Experience the Latent Value Gap firsthand. Discover cooperative connections you didn't know existed in a simulated community.">
 <meta property="og:type" content="website">
 <script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
-<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;&:focus{position:static;width:auto;height:auto}">Skip to content</a>
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,26,46,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(42,157,143,.15);padding:0 1.5rem">
-  <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:50px">
-    <a href="index.html" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.05rem;font-weight:700;color:white;text-decoration:none">Latent <span style="color:#34D1BF">Value</span> Network</a>
-    <div style="display:flex;gap:1.2rem;align-items:center">
-      <a href="index.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Hub</a>
-      <a href="demo.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Demo</a>
-      <a href="provocations.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Provocations</a>
-      <a href="architecture.html" style="font-size:.75rem;color:rgba(255,255,255,.5);text-decoration:none">Architecture</a>
-      <a href="https://github.com/sillinous/latent-value-network" style="font-size:.7rem;font-weight:600;color:white;background:#2A9D8F;padding:.3rem .8rem;border-radius:3px;text-decoration:none">GitHub</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="lvn-nav" role="navigation" aria-label="Main navigation">
+  <div class="lvn-nav-inner">
+    <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
+    <div class="lvn-nav-links">
+      <a href="index.html">Hub</a>
+      <a href="demo.html">Demo</a>
+      <a href="provocations.html">Provocations</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="https://github.com/sillinous/latent-value-network" class="nav-gh">GitHub</a>
+      <button class="lvn-nav-theme" aria-label="Toggle dark mode" title="Toggle dark mode">☽</button>
     </div>
   </div>
 </nav>
 
+<div class="screen-progress" id="screen-progress">
+  <div class="screen-step active" data-screen="0"><span class="screen-step-dot"></span><span>Welcome</span></div>
+  <div class="screen-step-connector"></div>
+  <div class="screen-step" data-screen="1"><span class="screen-step-dot"></span><span>Profile</span></div>
+  <div class="screen-step-connector"></div>
+  <div class="screen-step" data-screen="2"><span class="screen-step-dot"></span><span>Scan</span></div>
+  <div class="screen-step-connector"></div>
+  <div class="screen-step" data-screen="3"><span class="screen-step-dot"></span><span>Matches</span></div>
+  <div class="screen-step-connector"></div>
+  <div class="screen-step" data-screen="4"><span class="screen-step-dot"></span><span>Your Role</span></div>
+</div>
 
+<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;&:focus{position:static;width:auto;height:auto}">Skip to content</a>
 <header>
   <div class="container">
     <div class="logo">Latent <span>Value</span> Network</div>
@@ -828,6 +920,7 @@ footer .f-logo span { color: var(--teal); }
 <!-- SCREEN 2: YOUR PROFILE -->
 <!-- ═══════════════════════════════════════ -->
 <div id="screen-profile" class="screen">
+  <button class="back-btn" onclick="showScreen('screen-intro')">Back</button>
   <div class="container profile-section">
     <h2>Tell us about your situation</h2>
     <p class="subtitle">We'll show you the latent value you didn't know you had — and the connections you're missing.</p>
@@ -927,6 +1020,7 @@ footer .f-logo span { color: var(--teal); }
 <!-- SCREEN 4: RESULTS -->
 <!-- ═══════════════════════════════════════ -->
 <div id="screen-results" class="screen">
+  <button class="back-btn" onclick="showScreen('screen-profile')">Back to profile</button>
   <div class="container results-section">
     <h2>Your Latent Value Map</h2>
     <p class="results-subtitle">Here's what an ambient matching system could surface for you — connections neither party would have searched for.</p>
@@ -980,6 +1074,7 @@ footer .f-logo span { color: var(--teal); }
 <!-- SCREEN 5: FIND YOUR ROLE -->
 <!-- ═══════════════════════════════════════ -->
 <div id="screen-role" class="screen">
+  <button class="back-btn" onclick="showScreen('screen-results')">Back to matches</button>
   <div class="container profile-section">
     <h2>Where do you fit in?</h2>
     <p class="subtitle">The LVN needs diverse minds. Help us figure out where your expertise is most needed.</p>
@@ -1080,6 +1175,13 @@ function addCustomChip(containerId, inputId) {
 
 // ── Navigation ──
 function showScreen(id) {
+  // Update screen progress
+  const screenMap = {'screen-intro':0, 'screen-profile':1, 'screen-discovery':2, 'screen-results':3, 'screen-role':4};
+  const idx = screenMap[id] ?? 0;
+  document.querySelectorAll('.screen-step').forEach((step, i) => {
+    step.classList.toggle('active', i === idx);
+    step.classList.toggle('done', i < idx);
+  });
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1642,5 +1744,6 @@ document.addEventListener('keydown', function(e) {
 });
 </script>
 
+<script src="shared.js"></script>
 </body>
 </html>
