@@ -694,11 +694,15 @@ footer a{color:rgba(255,255,255,.4)}
       Understanding <em>why</em> the gap exists is essential to designing something that actually closes it.
     </p>
 
+        <div style="display:flex;justify-content:flex-end;margin-bottom:0.5rem">
+      <button onclick="document.querySelectorAll('.why-thread').forEach(t=>t.classList.toggle('collapsed',this.dataset.state!=='collapsed'));this.dataset.state=this.dataset.state==='collapsed'?'expanded':'collapsed';this.textContent=this.dataset.state==='collapsed'?'Expand all ▼':'Collapse all ▲'" class="btn-ghost" style="font-size:0.7rem;padding:0.3rem 0.7rem" data-state="expanded">Collapse all ▲</button>
+    </div>
     <div class="why-threads">
 
       <div class="why-thread psych">
         <div class="why-label psych">Psychology</div>
-        <h3>We don't know what we know — and we can't imagine what others need.</h3>
+        <button class="why-thread-toggle" aria-expanded="true" onclick="this.parentElement.classList.toggle('collapsed');this.setAttribute('aria-expanded',!this.parentElement.classList.contains('collapsed'))"><h3>We don't know what we know — and we can't imagine what others need.</h3><span class="why-thread-arrow">▼</span></button>
+        <div class="why-thread-body">
         <p>
           Psychologists call it the <strong>curse of knowledge</strong>: once you've internalized an expertise, 
           you literally cannot remember what it was like not to have it. The retired accountant doesn't think of 
@@ -714,10 +718,10 @@ footer a{color:rgba(255,255,255,.4)}
         <blockquote>The skills that feel most natural to you are precisely the ones that are most invisible to you — and most valuable to someone else.</blockquote>
         <div class="why-cite">Kruger & Dunning 1999; Camerer, Loewenstein & Weber 1989; Fischhoff 1975</div>
       </div>
-
-      <div class="why-thread socio">
+      </div><div class="why-thread socio">
         <div class="why-label socio">Sociology</div>
-        <h3>Our networks are silos, and social platforms reinforce them.</h3>
+        <button class="why-thread-toggle" aria-expanded="true" onclick="this.parentElement.classList.toggle('collapsed');this.setAttribute('aria-expanded',!this.parentElement.classList.contains('collapsed'))"><h3>Our networks are silos, and social platforms reinforce them.</h3><span class="why-thread-arrow">▼</span></button>
+        <div class="why-thread-body">
         <p>
           Mark Granovetter's foundational discovery — that <strong>weak ties</strong>, not strong ones, are the primary 
           conduits for new opportunities — is now one of the most replicated findings in social science. 
@@ -734,10 +738,10 @@ footer a{color:rgba(255,255,255,.4)}
         <blockquote>The most valuable connections in your community are the ones that would never appear in your feed, your search results, or your social graph. They exist in the space between networks — and nothing is designed to find them.</blockquote>
         <div class="why-cite">Granovetter 1973; Rajkumar et al., Science 2022; Chetty et al., Nature 2022; McPherson et al. 2001</div>
       </div>
-
-      <div class="why-thread econ">
+      </div><div class="why-thread econ">
         <div class="why-label econ">Economics</div>
-        <h3>Markets are brilliant at pricing — and blind to everything else.</h3>
+        <button class="why-thread-toggle" aria-expanded="true" onclick="this.parentElement.classList.toggle('collapsed');this.setAttribute('aria-expanded',!this.parentElement.classList.contains('collapsed'))"><h3>Markets are brilliant at pricing — and blind to everything else.</h3><span class="why-thread-arrow">▼</span></button>
+        <div class="why-thread-body">
         <p>
           Market economies are extraordinary engines for matching supply with demand when both sides can be 
           articulated and priced. But <strong>latent value defies articulation</strong>. You can't post a want-ad 
@@ -755,10 +759,10 @@ footer a{color:rgba(255,255,255,.4)}
         <blockquote>The $1.3 trillion "latent value gap" isn't the value of goods that fail to trade. It's the value of cooperative relationships that fail to form — because markets have no mechanism for discovering them.</blockquote>
         <div class="why-cite">Ostrom 1990; Coase 1960; Akerlof 1970; Arrow 1962</div>
       </div>
-
-      <div class="why-thread philo">
+      </div><div class="why-thread philo">
         <div class="why-label philo">Philosophy</div>
-        <h3>We've confused connection with cooperation.</h3>
+        <button class="why-thread-toggle" aria-expanded="true" onclick="this.parentElement.classList.toggle('collapsed');this.setAttribute('aria-expanded',!this.parentElement.classList.contains('collapsed'))"><h3>We've confused connection with cooperation.</h3><span class="why-thread-arrow">▼</span></button>
+        <div class="why-thread-body">
         <p>
           We live in the most "connected" era in human history. Average social media users maintain hundreds of 
           digital connections. Yet loneliness, civic disengagement, and institutional distrust are at record levels. 
@@ -774,10 +778,10 @@ footer a{color:rgba(255,255,255,.4)}
         <blockquote>Six billion people carry smartphones, each one a node in a planetary network. But a network of nodes is not a community. A community is a network of <em>capabilities and needs</em> — and that network is almost entirely unmapped.</blockquote>
         <div class="why-cite">Putnam 2000; Turkle 2011; Sennett 2012; Arendt 1958</div>
       </div>
-
-      <div class="why-thread evol">
+      </div><div class="why-thread evol">
         <div class="why-label evol">Evolutionary Biology</div>
-        <h3>We're wired for reciprocity — at a scale our biology can't handle.</h3>
+        <button class="why-thread-toggle" aria-expanded="true" onclick="this.parentElement.classList.toggle('collapsed');this.setAttribute('aria-expanded',!this.parentElement.classList.contains('collapsed'))"><h3>We're wired for reciprocity — at a scale our biology can't handle.</h3><span class="why-thread-arrow">▼</span></button>
+        <div class="why-thread-body">
         <p>
           Humans evolved extraordinary capacities for cooperation — far beyond what any other primate achieves. 
           Direct reciprocity, indirect reciprocity, group selection, and kin selection together created a species 
@@ -794,10 +798,9 @@ footer a{color:rgba(255,255,255,.4)}
         <blockquote>The question isn't "are humans cooperative?" — we demonstrably are. The question is: "what happens when cooperative creatures are embedded in networks too vast for their perceptual systems to navigate?" The answer is what we see around us: willing cooperators, failing to cooperate.</blockquote>
         <div class="why-cite">Nowak 2006; Dunbar 1992; Tomasello 2009; Bowles & Gintis 2011</div>
       </div>
+      </div></div>
 
-    </div>
-
-    <div class="thesis-banner">
+    <div class="thesis-banner reveal">
       <div class="thesis-label">The Core Thesis</div>
       <h3>The cooperative capacity of humanity vastly exceeds its cooperative performance — and the gap is perceptual, not motivational.</h3>
       <p>
@@ -814,7 +817,7 @@ footer a{color:rgba(255,255,255,.4)}
       <p style="font-size:.88rem;color:var(--mid);line-height:1.6;margin-bottom:1rem">
         Each level compounds the others. You can't fix the gap by addressing any single layer alone.
       </p>
-      <div class="cascade">
+      <div class="cascade reveal">
         <div class="cascade-step">
           <strong>Cognitive blindness</strong>
           <p>Experts can't see their own expertise → latent capacity goes unrecognized</p>

@@ -204,4 +204,110 @@
     }
   } catch {}
 
+
+  // ── Scroll-to-Top Button ──
+  const scrollBtn = document.createElement('button');
+  scrollBtn.className = 'scroll-top-btn';
+  scrollBtn.setAttribute('aria-label', 'Scroll to top');
+  scrollBtn.textContent = '↑';
+  scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  document.body.appendChild(scrollBtn);
+
+  let lastScroll = 0;
+  function checkScrollBtn() {
+    const show = window.scrollY > 400;
+    scrollBtn.classList.toggle('visible', show);
+  }
+
+  // ── Reading Progress Bar (hub page) ──
+  let progressBar = null;
+  const isHubPage = window.location.pathname === '/' || 
+                window.location.pathname.endsWith('index.html') ||
+                (!window.location.pathname.includes('demo') && 
+                 !window.location.pathname.includes('provocations') && 
+                 !window.location.pathname.includes('architecture') &&
+                 !window.location.pathname.includes('404'));
+  if (isHubPage) {
+    progressBar = document.createElement('div');
+    progressBar.className = 'reading-progress';
+    document.body.appendChild(progressBar);
+  }
+
+  function updateReadingProgress() {
+    if (!progressBar) return;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+    progressBar.style.width = Math.min(progress, 100) + '%';
+  }
+
+  // ── Counter Animation ──
+  function animateCounters() {
+    document.querySelectorAll('.stat .num, .summary-stat-num, .stat-big').forEach(el => {
+      if (el.dataset.counted) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top > window.innerHeight || rect.bottom < 0) return;
+      el.dataset.counted = '1';
+      
+      const text = el.textContent.trim();
+      // Parse number from text like "$1.3T", "83.4%", "42%", "2.5h", "#1", "r=.58"
+      const numMatch = text.match(/([\d.]+)/);
+      if (!numMatch) return;
+      
+      const target = parseFloat(numMatch[1]);
+      const prefix = text.slice(0, text.indexOf(numMatch[1]));
+      const suffix = text.slice(text.indexOf(numMatch[1]) + numMatch[1].length);
+      const decimals = numMatch[1].includes('.') ? numMatch[1].split('.')[1].length : 0;
+      const duration = 1200;
+      const start = performance.now();
+      
+      function step(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        const current = (target * eased).toFixed(decimals);
+        el.textContent = prefix + current + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  // ── Why-Thread Staggered Reveal ──
+  const whyThreads = document.querySelectorAll('.why-thread');
+  if (whyThreads.length > 0) {
+    const threadObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          threadObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -30px 0px' });
+
+    whyThreads.forEach((thread, i) => {
+      thread.classList.add('reveal-item');
+      thread.style.transitionDelay = (i * 120) + 'ms';
+      threadObserver.observe(thread);
+    });
+  }
+
+  // ── Combined Scroll Handler ──
+  let scrollTicking = false;
+  window.addEventListener('scroll', () => {
+    if (!scrollTicking) {
+      requestAnimationFrame(() => {
+        checkScrollBtn();
+        updateReadingProgress();
+        animateCounters();
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  }, { passive: true });
+
+  // Initial check
+  checkScrollBtn();
+  updateReadingProgress();
+  animateCounters();
+
 })();

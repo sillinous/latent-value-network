@@ -631,3 +631,167 @@ body::before {
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .footer-brand { grid-column: 1 / -1; }
 }
+
+/* ── Scroll to Top Button ── */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--teal, #2A9D8F);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(42,157,143,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: all 300ms cubic-bezier(0.16,1,0.3,1);
+  z-index: 900;
+}
+.scroll-top-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+.scroll-top-btn:hover {
+  background: var(--teal-glow, #34D1BF);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(42,157,143,0.4);
+}
+
+/* ── Reading Progress Bar ── */
+.reading-progress {
+  position: fixed;
+  top: var(--nav-height, 56px);
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--teal, #2A9D8F), var(--gold, #E9C46A));
+  z-index: 1001;
+  transition: width 60ms linear;
+}
+
+/* ── Global Smooth Scroll ── */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ── Focus Visible ── */
+:focus-visible {
+  outline: 2px solid var(--teal, #2A9D8F);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--teal, #2A9D8F);
+  outline-offset: 3px;
+}
+
+/* ── Counter Animation ── */
+.count-up { transition: none; }
+
+/* ── Section Anchor Offset ── */
+[id] { scroll-margin-top: calc(var(--nav-height, 56px) + 1rem); }
+
+/* ── Hub Dark Mode: Map hardcoded vars ── */
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .why-thread h3,
+[data-theme="dark"] .cascade-step strong { color: #E8EDF3; }
+
+[data-theme="dark"] .section-lead,
+[data-theme="dark"] .why-thread p,
+[data-theme="dark"] .cascade-step p,
+[data-theme="dark"] .section-container p { color: #8BA5BE; }
+
+[data-theme="dark"] .why-thread { 
+  background: linear-gradient(135deg, rgba(42,157,143,0.06), rgba(233,196,106,0.03));
+  border-color: rgba(42,157,143,0.12); 
+}
+
+[data-theme="dark"] .why-thread blockquote {
+  background: rgba(42,157,143,0.04);
+  border-left-color: rgba(42,157,143,0.3);
+  color: #8BA5BE;
+}
+
+[data-theme="dark"] .story-card,
+[data-theme="dark"] .evidence-card,
+[data-theme="dark"] .faq-item {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .gap-callout {
+  background: rgba(42,157,143,0.06);
+  border-color: rgba(42,157,143,0.15);
+}
+
+[data-theme="dark"] .cascade::before {
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .cascade-step::before {
+  background: var(--bg-primary, #0F1A2E);
+}
+
+[data-theme="dark"] .how-step {
+  border-color: rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .audience-tab.active {
+  background: rgba(42,157,143,0.15);
+}
+
+/* ── Thread Expand/Collapse ── */
+.why-thread-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  gap: 0.6rem;
+}
+.why-thread-toggle h3 {
+  flex: 1;
+  margin: 0;
+}
+.why-thread-arrow {
+  font-size: 0.8rem;
+  color: var(--teal, #2A9D8F);
+  transition: transform 300ms cubic-bezier(0.16,1,0.3,1);
+  flex-shrink: 0;
+}
+.why-thread.collapsed .why-thread-arrow {
+  transform: rotate(-90deg);
+}
+.why-thread-body {
+  max-height: 800px;
+  overflow: hidden;
+  transition: max-height 500ms cubic-bezier(0.16,1,0.3,1), opacity 300ms;
+  opacity: 1;
+}
+.why-thread.collapsed .why-thread-body {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* ── Staggered Thread Reveal ── */
+.why-thread.reveal-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 500ms cubic-bezier(0.16,1,0.3,1);
+}
+.why-thread.reveal-item.visible {
+  opacity: 1;
+  transform: none;
+}
