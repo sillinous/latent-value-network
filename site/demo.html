@@ -121,6 +121,10 @@ body::before{opacity:.008!important}
 /* ── Drag Interaction ── */
 .network-stage canvas{touch-action:none}
 .network-stage.dragging{cursor:grabbing!important}
+
+/* ── Story Vignettes ── */
+.story-vignette{opacity:0;animation:storyReveal 1s .3s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes storyReveal{to{opacity:1}}
 /* ── Canvas Tooltip ── */
 .canvas-tooltip{position:absolute;pointer-events:none;opacity:0;transition:opacity 200ms;
   background:rgba(13,19,33,.95);border:1px solid rgba(42,157,143,.3);border-radius:8px;
@@ -226,20 +230,23 @@ body::before{opacity:.008!important}
       <div class="phase-header">
         <div class="phase-num">✦</div>
         <div>
-          <div class="phase-title">The people above are your neighbors.</div>
-          <div class="phase-subtitle" style="margin-top:.3rem">Each dot is a real person with skills, needs, and resources. Right now they're dim. <strong style="color:var(--teal-glow)">You can't see what connects you.</strong></div>
+          <div class="phase-title">Someone near you is struggling with the exact thing you know how to fix.</div>
+          <div class="phase-subtitle" style="margin-top:.3rem">And you have no idea they exist. <strong style="color:var(--teal-glow)">Neither do they.</strong></div>
         </div>
       </div>
-      <p style="font-size:.85rem;color:var(--text);line-height:1.65;margin-bottom:.5rem">This is the <strong style="color:white">latent value gap</strong> — trillions in cooperative potential that goes unrealized because neither party knows the other exists. The retired accountant who could save a freelancer thousands. The nurse whose medical translation skills could help dozens of families. The idle kitchen that could become a community hub.</p>
-      <p style="font-size:.85rem;color:var(--text-dim);line-height:1.65">Tell us about yourself and watch what lights up.</p>
-      <div class="btn-row"><button class="btn-glow" onclick="goPhase(1)">Begin Discovery →</button></div>
+      <div class="story-vignette" style="padding:.8rem 1rem;background:rgba(233,196,106,.04);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:.82rem;line-height:1.65;color:var(--text)">
+        Robert, 71, retired after 40 years as an accountant. He sits at home most days, wishing he could still be useful to someone. Half a mile away, Sarah, 28, just went freelance and is hemorrhaging money on taxes she doesn't understand. Robert could save her thousands in an afternoon — <strong style="color:white">and it would be the best day he's had in months.</strong> But they will never meet. Neither knows the other exists. Neither would ever think to search for the other.
+      </div>
+      <p style="font-size:.82rem;color:var(--text-dim);line-height:1.65;margin-bottom:.4rem">Every dot above is a real person with exactly this kind of hidden potential. Right now the network is dark — because <em>this is how the world actually works.</em> We walk past each other every day, carrying exactly what someone nearby desperately needs.</p>
+      <p style="font-size:.82rem;color:var(--text);line-height:1.65"><strong style="color:white">Tell us a little about yourself.</strong> Watch what lights up.</p>
+      <div class="btn-row"><button class="btn-glow" onclick="goPhase(1)">See Who Needs You →</button></div>
     </div>
 
     <!-- PHASE 1 -->
     <div class="panel-phase" id="phase-1">
       <div class="phase-header">
         <div class="phase-num">1</div>
-        <div><div class="phase-title">What can you do?</div><div class="phase-subtitle">Select skills — even ones you think don't matter.</div></div>
+        <div><div class="phase-title">What do you carry that others might need?</div><div class="phase-subtitle">Think broadly. The things you dismiss as "nothing special" are often exactly what someone nearby is desperate for.</div></div>
       </div>
       <div class="chip-label">Your skills & knowledge</div>
       <div class="chip-grid" id="skill-chips">
@@ -262,7 +269,7 @@ body::before{opacity:.008!important}
       </div>
       <div class="btn-row">
         <button class="btn-ghost" onclick="goPhase(0)">← Back</button>
-        <button class="btn-glow" onclick="goPhase(2)">Next: What do you need? →</button>
+        <button class="btn-glow" onclick="goPhase(2)">Next: What weighs on you? →</button>
       </div>
     </div>
 
@@ -270,7 +277,7 @@ body::before{opacity:.008!important}
     <div class="panel-phase" id="phase-2">
       <div class="phase-header">
         <div class="phase-num">2</div>
-        <div><div class="phase-title">What's hard right now?</div><div class="phase-subtitle">Nobody searches for help they don't know exists. That's what we find.</div></div>
+        <div><div class="phase-title">What would change if the right person showed up?</div><div class="phase-subtitle">Everyone carries something they can't solve alone. You're not the only one — and the help you need might already be closer than you think.</div></div>
       </div>
       <div class="chip-label">Challenges & needs</div>
       <div class="chip-grid" id="need-chips">
@@ -292,7 +299,7 @@ body::before{opacity:.008!important}
       <textarea class="context-area" id="context-input" placeholder="Anything about your situation... e.g. 'I'm a retired teacher who just moved here and doesn't know anyone yet'"></textarea>
       <div class="btn-row">
         <button class="btn-ghost" onclick="goPhase(1)">← Back</button>
-        <button class="btn-glow" onclick="runDiscovery()">Reveal Connections ✦</button>
+        <button class="btn-glow" onclick="runDiscovery()">Show Me Who's There ✦</button>
       </div>
     </div>
 
@@ -301,27 +308,27 @@ body::before{opacity:.008!important}
       <div class="phase-header">
         <div class="phase-num">✦</div>
         <div><div class="phase-title" id="results-title">Connections Found</div>
-        <div class="phase-subtitle">Connections an ambient matching system would surface — without either party searching.</div></div>
+        <div class="phase-subtitle" id="results-subtitle">These people were always there. They were always carrying what you need — and needing what you carry. Until now, neither of you could see it.</div></div>
       </div>
       
       <div class="before-after" id="before-after">
-        <div class="ba-side"><div class="ba-label">Before</div><div class="ba-num dim" id="ba-before">12 people</div><div class="ba-desc">Invisible to you</div></div>
+        <div class="ba-side"><div class="ba-label">Before</div><div class="ba-num dim" id="ba-before">12 strangers</div><div class="ba-desc">Walking past you every day</div></div>
         <div class="ba-arrow">→</div>
-        <div class="ba-side"><div class="ba-label">After LVN</div><div class="ba-num lit" id="ba-after">0 connections</div><div class="ba-desc">Surfaced by ambient matching</div></div>
+        <div class="ba-side"><div class="ba-label">After</div><div class="ba-num lit" id="ba-after">0 neighbors</div><div class="ba-desc">Who were there all along</div></div>
       </div>
       <div class="summary-stats" id="summary-stats"></div>
       <div class="matches-grid" id="matches-grid"></div>
       <div class="insight-callout" id="insight-box" style="margin-top:1.5rem">
-        <h3>✦ What you didn't know about yourself</h3>
+        <h3>✦ What nobody ever told you about yourself</h3>
         <p id="insight-text"></p>
       </div>
       <div class="insight-callout" style="border-color:rgba(233,196,106,.2)">
         <h3>The research says...</h3>
-        <p><strong style="color:var(--gold)">83.4%</strong> of jobs come through weak ties, not close friends. <strong style="color:var(--gold)">42%</strong> of professionals have expertise their colleagues don't know about. The connections above are exactly what current platforms fail to surface.</p>
+        <p>The people who change your life are almost never the ones you'd think to ask. <strong style="color:var(--gold)">83.4%</strong> of jobs come through acquaintances, not close friends — people on the periphery of your world who bridge to entirely different ones. <strong style="color:var(--gold)">42%</strong> of professionals have expertise their own colleagues don't know about. We're surrounded by help we can't see, carried by people who don't know they're carrying it. This isn't a market failure. It's a <em>perception</em> failure. And it's solvable.</p>
       </div>
       <div class="btn-row">
-        <button class="btn-ghost" onclick="goPhase(2)">← Change Profile</button>
-        <button class="btn-glow" onclick="goPhase(4)">What Can I Do? →</button>
+        <button class="btn-ghost" onclick="goPhase(2)">← I want to try different answers</button>
+        <button class="btn-glow" onclick="goPhase(4)">How Do I Make This Real? →</button>
         <button class="btn-ghost" style="margin-left:auto" id="share-btn">Share Results</button>
       </div>
     </div>
@@ -330,8 +337,8 @@ body::before{opacity:.008!important}
     <div class="panel-phase" id="phase-4">
       <div class="phase-header">
         <div class="phase-num">→</div>
-        <div><div class="phase-title">This is a simulation. The real thing needs you.</div>
-        <div class="phase-subtitle">The LVN is an open protocol built by researchers, engineers, and practitioners.</div></div>
+        <div><div class="phase-title">You just saw what's possible. Now imagine it was real.</div>
+        <div class="phase-subtitle">The Latent Value Network is an open protocol being built by people who believe cooperation shouldn't require this much luck. It's not a company. It's not an app. It's infrastructure — like roads, but for human connection. And it needs people exactly like you.</div></div>
       </div>
       <div id="role-recs"></div>
       <div class="btn-row" style="flex-wrap:wrap;gap:.5rem">
@@ -358,18 +365,18 @@ body::before{opacity:.008!important}
 const state={skills:new Set(),needs:new Set(),context:'',phase:0,matches:[]};
 
 const members=[
-  {name:"Sarah",age:28,emoji:"👩‍💻",role:"UX designer, freelance",dist:"0.5 mi",skills:["design","coding","writing","tech-support"],needs:["small-business","financial-stress","loneliness"],story:"Recently went freelance. Struggles with invoicing and taxes. Misses having coworkers.",latent:"Has user-research skills that nonprofits desperately need but she's never thought to offer."},
-  {name:"Robert",age:71,emoji:"👴",role:"Retired accountant",dist:"1.2 mi",skills:["finance","organizing","teaching"],needs:["learning-tech","loneliness","community"],story:"40 years of financial expertise. Would love to help people but doesn't know how to offer.",latent:"Could save a freelancer thousands in tax optimization — expertise he considers 'nothing special.'"},
-  {name:"Priya",age:35,emoji:"👩‍🍳",role:"Restaurant owner",dist:"0.8 mi",skills:["cooking","languages","organizing","small-business"],needs:["tech-support","side-project","home-maintenance"],story:"Runs a small restaurant. Needs a better website. Has a commercial kitchen idle 4 days a week.",latent:"Her idle kitchen is community infrastructure — perfect for cooking classes or a co-op bakery."},
-  {name:"Marcus",age:19,emoji:"👨‍🎓",role:"Community college student",dist:"2 mi",skills:["coding","tech-support","driving","design"],needs:["career-change","education","financial-stress"],story:"Studying CS. Builds websites for fun but doesn't see it as marketable. Has a truck and free mornings.",latent:"Could build the website Priya needs in a weekend — gaining a portfolio piece that launches his career."},
-  {name:"Diana",age:45,emoji:"👩‍⚕️",role:"Nurse practitioner",dist:"1.5 mi",skills:["healthcare","teaching","organizing","elder-care"],needs:["home-maintenance","parenting","side-project"],story:"Works at the clinic. Constantly translates medical jargon but doesn't see that as a skill.",latent:"Her medical-to-plain-language ability is a rare, transferable communication superpower."},
-  {name:"Tom",age:52,emoji:"🧑‍🌾",role:"Small farm operator",dist:"3 mi",skills:["farming","home-repair","driving","gardening"],needs:["small-business","learning-tech","legal-issue"],story:"Optimized irrigation through trial and error. Has surplus equipment sitting idle.",latent:"His problem-solving approach to irrigation is systems engineering without the degree."},
-  {name:"Lisa",age:38,emoji:"👩‍🏫",role:"Former teacher, stay-at-home mom",dist:"0.3 mi",skills:["teaching","childcare","writing","organizing"],needs:["career-change","loneliness","side-project","community"],story:"Left teaching 3 years ago. Misses intellectual engagement. Has curriculum design skills she thinks nobody needs.",latent:"Curriculum design is content strategy by another name — a skill tech companies pay $120K+ for."},
-  {name:"Jin",age:42,emoji:"👨‍🔬",role:"Lab technician",dist:"4 mi",skills:["healthcare","coding","languages","gardening"],needs:["elder-care","community","side-project"],story:"Speaks Korean and English fluently. Parents are aging and healthcare navigation is overwhelming.",latent:"His bilingual healthcare navigation could help dozens of immigrant families nearby."},
-  {name:"Carmen",age:55,emoji:"👩‍💼",role:"Nonprofit director",dist:"1 mi",skills:["organizing","writing","legal","community-org"],needs:["tech-support","financial-stress","learning-tech"],story:"Runs a food bank. Drowning in paperwork. Data in spreadsheets nobody understands.",latent:"Her grant-writing skills transfer to any fundraising context — small businesses included."},
-  {name:"Derek",age:31,emoji:"👨‍🔧",role:"Electrician",dist:"2.5 mi",skills:["home-repair","driving","teaching"],needs:["legal-issue","parenting","financial-stress"],story:"Great at his trade but terrible at business. Needs help with contracts. Coaches kids' soccer.",latent:"His coaching instinct means he naturally explains complex things simply — a teaching superpower."},
-  {name:"Anika",age:24,emoji:"👩‍🎨",role:"Designer & barista",dist:"1.8 mi",skills:["design","coding","writing"],needs:["financial-stress","small-business","career-change","loneliness"],story:"Beautiful designs between shifts. Dreams of freelance but has no business network.",latent:"Her visual skills could transform how every local org presents itself — but she's never been asked."},
-  {name:"Miguel",age:48,emoji:"👨‍🏭",role:"Warehouse supervisor",dist:"3.5 mi",skills:["organizing","driving","home-repair","languages"],needs:["education","career-change","health-nav","elder-care"],story:"Manages logistics for 30 people daily. Speaks Spanish fluently. Mom just moved in.",latent:"His logistics thinking is systems engineering without the degree — transferable to consulting."}
+  {name:"Sarah",age:28,emoji:"👩‍💻",role:"UX designer, freelance",dist:"0.5 mi",skills:["design","coding","writing","tech-support"],needs:["small-business","financial-stress","loneliness"],story:"Left her design job three months ago to go freelance. The freedom is incredible but the loneliness hit hard — she eats lunch alone every day now. Last month she overpaid her taxes by $2,400 because she didn't know about quarterly deductions.",latent:"The user-research methods she uses to design interfaces are exactly what nonprofits need to understand their communities — she just never framed it that way."},
+  {name:"Robert",age:71,emoji:"👴",role:"Retired accountant",dist:"1.2 mi",skills:["finance","organizing","teaching"],needs:["learning-tech","loneliness","community"],story:"Retired after 40 years. His wife passed last spring. He's sharp as ever but the days feel empty. He helped his neighbor's kid with taxes once and it was the most alive he'd felt in months. He'd help anyone — he just doesn't know who needs him.",latent:"The tax knowledge he calls 'basic' would save Sarah $2,400 this quarter alone. And the conversation would give him something no amount of money can buy: feeling needed again."},
+  {name:"Priya",age:35,emoji:"👩‍🍳",role:"Restaurant owner",dist:"0.8 mi",skills:["cooking","languages","organizing","small-business"],needs:["tech-support","side-project","home-maintenance"],story:"Pours everything into her restaurant but can barely keep the lights on. Her food is extraordinary but her website looks like 2003 and she's losing customers to chains with better SEO. Four days a week her beautiful kitchen sits completely empty.",latent:"Her idle kitchen is community infrastructure — perfect for cooking classes or a co-op bakery."},
+  {name:"Marcus",age:19,emoji:"👨‍🎓",role:"Community college student",dist:"2 mi",skills:["coding","tech-support","driving","design"],needs:["career-change","education","financial-stress"],story:"First in his family to go to college. Taught himself to code at 15 but doesn't list it on his resume because it's 'just a hobby.' Has a truck and free mornings but no idea anyone nearby needs exactly what he can do.",latent:"He could build Priya's website in 48 hours. She'd get the online presence that saves her restaurant. He'd get a real client story that transforms 'hobby' into 'career.' Both lives change — and neither would ever find the other by searching."},
+  {name:"Diana",age:45,emoji:"👩‍⚕️",role:"Nurse practitioner",dist:"1.5 mi",skills:["healthcare","teaching","organizing","elder-care"],needs:["home-maintenance","parenting","side-project"],story:"Spends her days explaining complicated diagnoses in words patients actually understand. She goes home exhausted, thinking she's 'just a nurse.' Her porch has needed repair for two years — she can't afford a contractor and doesn't know who to ask.",latent:"Her medical-to-plain-language ability is a rare, transferable communication superpower."},
+  {name:"Tom",age:52,emoji:"🧑‍🌾",role:"Small farm operator",dist:"3 mi",skills:["farming","home-repair","driving","gardening"],needs:["small-business","learning-tech","legal-issue"],story:"Figured out how to cut his water bill 40% through a homemade irrigation system that an engineer would call brilliant. He has $15,000 in equipment sitting in his barn because he bought for scale and the market didn't come. He'd sell it for pennies just to clear the space.",latent:"His problem-solving approach to irrigation is systems engineering without the degree."},
+  {name:"Lisa",age:38,emoji:"👩‍🏫",role:"Former teacher, stay-at-home mom",dist:"0.3 mi",skills:["teaching","childcare","writing","organizing"],needs:["career-change","loneliness","side-project","community"],story:"Walked away from teaching for her kids. Most days she loves it. Some days she sits in the car after school drop-off and cries because she misses being someone who made things. She designed curricula that won awards — she thinks that part of her life is over.",latent:"Curriculum design is content strategy by another name — a skill tech companies pay $120K+ for."},
+  {name:"Jin",age:42,emoji:"👨‍🔬",role:"Lab technician",dist:"4 mi",skills:["healthcare","coding","languages","gardening"],needs:["elder-care","community","side-project"],story:"His mother's doctor speaks no Korean. Jin translates everything — diagnoses, medications, insurance forms. It takes hours every week. He has no idea that three other Korean families on his block are drowning in the same isolation.",latent:"His bilingual healthcare navigation could help dozens of immigrant families nearby."},
+  {name:"Carmen",age:55,emoji:"👩‍💼",role:"Nonprofit director",dist:"1 mi",skills:["organizing","writing","legal","community-org"],needs:["tech-support","financial-stress","learning-tech"],story:"Feeds 200 families a week on a shoestring budget. She stays until midnight doing paperwork that a good database could handle in minutes. She's one bad quarter from shutting down — not because of demand but because she can't prove her impact to funders.",latent:"Her grant-writing skills transfer to any fundraising context — small businesses included."},
+  {name:"Derek",age:31,emoji:"👨‍🔧",role:"Electrician",dist:"2.5 mi",skills:["home-repair","driving","teaching"],needs:["legal-issue","parenting","financial-stress"],story:"Best electrician in the county but signed a contract last year that cost him $8,000 because he didn't understand the liability clause. Coaches his daughter's soccer team on weekends — the kids adore him because he makes everything make sense.",latent:"His coaching instinct means he naturally explains complex things simply — a teaching superpower."},
+  {name:"Anika",age:24,emoji:"👩‍🎨",role:"Designer & barista",dist:"1.8 mi",skills:["design","coding","writing"],needs:["financial-stress","small-business","career-change","loneliness"],story:"Works the 6am shift at a coffee shop, then designs until midnight. Her portfolio is stunning but she doesn't know a single person who hires designers. She's 24, talented, broke, and starting to wonder if this is what giving up feels like.",latent:"Her visual skills could transform how every local org presents itself — but she's never been asked."},
+  {name:"Miguel",age:48,emoji:"👨‍🏭",role:"Warehouse supervisor",dist:"3.5 mi",skills:["organizing","driving","home-repair","languages"],needs:["education","career-change","health-nav","elder-care"],story:"Coordinates 30 warehouse workers across three shifts without breaking a sweat. But when his mom moved in last month, navigating her Medicare enrollment made him feel helpless for the first time in his life. He doesn't know where to start.",latent:"His logistics thinking is systems engineering without the degree — transferable to consulting."}
 ];
 
 const relations={
@@ -612,10 +619,10 @@ function renderResults(){
     <div class="summary-stat"><div class="summary-stat-num">${total}</div><div class="summary-stat-label">Connections surfaced</div></div>
     <div class="summary-stat"><div class="summary-stat-num">${mutual}</div><div class="summary-stat-label">Mutual exchanges</div></div>
     <div class="summary-stat"><div class="summary-stat-num">${xb}</div><div class="summary-stat-label">Cross-boundary</div></div>`;
-  document.getElementById('results-title').textContent=total+' Connections Found';
+  document.getElementById('results-title').textContent=total+' People Who Were There All Along';
   state.matches.forEach((match,i)=>{
     const m=match.member;
-    const tl=match.type==='you-offer'?'You can help':match.type==='you-need'?'They can help you':'Mutual exchange';
+    const tl=match.type==='you-offer'?'You have what they need':match.type==='you-need'?'They carry what you need':'You need each other';
     const ot=match.youHelp.map(s=>`<span class="match-tag offer">you offer: ${s.replace(/-/g,' ')}</span>`).join('');
     const nt=match.theyHelp.map(s=>`<span class="match-tag need">they offer: ${s.replace(/-/g,' ')}</span>`).join('');
     const card=document.createElement('div');card.className='match-card';
@@ -625,10 +632,22 @@ function renderResults(){
       ${m.latent?`<div class="match-latent">✦ ${m.latent}</div>`:''}`;
     grid.appendChild(card);setTimeout(()=>card.classList.add('visible'),200+i*200);
   });
-  const ins=["Several of your skills map to needs people rarely search for directly. These connections would never surface on a traditional platform.",
-    "Your skill combination is unusual here — your cooperative potential is disproportionately high. These matches wouldn't exist on any search-based system.",
-    "The strongest matches are with people whose skills are completely different from yours. This is complementarity, not similarity — the LVN's core innovation."];
-  document.getElementById('insight-text').textContent=ins[Math.floor(Math.random()*ins.length)];
+  // Generate personalized insight based on what they selected
+  const skillNames = [...state.skills].map(s => s.replace(/-/g,' '));
+  const needNames = [...state.needs].map(n => n.replace(/-/g,' '));
+  const mutualCount = state.matches.filter(m => m.type === 'mutual').length;
+  
+  let insight = '';
+  if (mutualCount >= 3) {
+    insight = 'You matched mutually with ' + mutualCount + ' people — meaning you carry something they need AND they carry something you need. These aren\'t transactions. They\'re relationships waiting to exist. Not one of these people would have appeared in any search you\'d think to run.';
+  } else if (state.skills.size >= 4) {
+    insight = 'You selected ' + state.skills.size + ' skills. Here\'s the thing most people never hear: the combination matters more than any individual skill. Your specific blend of ' + skillNames.slice(0,3).join(', ') + ' doesn\'t exist in most communities. That makes you disproportionately valuable — not because of what you know, but because of what you uniquely bridge.';
+  } else if (state.needs.size >= 3) {
+    insight = 'You\'re carrying ' + state.needs.size + ' challenges right now. Look at the matches above — each person facing something similar found someone nearby who could help. You\'re not supposed to solve everything alone. The fact that help exists this close, invisible until now, isn\'t a failure of character. It\'s a failure of infrastructure.';
+  } else {
+    insight = 'Every person above was hiding in plain sight — carrying skills and needs that perfectly complement yours. None of them would have shown up in any search, any app, any platform you currently use. That\'s not because the technology is bad. It\'s because no existing system looks for complementarity. They all look for similarity. And similarity is exactly the wrong thing to optimize for when what you need is someone different from you.';
+  }
+  document.getElementById('insight-text').textContent = insight;
   setB(total+' connections');
   document.getElementById('share-btn').onclick=()=>{
     const t=`I found ${total} hidden cooperative connections in the LVN demo. Try it: `;
