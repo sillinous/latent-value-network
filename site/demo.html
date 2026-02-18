@@ -4,955 +4,181 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Discover Your Latent Value — The Latent Value Network</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="description" content="See the invisible cooperative connections around you.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
 <style>
 :root {
-  --navy: #1B2A4A;
-  --deep: #0F1A2E;
-  --slate: #3D5A80;
-  --teal: #2A9D8F;
-  --teal-glow: #34D1BF;
-  --gold: #E9C46A;
-  --warm-cream: #FAF8F5;
-  --warm-gray: #F0EDE8;
-  --mid-text: #5A6577;
-  --light-text: #8B95A5;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --bg:#070B14;--surface:#0D1321;--surface2:#141C2E;--border:rgba(42,157,143,.12);
+  --text:#C8D6E5;--text-dim:#5A7088;--teal:#2A9D8F;--teal-glow:#34D1BF;--gold:#E9C46A;
+  --font-display:'Cormorant Garamond',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg)!important;color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{opacity:.008!important}
+.demo-wrap{max-width:1000px;margin:0 auto;padding:1rem 1.5rem 4rem}
+
+/* ── Network Stage ── */
+.network-stage{position:relative;width:100%;aspect-ratio:16/10;max-height:520px;border-radius:16px;overflow:hidden;
+  background:radial-gradient(ellipse at center,#0D1825,#070B14);border:1px solid var(--border);
+  box-shadow:0 0 60px rgba(42,157,143,.06),inset 0 0 80px rgba(0,0,0,.4);margin-bottom:1.5rem}
+.network-stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.you-label{position:absolute;left:50%;top:50%;transform:translate(-50%,38px);font-family:var(--font-mono);
+  font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity 600ms;pointer-events:none}
+.you-label.visible{opacity:1}
+.net-legend{position:absolute;bottom:12px;right:12px;display:flex;gap:1rem;font-family:var(--font-mono);
+  font-size:.55rem;color:var(--text-dim);opacity:0;transition:opacity 500ms}
+.net-legend.visible{opacity:1}
+.legend-item{display:flex;align-items:center;gap:.3rem}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.net-status{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);
+  font-size:.65rem;letter-spacing:.1em;color:var(--teal);opacity:0;transition:opacity 400ms;text-align:center}
+.net-status.visible{opacity:1}
+.match-badge{position:absolute;top:16px;right:16px;padding:.3rem .7rem;background:rgba(42,157,143,.15);
+  border:1px solid rgba(42,157,143,.3);border-radius:20px;font-family:var(--font-mono);
+  font-size:.65rem;color:var(--teal-glow);opacity:0;transition:opacity 400ms}
+.match-badge.visible{opacity:1}
+
+/* ── Control Panel ── */
+.control-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.panel-phase{display:none;padding:2rem;animation:panelIn 500ms cubic-bezier(.16,1,.3,1) both}
+.panel-phase.active{display:block}
+@keyframes panelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.phase-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.5rem}
+.phase-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;background:rgba(42,157,143,.12);color:var(--teal);flex-shrink:0}
+.phase-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:white}
+.phase-subtitle{font-size:.82rem;color:var(--text-dim);line-height:1.5}
+.progress-strip{display:flex;height:3px;background:var(--surface2)}
+.progress-seg{flex:1;transition:background 500ms}
+.progress-seg.done{background:var(--teal)}
+.progress-seg.active{background:var(--gold)}
+
+/* ── Chips ── */
+.chip-grid{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+.chip{padding:.45rem .9rem;font-family:var(--font-body);font-size:.78rem;background:var(--surface2);
+  color:var(--text-dim);border:1.5px solid rgba(255,255,255,.06);border-radius:20px;cursor:pointer;
+  transition:all 200ms cubic-bezier(.34,1.56,.64,1);user-select:none}
+.chip:hover{border-color:rgba(42,157,143,.3);color:var(--text)}
+.chip.selected{background:rgba(42,157,143,.15);border-color:var(--teal);color:var(--teal-glow)}
+.chip-label{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.6rem}
+.context-area{width:100%;min-height:80px;padding:.8rem;font-family:var(--font-body);font-size:.85rem;line-height:1.5;
+  background:var(--surface2);border:1.5px solid rgba(255,255,255,.06);border-radius:10px;color:var(--text);resize:vertical;transition:border-color 200ms}
+.context-area:focus{outline:none;border-color:var(--teal)}
+.context-area::placeholder{color:var(--text-dim)}
+
+/* ── Buttons ── */
+.btn-glow{padding:.65rem 2rem;font-family:var(--font-body);font-size:.88rem;font-weight:600;
+  background:linear-gradient(135deg,var(--teal),#1F7A6F);color:white;border:none;border-radius:8px;cursor:pointer;
+  transition:all 250ms cubic-bezier(.34,1.56,.64,1);box-shadow:0 4px 20px rgba(42,157,143,.3);text-decoration:none;display:inline-block}
+.btn-glow:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(42,157,143,.4)}
+.btn-glow:active{transform:scale(.97)}
+.btn-ghost{padding:.5rem 1rem;font-family:var(--font-body);font-size:.78rem;background:transparent;
+  color:var(--text-dim);border:1px solid rgba(255,255,255,.08);border-radius:6px;cursor:pointer;transition:all 200ms;text-decoration:none;display:inline-block}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,.15)}
+.btn-row{display:flex;gap:.6rem;align-items:center;margin-top:1.5rem;flex-wrap:wrap}
+
+/* ── Match Cards ── */
+.matches-grid{display:grid;gap:.8rem;margin-top:1rem}
+.match-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;
+  opacity:0;transform:translateY(12px);transition:all 400ms cubic-bezier(.16,1,.3,1);cursor:default}
+.match-card.visible{opacity:1;transform:none}
+.match-card:hover{border-color:rgba(42,157,143,.3);transform:translateY(-2px)}
+.match-header{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+.match-emoji{font-size:1.8rem}
+.match-info{flex:1}
+.match-name{font-weight:600;font-size:.95rem;color:white}
+.match-role{font-size:.72rem;color:var(--text-dim)}
+.match-score{font-family:var(--font-mono);font-size:.65rem;padding:.2rem .5rem;border-radius:12px;background:rgba(42,157,143,.1);color:var(--teal)}
+.match-type-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.05em;padding:.15rem .5rem;border-radius:10px;margin-bottom:.6rem}
+.match-type-badge.mutual{background:rgba(42,157,143,.1);color:var(--teal-glow)}
+.match-type-badge.you-offer{background:rgba(233,196,106,.12);color:var(--gold)}
+.match-type-badge.you-need{background:rgba(61,90,128,.15);color:#7BA1C7}
+.match-story{font-size:.82rem;line-height:1.55;color:var(--text);margin-bottom:.6rem}
+.match-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.5rem}
+.match-tag{font-family:var(--font-mono);font-size:.6rem;padding:.15rem .5rem;border-radius:3px}
+.match-tag.offer{background:rgba(42,157,143,.08);color:var(--teal)}
+.match-tag.need{background:rgba(233,196,106,.1);color:var(--gold)}
+.match-latent{padding:.55rem .8rem;background:linear-gradient(135deg,rgba(42,157,143,.06),rgba(233,196,106,.04));
+  border-left:3px solid var(--teal);border-radius:0 8px 8px 0;font-size:.78rem;color:var(--teal-glow);font-style:italic;line-height:1.5}
+
+/* ── Summary Stats ── */
+.summary-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:1.5rem 0}
+.summary-stat{text-align:center;padding:1rem;background:var(--surface2);border-radius:10px;border:1px solid rgba(255,255,255,.04)}
+.summary-stat-num{font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--teal-glow);line-height:1}
+.summary-stat-label{font-size:.7rem;color:var(--text-dim);margin-top:.3rem}
+
+/* ── Insight ── */
+.insight-callout{padding:1.2rem;background:linear-gradient(135deg,rgba(42,157,143,.08),rgba(233,196,106,.04));
+  border:1px solid rgba(42,157,143,.15);border-radius:12px;margin:1rem 0}
+.insight-callout h3{font-family:var(--font-display);font-size:1.1rem;color:white;margin-bottom:.4rem}
+.insight-callout p{font-size:.82rem;color:var(--text);line-height:1.6}
+
+
+/* ── Canvas Tooltip ── */
+.canvas-tooltip{position:absolute;pointer-events:none;opacity:0;transition:opacity 200ms;
+  background:rgba(13,19,33,.95);border:1px solid rgba(42,157,143,.3);border-radius:8px;
+  padding:.6rem .8rem;max-width:220px;backdrop-filter:blur(8px);z-index:10}
+.canvas-tooltip.show{opacity:1}
+.canvas-tooltip .ct-name{font-weight:600;font-size:.82rem;color:white;margin-bottom:.15rem}
+.canvas-tooltip .ct-role{font-size:.68rem;color:var(--text-dim);margin-bottom:.3rem}
+.canvas-tooltip .ct-skills{display:flex;flex-wrap:wrap;gap:.2rem}
+.canvas-tooltip .ct-skill{font-family:var(--font-mono);font-size:.55rem;padding:.1rem .35rem;
+  border-radius:3px;background:rgba(42,157,143,.12);color:var(--teal)}
+.canvas-tooltip .ct-need{font-family:var(--font-mono);font-size:.55rem;padding:.1rem .35rem;
+  border-radius:3px;background:rgba(233,196,106,.1);color:var(--gold)}
+.canvas-tooltip .ct-dim{font-size:.6rem;color:var(--text-dim);margin-top:.3rem;font-style:italic;
+  border-top:1px solid rgba(255,255,255,.06);padding-top:.3rem}
+
+/* ── Before/After Banner ── */
+.before-after{display:flex;gap:1rem;margin:1rem 0;padding:.8rem;background:var(--surface2);border-radius:10px;
+  border:1px solid rgba(255,255,255,.04)}
+.ba-side{flex:1;text-align:center}
+.ba-label{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:.3rem}
+.ba-num{font-family:var(--font-display);font-size:1.8rem;font-weight:700;line-height:1}
+.ba-num.dim{color:rgba(255,255,255,.15)}
+.ba-num.lit{color:var(--teal-glow)}
+.ba-desc{font-size:.65rem;color:var(--text-dim);margin-top:.2rem}
+.ba-arrow{display:flex;align-items:center;font-size:1.5rem;color:var(--gold);opacity:.5}
+
+/* ── Pulse ring on chip select ── */
+@keyframes chipPulse{0%{box-shadow:0 0 0 0 rgba(42,157,143,.4)}70%{box-shadow:0 0 0 8px rgba(42,157,143,0)}100%{box-shadow:0 0 0 0 rgba(42,157,143,0)}}
+.chip.just-selected{animation:chipPulse .5s ease-out}
+
+/* ── Match card highlight ── */
+.match-card.highlighted{border-color:var(--gold)!important;box-shadow:0 0 20px rgba(233,196,106,.15)}
+
+/* ── Connection label on canvas ── */
+.conn-label-float{position:absolute;font-family:var(--font-mono);font-size:.5rem;color:rgba(42,157,143,.6);
+  pointer-events:none;opacity:0;transition:opacity 400ms;letter-spacing:.05em;text-transform:uppercase}
+.conn-label-float.show{opacity:1}
+
+/* ── Live counter ── */
+.live-counter{position:absolute;bottom:12px;left:12px;font-family:var(--font-mono);font-size:.6rem;
+  color:var(--text-dim);opacity:0;transition:opacity 500ms}
+.live-counter.visible{opacity:1}
+.live-counter .lc-num{color:var(--teal-glow);font-weight:700;font-size:.75rem}
+
+@media(max-width:768px){
+  .demo-wrap{padding:.8rem 1rem 3rem}
+  .network-stage{aspect-ratio:4/3;max-height:350px}
+  .summary-stats{grid-template-columns:1fr}
+  .phase-title{font-size:1.15rem}
 }
-
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: var(--font-body);
-  color: var(--navy);
-  background: var(--warm-cream);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-  padding-top: calc(var(--nav-height, 48px) + 36px);
-}
-
-/* ── Noise overlay ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-}
-
-::selection { background: rgba(42,157,143,0.2); }
-
-.container {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-/* ── Header ── */
-header {
-  padding: 2rem 0;
-  text-align: center;
-  border-bottom: 1px solid rgba(42,157,143,0.15);
-}
-
-.logo {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--navy);
-}
-.logo span { color: var(--teal); }
-
-.tagline {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--light-text);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-top: 0.3rem;
-}
-
-/* ── Screens ── */
-.screen { display: none; padding: 3rem 0 4rem; }
-.screen.active { display: block; }
-
-/* ── Screen 1: Intro ── */
-.intro-hero {
-  text-align: center;
-  padding: 4rem 0 2rem;
-}
-
-.intro-hero h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2.2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  color: var(--navy);
-  line-height: 1.15;
-  margin-bottom: 1rem;
-}
-
-.intro-hero h1 em {
-  color: var(--teal);
-  font-style: italic;
-}
-
-.intro-lead {
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: var(--mid-text);
-  max-width: 640px;
-  margin: 0 auto 2.5rem;
-}
-
-.story-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  text-align: left;
-  position: relative;
-  overflow: hidden;
-}
-
-.story-card::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 4px;
-  background: linear-gradient(to bottom, var(--teal), var(--gold));
-}
-
-.story-card .person {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.8rem;
-}
-
-.story-card .avatar {
-  width: 48px; height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  background: var(--warm-gray);
-}
-
-.story-card .name {
-  font-weight: 600;
-  color: var(--navy);
-  font-size: 1rem;
-}
-
-.story-card .role {
-  font-size: 0.8rem;
-  color: var(--light-text);
-}
-
-.story-card .situation {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--mid-text);
-}
-
-.story-card .hidden-value {
-  margin-top: 0.8rem;
-  padding: 0.6rem 0.8rem;
-  background: rgba(42,157,143,0.06);
-  border-radius: 6px;
-  font-size: 0.85rem;
-  color: var(--teal);
-  font-weight: 500;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all 0.6s ease;
-}
-
-.story-card .hidden-value.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.reveal-btn {
-  display: block;
-  margin: 2rem auto;
-  padding: 0.7rem 2rem;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: transparent;
-  color: var(--teal);
-  border: 1.5px solid var(--teal);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.reveal-btn:hover {
-  background: var(--teal);
-  color: white;
-}
-
-.match-arrow {
-  text-align: center;
-  padding: 1rem 0;
-  opacity: 0;
-  transition: all 0.8s ease;
-}
-
-.match-arrow.visible { opacity: 1; }
-
-.match-arrow .line {
-  width: 2px;
-  height: 40px;
-  background: linear-gradient(to bottom, var(--teal), var(--gold));
-  margin: 0 auto;
-}
-
-.match-arrow .label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-top: 0.5rem;
-}
-
-.match-explanation {
-  background: linear-gradient(135deg, var(--navy), var(--deep));
-  border-radius: 12px;
-  padding: 2rem;
-  color: white;
-  text-align: center;
-  margin: 1.5rem 0;
-  opacity: 0;
-  transform: translateY(15px);
-  transition: all 0.8s ease;
-}
-
-.match-explanation.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.match-explanation h3 {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 0.6rem;
-  color: var(--teal-glow);
-}
-
-.match-explanation p {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: rgba(255,255,255,0.7);
-  max-width: 560px;
-  margin: 0 auto;
-}
-
-.cta-section {
-  text-align: center;
-  padding: 2rem 0;
-  opacity: 0;
-  transition: all 0.8s ease;
-}
-
-.cta-section.visible { opacity: 1; }
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2.5rem;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
-  background: var(--navy);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-primary:hover {
-  background: var(--slate);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(27,42,74,0.2);
-}
-
-/* ── Screen 2: Your Profile ── */
-.profile-section h2 {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  font-weight: 700;
-  color: var(--navy);
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.profile-section .subtitle {
-  text-align: center;
-  font-size: 0.95rem;
-  color: var(--mid-text);
-  margin-bottom: 2.5rem;
-}
-
-.input-group {
-  margin-bottom: 2rem;
-}
-
-.input-group label {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 0.3rem;
-}
-
-.input-group .hint {
-  font-size: 0.8rem;
-  color: var(--light-text);
-  margin-bottom: 0.6rem;
-}
-
-.chip-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.chip {
-  padding: 0.5rem 1rem;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 500;
-  border: 1.5px solid var(--divider, #D1D5DB);
-  border-radius: 20px;
-  background: var(--bg-card);
-  color: var(--mid-text);
-  cursor: pointer;
-  transition: all 0.2s;
-  user-select: none;
-}
-
-.chip:hover {
-  border-color: var(--teal);
-  color: var(--teal);
-}
-
-.chip.selected {
-  background: var(--teal);
-  border-color: var(--teal);
-  color: white;
-}
-
-.custom-input {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.custom-input input {
-  flex: 1;
-  padding: 0.5rem 0.8rem;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  border: 1.5px solid #D1D5DB;
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.custom-input input:focus { border-color: var(--teal); }
-
-.custom-input button {
-  padding: 0.5rem 1rem;
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: var(--warm-gray);
-  color: var(--navy);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.context-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 0.8rem;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  border: 1.5px solid #D1D5DB;
-  border-radius: 10px;
-  outline: none;
-  resize: vertical;
-  line-height: 1.5;
-  transition: border-color 0.2s;
-}
-
-.context-textarea:focus { border-color: var(--teal); }
-
-.progress-bar {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 2rem 0;
-}
-
-.progress-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: #D1D5DB;
-  transition: all 0.3s;
-}
-
-.progress-dot.active { background: var(--teal); transform: scale(1.3); }
-.progress-dot.done { background: var(--gold); }
-
-/* ── Screen 3: Discovery ── */
-.discovery-section { text-align: center; }
-
-.discovery-section h2 {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  font-weight: 700;
-  color: var(--navy);
-  margin-bottom: 0.5rem;
-}
-
-.scanning-animation {
-  width: 200px; height: 200px;
-  margin: 2rem auto;
-  position: relative;
-}
-
-.scan-ring {
-  position: absolute;
-  inset: 0;
-  border: 2px solid rgba(42,157,143,0.2);
-  border-radius: 50%;
-  animation: scanPulse 2s infinite ease-out;
-}
-
-.scan-ring:nth-child(2) { animation-delay: 0.5s; }
-.scan-ring:nth-child(3) { animation-delay: 1s; }
-
-@keyframes scanPulse {
-  0% { transform: scale(0.3); opacity: 1; border-color: rgba(42,157,143,0.6); }
-  100% { transform: scale(1.2); opacity: 0; border-color: rgba(42,157,143,0); }
-}
-
-.scan-center {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 16px; height: 16px;
-  background: var(--teal);
-  border-radius: 50%;
-  box-shadow: 0 0 20px rgba(42,157,143,0.5);
-}
-
-.scan-status {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--light-text);
-  letter-spacing: 0.05em;
-}
-
-.scan-status .highlight { color: var(--teal); font-weight: 500; }
-
-/* ── Screen 4: Results ── */
-.results-section h2 {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  font-weight: 700;
-  color: var(--navy);
-  text-align: center;
-  margin-bottom: 0.3rem;
-}
-
-.results-subtitle {
-  text-align: center;
-  font-size: 0.95rem;
-  color: var(--mid-text);
-  margin-bottom: 2rem;
-}
-
-.match-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 1.8rem;
-  margin-bottom: 1.2rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
-  position: relative;
-}
-
-.match-card.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.match-card .match-type {
-  display: inline-block;
-  padding: 0.25rem 0.7rem;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  border-radius: 12px;
-  margin-bottom: 0.8rem;
-}
-
-.match-type.you-offer { background: rgba(42,157,143,0.1); color: var(--teal); }
-.match-type.you-need { background: rgba(233,196,106,0.2); color: #B8860B; }
-.match-type.mutual { background: rgba(27,42,74,0.08); color: var(--navy); }
-
-.match-card .match-person {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 0.8rem;
-}
-
-.match-card .match-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  background: var(--warm-gray);
-}
-
-.match-card .match-name {
-  font-weight: 600;
-  color: var(--navy);
-  font-size: 0.95rem;
-}
-
-.match-card .match-distance {
-  font-size: 0.75rem;
-  color: var(--light-text);
-}
-
-.match-card .match-insight {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: var(--mid-text);
-  margin-bottom: 0.8rem;
-}
-
-.match-card .match-bridge {
-  padding: 0.6rem 0.8rem;
-  background: linear-gradient(135deg, rgba(42,157,143,0.06), rgba(233,196,106,0.06));
-  border-radius: 8px;
-  font-size: 0.8rem;
-  color: var(--slate);
-  border-left: 3px solid var(--teal);
-}
-
-.match-card .match-bridge strong { color: var(--navy); }
-
-.latent-value-counter {
-  background: linear-gradient(135deg, var(--navy), var(--deep));
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  margin: 2rem 0;
-  color: white;
-}
-
-.latent-value-counter h3 {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--teal-glow);
-  margin-bottom: 0.5rem;
-}
-
-.counter-value {
-  font-family: var(--font-display);
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: var(--gold);
-  line-height: 1;
-  margin-bottom: 0.3rem;
-}
-
-.counter-label {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.5);
-}
-
-.counter-explanation {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
-  margin-top: 1rem;
-  line-height: 1.5;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.insight-box {
-  background: var(--warm-gray);
-  border-radius: 12px;
-  padding: 1.8rem;
-  margin: 2rem 0;
-}
-
-.insight-box h3 {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 0.6rem;
-}
-
-.insight-box p {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: var(--mid-text);
-}
-
-.final-cta {
-  text-align: center;
-  padding: 2rem 0 3rem;
-}
-
-.final-cta h3 {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--navy);
-  margin-bottom: 0.5rem;
-}
-
-.final-cta p {
-  font-size: 0.95rem;
-  color: var(--mid-text);
-  margin-bottom: 1.5rem;
-}
-
-.btn-group {
-  display: flex;
-  gap: 0.8rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.8rem;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  font-weight: 600;
-  background: transparent;
-  color: var(--navy);
-  border: 1.5px solid var(--navy);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-secondary:hover {
-  background: var(--navy);
-  color: white;
-}
-
-/* ── Footer ── */
-footer {
-  background: var(--deep);
-  padding: 2rem;
-  text-align: center;
-}
-
-footer p {
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.3);
-}
-
-footer .f-logo {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  color: white;
-  margin-bottom: 0.5rem;
-}
-
-footer .f-logo span { color: var(--teal); }
-
-/* ── Animations ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-  opacity: 0;
-  animation: fadeUp 0.6s forwards;
-}
-
-@media (max-width: 640px) {
-  .story-card { padding: 1.5rem; }
-  .match-card { padding: 1.3rem; }
-  .container { padding: 0 1rem; }
-}
-
-/* ── Screen-Level Progress ── */
-.screen-progress {
-  position: fixed;
-  top: var(--nav-height, 48px);
-  left: 0;
-  right: 0;
-  z-index: 999;
-  background: rgba(15,26,46,0.85);
-  backdrop-filter: blur(8px);
-  padding: 0.5rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  transition: opacity var(--duration-normal, 250ms);
-}
-.screen-progress.hidden { opacity: 0; pointer-events: none; }
-.screen-step {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.65rem;
-  font-family: var(--font-body);
-  color: rgba(255,255,255,0.3);
-  transition: all 300ms;
-}
-.screen-step.active { color: var(--teal); }
-.screen-step.done { color: var(--gold); }
-.screen-step-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.screen-step.active .screen-step-dot { background: var(--teal); transform: scale(1.4); }
-.screen-step.done .screen-step-dot { background: var(--gold); }
-.screen-step-connector {
-  width: 24px;
-  height: 2px;
-  background: rgba(255,255,255,0.1);
-  margin: 0 0.15rem;
-  transition: background 300ms;
-}
-.screen-step.done + .screen-step-connector,
-.screen-step.done ~ .screen-step-connector { background: var(--gold); }
-
-/* ── Back Button ── */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: none;
-  border: none;
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  color: var(--text-secondary, #5A6577);
-  cursor: pointer;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  transition: all 200ms;
-}
-.back-btn:hover { color: var(--teal); background: rgba(42,157,143,0.06); }
-.back-btn::before { content: '←'; font-size: 1rem; }
-
-/* ── Screen Transitions ── */
-.screen {
-  animation: screenFadeIn 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-@keyframes screenFadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-
-/* ── Match Filters ── */
-.match-filters {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.2rem;
-  padding: 0.8rem;
-  background: var(--warm-gray, #F0EDE8);
-  border-radius: 10px;
-}
-.filter-btn {
-  padding: 0.35rem 0.8rem;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 500;
-  border: 1.5px solid rgba(0,0,0,0.08);
-  border-radius: 20px;
-  background: var(--bg-card);
-  color: var(--mid-text, #5A6577);
-  cursor: pointer;
-  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.filter-btn:hover { border-color: var(--teal); color: var(--teal); }
-.filter-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
-.sort-select {
-  padding: 0.35rem 0.6rem;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  border: 1.5px solid rgba(0,0,0,0.08);
-  border-radius: 20px;
-  background: var(--bg-card);
-  color: var(--mid-text, #5A6577);
-  cursor: pointer;
-  margin-left: auto;
-  -webkit-appearance: none;
-  appearance: none;
-  padding-right: 1.4rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A6577' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.4rem center;
-}
-
-/* ── Resume Banner ── */
-.resume-banner {
-  display: none;
-  padding: 0.8rem 1.2rem;
-  background: linear-gradient(135deg, rgba(42,157,143,0.08), rgba(233,196,106,0.08));
-  border: 1.5px solid rgba(42,157,143,0.15);
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  align-items: center;
-  gap: 0.8rem;
-}
-.resume-banner.show { display: flex; }
-.resume-banner-text {
-  flex: 1;
-  font-size: 0.82rem;
-  color: var(--mid-text, #5A6577);
-}
-.resume-banner-text strong { color: var(--teal); }
-.resume-btn {
-  padding: 0.4rem 1rem;
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  font-weight: 600;
-  background: var(--teal);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 200ms;
-}
-.resume-btn:hover { background: var(--teal-glow, #34D1BF); }
-.resume-dismiss {
-  background: none;
-  border: none;
-  font-size: 1.1rem;
-  color: var(--light-text, #8B95A5);
-  cursor: pointer;
-  padding: 0.2rem;
-}
-
-
-/* ── Expandable Match Cards ── */
-.match-expand-btn {
-  display: block;
-  width: 100%;
-  padding: 0.4rem;
-  margin-top: 0.5rem;
-  background: none;
-  border: none;
-  border-top: 1px solid rgba(0,0,0,0.04);
-  font-family: var(--font-body);
-  font-size: 0.7rem;
-  color: var(--teal, #2A9D8F);
-  cursor: pointer;
-  transition: all 200ms;
-}
-.match-expand-btn:hover { background: rgba(42,157,143,0.04); }
-.match-details {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: all 350ms cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 0 0.8rem;
-}
-.match-details.open {
-  max-height: 300px;
-  opacity: 1;
-  padding: 0.8rem;
-}
-.match-details-section {
-  margin-bottom: 0.6rem;
-}
-.match-details-label {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.58rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--light-text, #8B95A5);
-  margin-bottom: 0.25rem;
-}
-.match-details-value {
-  font-size: 0.78rem;
-  color: var(--mid-text, #5A6577);
-  line-height: 1.5;
-}
-.match-trust-bar {
-  height: 4px;
-  background: var(--warm-gray, #F0EDE8);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 0.3rem;
-}
-.match-trust-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--teal, #2A9D8F), var(--gold, #E9C46A));
-  border-radius: 2px;
-  transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
 </style>
-<meta name="description" content="Experience the Latent Value Gap firsthand. Discover cooperative connections you didn't know existed in a simulated community.">
-<meta property="og:title" content="Interactive Demo — Latent Value Network">
-<meta property="og:description" content="Experience the Latent Value Gap firsthand. Discover cooperative connections you didn't know existed in a simulated community.">
-<meta property="og:image" content="og-image.svg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="og-image.svg">
-<meta property="og:type" content="website">
-<script defer data-domain="latent-value-network.netlify.app" src="https://plausible.io/js/script.js"></script>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="shared.css">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to main content</a>
+<a href="#demo-main" class="skip-link">Skip to demo</a>
 <nav class="lvn-nav" role="navigation" aria-label="Main navigation">
   <div class="lvn-nav-inner">
     <a href="index.html" class="lvn-nav-logo">Latent <span>Value</span> Network</a>
     <button class="lvn-nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
     <div class="lvn-nav-links">
       <a href="index.html">Hub</a>
-      <a href="demo.html">Demo</a>
+      <a href="demo.html" class="active">Demo</a>
       <a href="provocations.html">Provocations</a>
       <a href="architecture.html">Architecture</a>
       <a href="https://github.com/sillinous/latent-value-network" class="nav-gh">GitHub</a>
@@ -961,1189 +187,582 @@ footer .f-logo span { color: var(--teal); }
   </div>
 </nav>
 
-<div class="screen-progress" id="screen-progress">
-  <div class="screen-step active" data-screen="0"><span class="screen-step-dot"></span><span>Welcome</span></div>
-  <div class="screen-step-connector"></div>
-  <div class="screen-step" data-screen="1"><span class="screen-step-dot"></span><span>Profile</span></div>
-  <div class="screen-step-connector"></div>
-  <div class="screen-step" data-screen="2"><span class="screen-step-dot"></span><span>Scan</span></div>
-  <div class="screen-step-connector"></div>
-  <div class="screen-step" data-screen="3"><span class="screen-step-dot"></span><span>Matches</span></div>
-  <div class="screen-step-connector"></div>
-  <div class="screen-step" data-screen="4"><span class="screen-step-dot"></span><span>Your Role</span></div>
-</div>
-
-<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;&:focus{position:static;width:auto;height:auto}">Skip to content</a>
-<header>
-  <div class="container">
-    <div class="logo">Latent <span>Value</span> Network</div>
-    <div class="tagline">Interactive Concept Demo</div>
+<main id="demo-main" class="demo-wrap">
+  <div class="network-stage" id="network-stage">
+    <canvas id="net-canvas"></canvas>
+    <div class="you-label" id="you-label">YOU</div>
+    <div class="net-status" id="net-status"></div>
+    <div class="match-badge" id="match-badge"></div>
+    <div class="net-legend" id="net-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#E9C46A"></div>You</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,.15)"></div>Community</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2A9D8F"></div>Match</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(42,157,143,.2)"></div>Connection</div>
+    </div>
+  
+    <div class="canvas-tooltip" id="canvas-tooltip">
+      <div class="ct-name"></div>
+      <div class="ct-role"></div>
+      <div class="ct-skills"></div>
+      <div class="ct-dim"></div>
+    </div>
+    <div class="live-counter" id="live-counter"><span class="lc-num" id="lc-num">0</span> potential connections</div>
   </div>
-</header>
 
-<!-- ═══════════════════════════════════════ -->
-<!-- SCREEN 1: THE STORY -->
-<!-- ═══════════════════════════════════════ -->
-<div id="screen-intro" class="screen active">
-    <div class="resume-banner" id="resume-banner">
-      <div class="resume-banner-text">You have <strong>saved progress</strong> from a previous visit.</div>
-      <button class="resume-btn" onclick="resumeProgress()">Resume</button>
-      <button class="resume-dismiss" onclick="dismissResume()" aria-label="Dismiss">×</button>
-    </div>
-  <div class="container">
-    <div class="intro-hero">
-      <h1>What if the help you need<br>is <em>already nearby?</em></h1>
-      <p class="intro-lead">
-        Every day, millions of cooperative connections fail to happen — not because people are unwilling, 
-        but because neither party knows the other exists. This is the <strong>Latent Value Gap</strong>.
-        Let us show you.
-      </p>
-    </div>
+  <div class="progress-strip" id="progress-strip">
+    <div class="progress-seg active" data-phase="0"></div>
+    <div class="progress-seg" data-phase="1"></div>
+    <div class="progress-seg" data-phase="2"></div>
+    <div class="progress-seg" data-phase="3"></div>
+  </div>
 
-    <div class="story-card" id="story-maria">
-      <div class="person">
-        <div class="avatar">👩‍🔧</div>
+  <div class="control-panel">
+    <!-- PHASE 0 -->
+    <div class="panel-phase active" id="phase-0">
+      <div class="phase-header">
+        <div class="phase-num">✦</div>
         <div>
-          <div class="name">Maria, 62</div>
-          <div class="role">Retired mechanical engineer · Newton, IL</div>
+          <div class="phase-title">The people above are your neighbors.</div>
+          <div class="phase-subtitle" style="margin-top:.3rem">Each dot is a real person with skills, needs, and resources. Right now they're dim. <strong style="color:var(--teal-glow)">You can't see what connects you.</strong></div>
         </div>
       </div>
-      <div class="situation">
-        Maria retired two years ago. She volunteers at the library and tends her garden. 
-        She's been feeling a bit purposeless since retirement — her grandkids live far away 
-        and she misses solving problems.
+      <p style="font-size:.85rem;color:var(--text);line-height:1.65;margin-bottom:.5rem">This is the <strong style="color:white">latent value gap</strong> — trillions in cooperative potential that goes unrealized because neither party knows the other exists. The retired accountant who could save a freelancer thousands. The nurse whose medical translation skills could help dozens of families. The idle kitchen that could become a community hub.</p>
+      <p style="font-size:.85rem;color:var(--text-dim);line-height:1.65">Tell us about yourself and watch what lights up.</p>
+      <div class="btn-row"><button class="btn-glow" onclick="goPhase(1)">Begin Discovery →</button></div>
+    </div>
+
+    <!-- PHASE 1 -->
+    <div class="panel-phase" id="phase-1">
+      <div class="phase-header">
+        <div class="phase-num">1</div>
+        <div><div class="phase-title">What can you do?</div><div class="phase-subtitle">Select skills — even ones you think don't matter.</div></div>
       </div>
-      <div class="hidden-value" id="maria-hidden">
-        ✦ Latent value: 35 years of drainage and HVAC expertise. Fixed her own septic system twice. 
-        Could diagnose most residential infrastructure problems in an afternoon.
+      <div class="chip-label">Your skills & knowledge</div>
+      <div class="chip-grid" id="skill-chips">
+        <div class="chip" data-v="home-repair">🔧 Home repair</div>
+        <div class="chip" data-v="cooking">🍳 Cooking</div>
+        <div class="chip" data-v="teaching">📚 Teaching</div>
+        <div class="chip" data-v="tech-support">💻 Tech support</div>
+        <div class="chip" data-v="gardening">🌱 Gardening</div>
+        <div class="chip" data-v="organizing">📋 Organizing</div>
+        <div class="chip" data-v="writing">✏️ Writing</div>
+        <div class="chip" data-v="finance">💰 Financial planning</div>
+        <div class="chip" data-v="driving">🚗 Driving / logistics</div>
+        <div class="chip" data-v="healthcare">🏥 Healthcare knowledge</div>
+        <div class="chip" data-v="childcare">👶 Childcare</div>
+        <div class="chip" data-v="coding">⌨️ Programming</div>
+        <div class="chip" data-v="design">🎨 Design</div>
+        <div class="chip" data-v="languages">🌍 Languages</div>
+        <div class="chip" data-v="legal">⚖️ Legal knowledge</div>
+        <div class="chip" data-v="farming">🌾 Farming</div>
       </div>
-    </div>
-
-    <div class="match-arrow" id="arrow1">
-      <div class="line"></div>
-      <div class="label">invisible connection</div>
-    </div>
-
-    <div class="story-card" id="story-james">
-      <div class="person">
-        <div class="avatar">👨‍👧</div>
-        <div>
-          <div class="name">James, 34</div>
-          <div class="role">Single dad, warehouse worker · 3 miles from Maria</div>
-        </div>
-      </div>
-      <div class="situation">
-        James has been noticing water pooling in his yard near the foundation. He Googled it once 
-        but the contractor quotes were $3,000+. He figured he'd just deal with it. He doesn't 
-        know it's slowly damaging his home's foundation.
-      </div>
-      <div class="hidden-value" id="james-hidden">
-        ✦ Latent value: James rebuilt a deck last summer and is a skilled woodworker. 
-        Maria's library needs new bookshelves — a project James would actually enjoy.
-      </div>
-    </div>
-
-    <div class="match-explanation" id="match-explain">
-      <h3>This connection died in silence.</h3>
-      <p>
-        Maria could diagnose James's drainage problem in 10 minutes and save him thousands. 
-        James could build the bookshelves Maria's library needs. 
-        Neither searched for the other. Neither knew they should.<br><br>
-        <strong>This is the Latent Value Gap.</strong> And it happens millions of times every day.
-      </p>
-    </div>
-
-    <button class="reveal-btn" id="btn-reveal" onclick="revealStory()">Reveal the invisible connections</button>
-
-    <div class="cta-section" id="intro-cta">
-      <p style="font-size:0.95rem; color:var(--mid-text); margin-bottom:1rem;">
-        Now imagine an AI that could sense these connections — not by surveilling people,<br>
-        but by understanding the situations they're <em>already sharing</em> with their AI assistant.
-      </p>
-      <button class="btn-primary" role="button" onclick="showScreen('screen-profile')">
-        Try It With Your Own Situation →
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════ -->
-<!-- SCREEN 2: YOUR PROFILE -->
-<!-- ═══════════════════════════════════════ -->
-<div id="screen-profile" class="screen">
-  <button class="back-btn" onclick="showScreen('screen-intro')">Back</button>
-  <div class="container profile-section">
-    <h2>Tell us about your situation</h2>
-    <p class="subtitle">We'll show you the latent value you didn't know you had — and the connections you're missing.</p>
-
-    <div class="progress-bar">
-      <div class="progress-dot active" id="pd1"></div>
-      <div class="progress-dot" id="pd2"></div>
-      <div class="progress-dot" id="pd3"></div>
-    </div>
-
-    <!-- Step 1: Skills / knowledge -->
-    <div id="step1" class="step">
-      <div class="input-group">
-        <label>What are you good at?</label>
-        <div class="hint">Select all that apply, or add your own. Think broadly — hobbies, work, life experience.</div>
-        <div class="chip-container" id="skills-chips">
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="home-repair">Home repair</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="cooking">Cooking</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="teaching">Teaching / explaining</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="tech-support">Tech support</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="gardening">Gardening</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="organizing">Organizing / planning</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="writing">Writing</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="finance">Financial planning</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="driving">Driving / logistics</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="healthcare">Healthcare knowledge</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="childcare">Childcare</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="coding">Programming</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="design">Design / creative</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="languages">Multiple languages</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="legal">Legal knowledge</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="farming">Farming / agriculture</div>
-        </div>
-        <div class="custom-input">
-          <input type="text" id="custom-skill" placeholder="Add something else...">
-          <button onclick="addCustomChip('skills-chips','custom-skill')">Add</button>
-        </div>
-      </div>
-      <button class="btn-primary" role="button" onclick="nextStep(2)" style="display:block;margin:1.5rem auto;">Continue →</button>
-    </div>
-
-    <!-- Step 2: Challenges / needs -->
-    <div id="step2" class="step" style="display:none;">
-      <div class="input-group">
-        <label>What are you dealing with right now?</label>
-        <div class="hint">Challenges, projects, things you wish you had help with — big or small.</div>
-        <div class="chip-container" id="needs-chips">
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="home-maintenance">Home maintenance issues</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="career-change">Career transition</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="health-nav">Navigating healthcare</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="small-business">Growing a small business</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="parenting">Parenting challenges</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="loneliness">Feeling isolated</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="financial-stress">Financial stress</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="learning-tech">Learning new technology</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="elder-care">Elder care / aging parents</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="legal-issue">Legal situation</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="moving">Moving / relocation</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="side-project">Side project stuck</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="community">Want to give back</div>
-          <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="education">Education / credentials</div>
-        </div>
-        <div class="custom-input">
-          <input type="text" id="custom-need" placeholder="Add something else...">
-          <button onclick="addCustomChip('needs-chips','custom-need')">Add</button>
-        </div>
-      </div>
-      <button class="btn-primary" role="button" onclick="nextStep(3)" style="display:block;margin:1.5rem auto;">Continue →</button>
-    </div>
-
-    <!-- Step 3: Context -->
-    <div id="step3" class="step" style="display:none;">
-      <div class="input-group">
-        <label>Anything else about your situation?</label>
-        <div class="hint">Optional. A sentence or two gives us more to work with. For example: "I just moved to a new town" or "I have a truck and free mornings."</div>
-        <textarea class="context-textarea" id="context-input" placeholder="I have a lot of experience with...  /  I've been struggling with...  /  I have access to..."></textarea>
-      </div>
-      <button class="btn-primary" role="button" onclick="startDiscovery()" style="display:block;margin:1.5rem auto;">Discover My Latent Value →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════ -->
-<!-- SCREEN 3: SCANNING -->
-<!-- ═══════════════════════════════════════ -->
-<div id="screen-discovery" class="screen">
-  <div class="container discovery-section" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh">
-    <canvas id="net-canvas" aria-label="Network visualization showing connections forming between community members" width="560" height="380" style="border-radius:12px;margin-bottom:1.2rem"></canvas>
-
-    <div class="scan-status" id="scan-status" aria-live="polite" role="status">
-      Analyzing your situation...
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════ -->
-<!-- SCREEN 4: RESULTS -->
-<!-- ═══════════════════════════════════════ -->
-<div id="screen-results" class="screen">
-  <button class="back-btn" onclick="showScreen('screen-profile')">Back to profile</button>
-  <div class="container results-section">
-    <h2>Your Latent Value Map</h2>
-    <p class="results-subtitle">Here's what an ambient matching system could surface for you — connections neither party would have searched for.</p>
-
-    <div id="matches-container"></div>
-
-    <div class="latent-value-counter">
-      <h3>Your Estimated Latent Value</h3>
-      <div class="counter-value" id="lv-counter">0</div>
-      <div class="counter-label">potential cooperative connections in a community of 1,000</div>
-      <div class="counter-explanation">
-        This is a simulation. In a real community with ambient matching, 
-        these connections would surface naturally — no searching, no profiles, no marketplace.
-        Just your AI noticing that someone nearby has exactly what you need, or needs exactly what you have.
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="goPhase(0)">← Back</button>
+        <button class="btn-glow" onclick="goPhase(2)">Next: What do you need? →</button>
       </div>
     </div>
 
-    <div class="insight-box">
-      <h3>What you probably didn't know about yourself</h3>
-      <p id="latent-insight">Loading insight...</p>
+    <!-- PHASE 2 -->
+    <div class="panel-phase" id="phase-2">
+      <div class="phase-header">
+        <div class="phase-num">2</div>
+        <div><div class="phase-title">What's hard right now?</div><div class="phase-subtitle">Nobody searches for help they don't know exists. That's what we find.</div></div>
+      </div>
+      <div class="chip-label">Challenges & needs</div>
+      <div class="chip-grid" id="need-chips">
+        <div class="chip" data-v="home-maintenance">🏠 Home maintenance</div>
+        <div class="chip" data-v="financial-stress">💸 Financial stress</div>
+        <div class="chip" data-v="learning-tech">📱 Learning technology</div>
+        <div class="chip" data-v="career-change">🔄 Career transition</div>
+        <div class="chip" data-v="loneliness">🤝 Social isolation</div>
+        <div class="chip" data-v="small-business">🏪 Small business help</div>
+        <div class="chip" data-v="elder-care">👴 Elder care</div>
+        <div class="chip" data-v="education">🎓 Education / learning</div>
+        <div class="chip" data-v="health-nav">🏥 Healthcare navigation</div>
+        <div class="chip" data-v="parenting">👨‍👧 Parenting support</div>
+        <div class="chip" data-v="legal-issue">📄 Legal help</div>
+        <div class="chip" data-v="side-project">💡 Project / side hustle</div>
+        <div class="chip" data-v="community">🏘 Community connection</div>
+      </div>
+      <div class="chip-label" style="margin-top:1rem">Tell us more (optional)</div>
+      <textarea class="context-area" id="context-input" placeholder="Anything about your situation... e.g. 'I'm a retired teacher who just moved here and doesn't know anyone yet'"></textarea>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="goPhase(1)">← Back</button>
+        <button class="btn-glow" onclick="runDiscovery()">Reveal Connections ✦</button>
+      </div>
     </div>
 
-    <div class="insight-box" style="border-left: 3px solid var(--gold);">
-      <h3>The research says...</h3>
-      <p>
-        <strong>83.4%</strong> of jobs are found through occasional or rare contacts, not close friends 
-        (Granovetter, 1973). Cross-class friendships are the <strong>single strongest predictor</strong> of 
-        upward economic mobility (Chetty et al., 2022). Knowledge workers spend <strong>2.5 hours per day</strong> 
-        searching for information that someone nearby already has (IDC). 
-        The connections that matter most are the ones nobody thinks to look for.
-      </p>
+    <!-- PHASE 3 -->
+    <div class="panel-phase" id="phase-3">
+      <div class="phase-header">
+        <div class="phase-num">✦</div>
+        <div><div class="phase-title" id="results-title">Connections Found</div>
+        <div class="phase-subtitle">Connections an ambient matching system would surface — without either party searching.</div></div>
+      </div>
+      
+      <div class="before-after" id="before-after">
+        <div class="ba-side"><div class="ba-label">Before</div><div class="ba-num dim" id="ba-before">12 people</div><div class="ba-desc">Invisible to you</div></div>
+        <div class="ba-arrow">→</div>
+        <div class="ba-side"><div class="ba-label">After LVN</div><div class="ba-num lit" id="ba-after">0 connections</div><div class="ba-desc">Surfaced by ambient matching</div></div>
+      </div>
+      <div class="summary-stats" id="summary-stats"></div>
+      <div class="matches-grid" id="matches-grid"></div>
+      <div class="insight-callout" id="insight-box" style="margin-top:1.5rem">
+        <h3>✦ What you didn't know about yourself</h3>
+        <p id="insight-text"></p>
+      </div>
+      <div class="insight-callout" style="border-color:rgba(233,196,106,.2)">
+        <h3>The research says...</h3>
+        <p><strong style="color:var(--gold)">83.4%</strong> of jobs come through weak ties, not close friends. <strong style="color:var(--gold)">42%</strong> of professionals have expertise their colleagues don't know about. The connections above are exactly what current platforms fail to surface.</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="goPhase(2)">← Change Profile</button>
+        <button class="btn-glow" onclick="goPhase(4)">What Can I Do? →</button>
+        <button class="btn-ghost" style="margin-left:auto" id="share-btn">Share Results</button>
+      </div>
     </div>
 
-    <div class="final-cta">
-      <h3>This doesn't exist yet. We're building it.</h3>
-      <p>
-        The Latent Value Network is an open collaborative initiative designing the protocol layer 
-        that could make ambient cooperation real. We need cryptographers, economists, ethicists, 
-        engineers, and practitioners.
-      </p>
-      <div class="btn-group">
-        <button class="btn-primary" role="button" onclick="window.open('https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md')">Read the White Paper</button>
-        <button class="btn-secondary" role="button" onclick="window.open('https://github.com/sillinous/latent-value-network')">Join on GitHub</button>
-        <button class="btn-secondary" role="button" onclick="showScreen('screen-role')">Find Your Role →</button>
+    <!-- PHASE 4 -->
+    <div class="panel-phase" id="phase-4">
+      <div class="phase-header">
+        <div class="phase-num">→</div>
+        <div><div class="phase-title">This is a simulation. The real thing needs you.</div>
+        <div class="phase-subtitle">The LVN is an open protocol built by researchers, engineers, and practitioners.</div></div>
+      </div>
+      <div id="role-recs"></div>
+      <div class="btn-row" style="flex-wrap:wrap;gap:.5rem">
+        <a href="https://github.com/sillinous/latent-value-network" class="btn-glow">Join on GitHub</a>
+        <a href="https://github.com/sillinous/latent-value-network/issues/new?template=introduction.md" class="btn-ghost">Introduce Yourself</a>
+        <a href="provocations.html" class="btn-ghost">Debate Open Questions</a>
+        <a href="index.html" class="btn-ghost">Read the Specification</a>
+        <button class="btn-ghost" onclick="goPhase(0)" style="margin-left:auto">Restart Demo</button>
       </div>
     </div>
   </div>
-</div>
-
-<!-- ═══════════════════════════════════════ -->
-<!-- SCREEN 5: FIND YOUR ROLE -->
-<!-- ═══════════════════════════════════════ -->
-<div id="screen-role" class="screen">
-  <button class="back-btn" onclick="showScreen('screen-results')">Back to matches</button>
-  <div class="container profile-section">
-    <h2>Where do you fit in?</h2>
-    <p class="subtitle">The LVN needs diverse minds. Help us figure out where your expertise is most needed.</p>
-
-    <div class="input-group">
-      <label>What's your background?</label>
-      <div class="hint">Select all that resonate — formal credentials aren't required.</div>
-      <div class="chip-container" id="role-chips">
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="ml-ai">AI / Machine Learning</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="crypto">Cryptography / Security</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="economics">Economics / Game Theory</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="network-sci">Network Science</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="ethics">Ethics / Philosophy</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="social-sci">Social Science / Psychology</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="systems-arch">Systems Architecture</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="community-org">Community Organizing</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="social-work">Social Work / Mutual Aid</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="product">Product Design / UX</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="policy">Public Policy</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="interested">Just interested / curious</div>
-      </div>
-    </div>
-
-    <div class="input-group">
-      <label>What excites you most?</label>
-      <div class="chip-container" id="interest-chips">
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="privacy">Making matching truly private</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="equity">Ensuring equity by design</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="trust">Building trust without surveillance</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="governance">Governing a digital commons</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="piloting">Running real-world pilots</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="measuring">Quantifying the gap</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="red-teaming">Breaking it (adversarial thinking)</div>
-        <div class="chip" role="checkbox" aria-checked="false" tabindex="0" data-v="integration">Making it work with existing AI</div>
-      </div>
-    </div>
-
-    <button class="btn-primary" role="button" onclick="showRoleResult()" style="display:block;margin:2rem auto;">Show My Path →</button>
-
-    <div id="role-result" style="display:none; margin-top:2rem;"></div>
-  </div>
-</div>
+</main>
 
 <footer class="lvn-footer-full">
   <div class="footer-grid">
-    <div class="footer-brand">
-      <div class="footer-logo">Latent <span>Value</span> Network</div>
-      <p>An open collaborative initiative designing the cooperative intelligence protocol. Not a company. Not a platform. A protocol for human cooperation.</p>
-      <p style="color:rgba(255,255,255,0.25);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.4)">CC BY-SA 4.0</a></p>
-    </div>
-    <div class="footer-col">
-      <h4>Explore</h4>
-      <a href="demo.html">Interactive Demo</a>
-      <a href="provocations.html">10 Provocations</a>
-      <a href="architecture.html">Architecture</a>
-      <a href="https://github.com/sillinous/latent-value-network/blob/main/PLAN.md">Development Plan</a>
-    </div>
-    <div class="footer-col">
-      <h4>Specifications</h4>
-      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md">White Paper</a>
-      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-003-signal-exchange-protocol.md">Signal Protocol</a>
-      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-005-trust-fabric.md">Trust Fabric</a>
-      <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/protocol-integration-strategy.md">MCP/A2A Strategy</a>
-    </div>
-    <div class="footer-col">
-      <h4>Contribute</h4>
-      <a href="https://github.com/sillinous/latent-value-network">GitHub Repository</a>
-      <a href="https://github.com/sillinous/latent-value-network/discussions">Discussions</a>
-      <a href="https://github.com/sillinous/latent-value-network/blob/main/CONTRIBUTING.md">Contributing Guide</a>
-      <a href="mailto:latentvaluenetwork@proton.me">Contact</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>Inspired by the work of Elinor Ostrom, Mark Granovetter, Raj Chetty, and everyone who believes cooperation doesn't need to be this hard.</p>
+    <div class="footer-brand"><div class="footer-logo">Latent <span>Value</span> Network</div><p>An open protocol for AI-assisted human cooperation.</p></div>
+    <div class="footer-col"><h4>Explore</h4><a href="demo.html">Demo</a><a href="provocations.html">Provocations</a><a href="architecture.html">Architecture</a></div>
+    <div class="footer-col"><h4>Specs</h4><a href="https://github.com/sillinous/latent-value-network/blob/main/docs/WD-001-white-paper.md">White Paper</a><a href="https://github.com/sillinous/latent-value-network/blob/main/PLAN.md">Dev Plan</a></div>
+    <div class="footer-col"><h4>Build</h4><a href="https://github.com/sillinous/latent-value-network">GitHub</a><a href="https://github.com/sillinous/latent-value-network/discussions">Discussions</a></div>
   </div>
 </footer>
 
 <script>
-// ── State ──
-const state = {
-  skills: new Set(),
-  needs: new Set(),
-  context: '',
-  roles: new Set(),
-  interests: new Set()
-};
+const state={skills:new Set(),needs:new Set(),context:'',phase:0,matches:[]};
 
-// ── Chip selection ──
-document.querySelectorAll('.chip-container').forEach(container => {
-  container.addEventListener('click', e => {
-    if (!e.target.classList.contains('chip')) return;
-    e.target.classList.toggle('selected');
-    const val = e.target.dataset.v;
-    const id = container.id;
-    let set;
-    if (id === 'skills-chips') set = state.skills;
-    else if (id === 'needs-chips') set = state.needs;
-    else if (id === 'role-chips') set = state.roles;
-    else if (id === 'interest-chips') set = state.interests;
-    if (set) {
-      if (e.target.classList.contains('selected')) set.add(val);
-      else set.delete(val);
-    }
-  });
-});
-
-function addCustomChip(containerId, inputId) {
-  const input = document.getElementById(inputId);
-  const val = input.value.trim();
-  if (!val) return;
-  const container = document.getElementById(containerId);
-  const chip = document.createElement('div');
-  chip.className = 'chip selected';
-  chip.dataset.v = val.toLowerCase().replace(/\s+/g, '-');
-  chip.textContent = val;
-  container.appendChild(chip);
-  input.value = '';
-  if (containerId === 'skills-chips') state.skills.add(chip.dataset.v);
-  else state.needs.add(chip.dataset.v);
-  chip.addEventListener('click', () => {
-    chip.classList.toggle('selected');
-    const s = containerId === 'skills-chips' ? state.skills : state.needs;
-    if (chip.classList.contains('selected')) s.add(chip.dataset.v);
-    else s.delete(chip.dataset.v);
-  });
-}
-
-// ── Navigation ──
-function showScreen(id) {
-  // Update screen progress
-  const screenMap = {'screen-intro':0, 'screen-profile':1, 'screen-discovery':2, 'screen-results':3, 'screen-role':4};
-  const idx = screenMap[id] ?? 0;
-  document.querySelectorAll('.screen-step').forEach((step, i) => {
-    step.classList.toggle('active', i === idx);
-    step.classList.toggle('done', i < idx);
-  });
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function nextStep(n) {
-  document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
-  document.getElementById('step' + n).style.display = 'block';
-  document.querySelectorAll('.progress-dot').forEach((d, i) => {
-    d.classList.remove('active');
-    d.classList.remove('done');
-    if (i < n - 1) d.classList.add('done');
-    if (i === n - 1) d.classList.add('active');
-  });
-}
-
-// ── Intro story reveal ──
-function revealStory() {
-  document.getElementById('maria-hidden').classList.add('revealed');
-  setTimeout(() => document.getElementById('james-hidden').classList.add('revealed'), 400);
-  setTimeout(() => document.getElementById('arrow1').classList.add('visible'), 800);
-  setTimeout(() => document.getElementById('match-explain').classList.add('visible'), 1200);
-  setTimeout(() => document.getElementById('intro-cta').classList.add('visible'), 1800);
-  document.getElementById('btn-reveal').style.display = 'none';
-}
-
-// ── Match generation engine ──
-const communityMembers = [
-  { name: "Sarah", age: 28, emoji: "👩‍💻", role: "UX designer, freelance", distance: "0.5 mi",
-    skills: ["design", "coding", "writing", "tech-support"], 
-    needs: ["small-business", "financial-stress", "loneliness"],
-    story: "Recently went freelance and is building a client base. Struggles with invoicing and taxes. Misses having coworkers.",
-    latent: "Has user-research skills that nonprofits desperately need but she's never thought to offer." },
-  { name: "Robert", age: 71, emoji: "👴", role: "Retired accountant", distance: "1.2 mi",
-    skills: ["finance", "organizing", "teaching"],
-    needs: ["learning-tech", "loneliness", "community"],
-    story: "Spent 40 years doing taxes and financial planning. Would love to help people but doesn't know how to offer. Learning to use his new tablet.",
-    latent: "Could save a freelancer thousands in tax optimization — expertise he considers 'nothing special.'" },
-  { name: "Priya", age: 35, emoji: "👩‍🍳", role: "Restaurant owner", distance: "0.8 mi",
-    skills: ["cooking", "languages", "organizing", "small-business"],
-    needs: ["tech-support", "side-project", "home-maintenance"],
-    story: "Runs a small Indian restaurant. Needs a better website but can't afford an agency. Has a commercial kitchen idle 4 days a week.",
-    latent: "Her idle kitchen is community infrastructure — perfect for cooking classes, food preservation workshops, or a co-op bakery." },
-  { name: "Marcus", age: 19, emoji: "👨‍🎓", role: "Community college student", distance: "2 mi",
-    skills: ["coding", "tech-support", "driving", "design"],
-    needs: ["career-change", "education", "financial-stress"],
-    story: "Studying computer science. Builds websites for fun but doesn't think of it as a marketable skill. Has a truck and free mornings.",
-    latent: "Could build the website Priya needs in a weekend — and gain a real portfolio piece that launches his career." },
-  { name: "Diana", age: 45, emoji: "👩‍⚕️", role: "Nurse practitioner", distance: "1.5 mi",
-    skills: ["healthcare", "teaching", "organizing", "elder-care"],
-    needs: ["home-maintenance", "parenting", "side-project"],
-    story: "Works at the county clinic. Constantly explains medical info to patients but doesn't see that as 'teaching.' Her porch needs repair.",
-    latent: "Her ability to translate medical jargon into plain language is a rare, transferable communication skill." },
-  { name: "Tom", age: 52, emoji: "🧑‍🌾", role: "Small farm operator", distance: "3 mi",
-    skills: ["farming", "home-repair", "driving", "gardening"],
-    needs: ["small-business", "learning-tech", "legal-issue"],
-    story: "Optimized his irrigation through trial and error. Has surplus equipment sitting idle. Wants to sell direct-to-consumer but doesn't know where to start.",
-    latent: "His problem-solving approach to irrigation is systems engineering without the degree." },
-  { name: "Lisa", age: 38, emoji: "👩‍🏫", role: "Former teacher, now stay-at-home mom", distance: "0.3 mi",
-    skills: ["teaching", "childcare", "writing", "organizing"],
-    needs: ["career-change", "loneliness", "side-project", "community"],
-    story: "Left teaching 3 years ago. Misses intellectual engagement. Has curriculum design skills she doesn't think anyone needs.",
-    latent: "Curriculum design is content strategy by another name — a skill tech companies pay $120K+ for." },
-  { name: "Jin", age: 42, emoji: "👨‍🔬", role: "Lab technician", distance: "4 mi",
-    skills: ["healthcare", "coding", "languages", "gardening"],
-    needs: ["elder-care", "community", "side-project"],
-    story: "Speaks Korean and English fluently. Parents are aging and navigating the healthcare system is overwhelming. Grows specialty vegetables on his balcony.",
-    latent: "His bilingual healthcare navigation experience could help dozens of immigrant families nearby." },
-  { name: "Carmen", age: 55, emoji: "👩‍💼", role: "Nonprofit director", distance: "1 mi",
-    skills: ["organizing", "writing", "legal", "community-org"],
-    needs: ["tech-support", "financial-stress", "learning-tech"],
-    story: "Runs a community food bank. Drowning in paperwork. The org's data is in spreadsheets that nobody understands. Could really use a volunteer with database skills.",
-    latent: "Her grant-writing skills are transferable to any fundraising context — small businesses included." },
-  { name: "Derek", age: 31, emoji: "👨‍🔧", role: "Electrician", distance: "2.5 mi",
-    skills: ["home-repair", "driving", "teaching"],
-    needs: ["legal-issue", "parenting", "financial-stress"],
-    story: "Great at his trade but terrible at the business side. Needs help with contracts and customer management. Coaches his kid's soccer team.",
-    latent: "His coaching instinct means he naturally explains complex things simply — a rare teaching superpower." },
-  { name: "Anika", age: 24, emoji: "👩‍🎨", role: "Graphic designer & barista", distance: "1.8 mi",
-    skills: ["design", "coding", "writing"],
-    needs: ["financial-stress", "small-business", "career-change", "loneliness"],
-    story: "Makes beautiful designs between coffee shop shifts. Dreams of going freelance but has no business network or financial safety net.",
-    latent: "Her visual communication skills could transform how every local organization presents itself — but she's never been asked." },
-  { name: "Miguel", age: 48, emoji: "👨‍🏭", role: "Warehouse supervisor", distance: "3.5 mi",
-    skills: ["organizing", "driving", "home-repair", "languages"],
-    needs: ["education", "career-change", "health-nav", "elder-care"],
-    story: "Manages logistics for 30 people daily. Speaks Spanish fluently. Mom just moved in and navigating her healthcare is overwhelming.",
-    latent: "His logistics optimization thinking is systems engineering without the degree — transferable to consulting." },
+const members=[
+  {name:"Sarah",age:28,emoji:"👩‍💻",role:"UX designer, freelance",dist:"0.5 mi",skills:["design","coding","writing","tech-support"],needs:["small-business","financial-stress","loneliness"],story:"Recently went freelance. Struggles with invoicing and taxes. Misses having coworkers.",latent:"Has user-research skills that nonprofits desperately need but she's never thought to offer."},
+  {name:"Robert",age:71,emoji:"👴",role:"Retired accountant",dist:"1.2 mi",skills:["finance","organizing","teaching"],needs:["learning-tech","loneliness","community"],story:"40 years of financial expertise. Would love to help people but doesn't know how to offer.",latent:"Could save a freelancer thousands in tax optimization — expertise he considers 'nothing special.'"},
+  {name:"Priya",age:35,emoji:"👩‍🍳",role:"Restaurant owner",dist:"0.8 mi",skills:["cooking","languages","organizing","small-business"],needs:["tech-support","side-project","home-maintenance"],story:"Runs a small restaurant. Needs a better website. Has a commercial kitchen idle 4 days a week.",latent:"Her idle kitchen is community infrastructure — perfect for cooking classes or a co-op bakery."},
+  {name:"Marcus",age:19,emoji:"👨‍🎓",role:"Community college student",dist:"2 mi",skills:["coding","tech-support","driving","design"],needs:["career-change","education","financial-stress"],story:"Studying CS. Builds websites for fun but doesn't see it as marketable. Has a truck and free mornings.",latent:"Could build the website Priya needs in a weekend — gaining a portfolio piece that launches his career."},
+  {name:"Diana",age:45,emoji:"👩‍⚕️",role:"Nurse practitioner",dist:"1.5 mi",skills:["healthcare","teaching","organizing","elder-care"],needs:["home-maintenance","parenting","side-project"],story:"Works at the clinic. Constantly translates medical jargon but doesn't see that as a skill.",latent:"Her medical-to-plain-language ability is a rare, transferable communication superpower."},
+  {name:"Tom",age:52,emoji:"🧑‍🌾",role:"Small farm operator",dist:"3 mi",skills:["farming","home-repair","driving","gardening"],needs:["small-business","learning-tech","legal-issue"],story:"Optimized irrigation through trial and error. Has surplus equipment sitting idle.",latent:"His problem-solving approach to irrigation is systems engineering without the degree."},
+  {name:"Lisa",age:38,emoji:"👩‍🏫",role:"Former teacher, stay-at-home mom",dist:"0.3 mi",skills:["teaching","childcare","writing","organizing"],needs:["career-change","loneliness","side-project","community"],story:"Left teaching 3 years ago. Misses intellectual engagement. Has curriculum design skills she thinks nobody needs.",latent:"Curriculum design is content strategy by another name — a skill tech companies pay $120K+ for."},
+  {name:"Jin",age:42,emoji:"👨‍🔬",role:"Lab technician",dist:"4 mi",skills:["healthcare","coding","languages","gardening"],needs:["elder-care","community","side-project"],story:"Speaks Korean and English fluently. Parents are aging and healthcare navigation is overwhelming.",latent:"His bilingual healthcare navigation could help dozens of immigrant families nearby."},
+  {name:"Carmen",age:55,emoji:"👩‍💼",role:"Nonprofit director",dist:"1 mi",skills:["organizing","writing","legal","community-org"],needs:["tech-support","financial-stress","learning-tech"],story:"Runs a food bank. Drowning in paperwork. Data in spreadsheets nobody understands.",latent:"Her grant-writing skills transfer to any fundraising context — small businesses included."},
+  {name:"Derek",age:31,emoji:"👨‍🔧",role:"Electrician",dist:"2.5 mi",skills:["home-repair","driving","teaching"],needs:["legal-issue","parenting","financial-stress"],story:"Great at his trade but terrible at business. Needs help with contracts. Coaches kids' soccer.",latent:"His coaching instinct means he naturally explains complex things simply — a teaching superpower."},
+  {name:"Anika",age:24,emoji:"👩‍🎨",role:"Designer & barista",dist:"1.8 mi",skills:["design","coding","writing"],needs:["financial-stress","small-business","career-change","loneliness"],story:"Beautiful designs between shifts. Dreams of freelance but has no business network.",latent:"Her visual skills could transform how every local org presents itself — but she's never been asked."},
+  {name:"Miguel",age:48,emoji:"👨‍🏭",role:"Warehouse supervisor",dist:"3.5 mi",skills:["organizing","driving","home-repair","languages"],needs:["education","career-change","health-nav","elder-care"],story:"Manages logistics for 30 people daily. Speaks Spanish fluently. Mom just moved in.",latent:"His logistics thinking is systems engineering without the degree — transferable to consulting."}
 ];
 
-function generateMatches() {
-  const skills = state.skills;
-  const needs = state.needs;
-  const ctx = (state.context || '').toLowerCase();
-  const matches = [];
+const relations={
+  'home-repair':['home-maintenance','side-project'],'cooking':['community','loneliness','side-project'],
+  'teaching':['education','learning-tech','career-change','community'],'tech-support':['learning-tech','side-project','small-business'],
+  'gardening':['community','loneliness','side-project'],'organizing':['small-business','career-change','financial-stress','side-project'],
+  'writing':['small-business','side-project','career-change'],'finance':['financial-stress','small-business','career-change'],
+  'driving':['community','side-project'],'healthcare':['health-nav','elder-care','community'],
+  'childcare':['parenting','community'],'coding':['side-project','small-business','learning-tech','career-change'],
+  'design':['small-business','side-project','career-change'],'languages':['community','education','elder-care'],
+  'legal':['legal-issue','small-business'],'farming':['community','home-maintenance','side-project'],
+  'community-org':['community','loneliness'],'small-business':['small-business','career-change'],'elder-care':['elder-care','health-nav']
+};
+function isRelated(s,n){return s===n||(relations[s]&&relations[s].includes(n))}
 
-  communityMembers.forEach(member => {
-    let score = 0;
-    let reasons = [];
-    let type = 'mutual';
+// ═══ CANVAS ═══
+const canvas=document.getElementById('net-canvas');
+const cx2d=canvas.getContext('2d');
+let W,H,dpr,nodes=[],af=0,matchedSet=new Set(),revealProgress=0;
 
-    // You can help them
-    const youCanHelp = [...skills].filter(s => member.needs.some(n => isRelated(s, n)));
-    // They can help you
-    const theyCanHelp = member.skills.filter(s => [...needs].some(n => isRelated(s, n)));
+function resizeCanvas(){
+  const r=canvas.parentElement.getBoundingClientRect();
+  dpr=devicePixelRatio||1;
+  W=canvas.width=r.width*dpr;H=canvas.height=r.height*dpr;
+  canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';
+  cx2d.setTransform(dpr,0,0,dpr,0,0);
+}
 
-    if (youCanHelp.length > 0) {
-      score += youCanHelp.length * 2;
-      reasons.push({ dir: 'offer', items: youCanHelp });
-    }
-    if (theyCanHelp.length > 0) {
-      score += theyCanHelp.length * 2;
-      reasons.push({ dir: 'need', items: theyCanHelp });
-    }
-
-    // Context bonus: if user's freetext mentions things relevant to this member
-    if (ctx.length > 5) {
-      member.skills.forEach(s => { if (ctx.includes(s.replace(/-/g, ' '))) score += 1.5; });
-      member.needs.forEach(n => { if (ctx.includes(n.replace(/-/g, ' '))) score += 1.5; });
-      // Check for member-specific keywords
-      const storyWords = member.story.toLowerCase();
-      const ctxWords = ctx.split(/\s+/).filter(w => w.length > 4);
-      ctxWords.forEach(w => { if (storyWords.includes(w)) score += 0.5; });
-    }
-
-    // Cross-boundary bonus
-    const yourSkillSet = new Set([...skills]);
-    const theirSkillSet = new Set(member.skills);
-    const overlap = [...yourSkillSet].filter(s => theirSkillSet.has(s)).length;
-    if (overlap === 0 && score > 0) score += 3; // Maximum cross-boundary bonus
-    else if (overlap <= 1 && score > 0) score += 1.5;
-
-    // Mutual bonus
-    if (youCanHelp.length > 0 && theyCanHelp.length > 0) score += 2;
-
-    if (score > 0) {
-      if (youCanHelp.length > 0 && theyCanHelp.length === 0) type = 'you-offer';
-      else if (theyCanHelp.length > 0 && youCanHelp.length === 0) type = 'you-need';
-      else type = 'mutual';
-
-      matches.push({ member, score, reasons, type });
-    }
+function initNodes(){
+  const w=W/dpr,h=H/dpr,cx=w/2,cy=h/2;
+  nodes=[{x:cx,y:cy,vx:0,vy:0,r:16,type:'you',label:'You',idx:-1}];
+  members.forEach((m,i)=>{
+    const a=(i/members.length)*Math.PI*2-Math.PI/2;
+    const orbit=Math.min(w,h)*.32+(i%3)*20;
+    nodes.push({x:cx+Math.cos(a)*orbit+(Math.random()-.5)*15,y:cy+Math.sin(a)*orbit+(Math.random()-.5)*15,
+      vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,r:8+Math.random()*4,type:'community',
+      label:m.name,emoji:m.emoji,idx:i,pulse:Math.random()*Math.PI*2});
   });
-
-  // Sort by score, take top 5
-  matches.sort((a, b) => b.score - a.score);
-  return matches.slice(0, 6);
 }
 
-function isRelated(skill, need) {
-  const relations = {
-    'home-repair': ['home-maintenance', 'side-project'],
-    'cooking': ['community', 'loneliness', 'side-project'],
-    'teaching': ['education', 'learning-tech', 'career-change', 'community'],
-    'tech-support': ['learning-tech', 'side-project', 'small-business'],
-    'gardening': ['community', 'loneliness', 'side-project'],
-    'organizing': ['small-business', 'career-change', 'financial-stress', 'side-project'],
-    'writing': ['small-business', 'side-project', 'career-change'],
-    'finance': ['financial-stress', 'small-business', 'career-change'],
-    'driving': ['moving', 'community', 'side-project'],
-    'healthcare': ['health-nav', 'elder-care', 'community'],
-    'childcare': ['parenting', 'community'],
-    'coding': ['side-project', 'small-business', 'learning-tech', 'career-change'],
-    'design': ['small-business', 'side-project', 'career-change'],
-    'languages': ['community', 'education', 'elder-care'],
-    'legal': ['legal-issue', 'small-business'],
-    'farming': ['community', 'home-maintenance', 'side-project'],
-  };
-  // Direct match
-  if (skill === need) return true;
-  // Related match
-  if (relations[skill] && relations[skill].includes(need)) return true;
-  return false;
-}
-
-function buildMatchNarrative(match) {
-  const m = match.member;
-  const youOffer = match.reasons.filter(r => r.dir === 'offer');
-  const theyOffer = match.reasons.filter(r => r.dir === 'need');
-
-  let insight = '';
-  if (youOffer.length > 0 && theyOffer.length > 0) {
-    insight = `${m.story} Meanwhile, your experience could help with exactly the challenges ${m.name} faces — and ${m.name} has skills that map to what you're dealing with. Neither of you would have searched for the other.`;
-  } else if (youOffer.length > 0) {
-    insight = `${m.story} Your background maps directly to what ${m.name} needs — but ${m.name} wouldn't know to look for someone like you, and you wouldn't know ${m.name} exists.`;
-  } else {
-    insight = `${m.story} ${m.name}'s experience is exactly what your situation calls for — but you'd never find each other through a job board, marketplace, or social network.`;
-  }
-
-  let bridge = '';
-  if (match.type === 'mutual') {
-    bridge = `<strong>Mutual exchange:</strong> You each have something the other needs, in domains different enough that no platform would connect you.`;
-  } else if (match.type === 'you-offer') {
-    bridge = `<strong>You have latent capacity</strong> that ${m.name} needs — expertise you probably don't think of as expertise.`;
-  } else {
-    bridge = `<strong>${m.name} has latent capacity</strong> that maps to your situation — capabilities ${m.name} doesn't even advertise.`;
-  }
-
-  return { insight, bridge };
-}
-
-function buildLatentInsight() {
-  const skills = [...state.skills];
-  const insights = [];
-
-  if (skills.includes('cooking')) insights.push("Your cooking experience isn't just a hobby — it's potential community-building infrastructure. People bond over food, and you have the skill to create those bonds.");
-  if (skills.includes('home-repair')) insights.push("Your home repair skills are invisible gold in any community. Most people's #1 unspoken need is help with their house — and most can't afford professional help.");
-  if (skills.includes('teaching')) insights.push("Your ability to explain things is a superpower most people undervalue. In a world of complexity, the capacity to make things clear is one of the most transferable latent capabilities.");
-  if (skills.includes('coding')) insights.push("Your programming skills map to dozens of non-obvious needs: the nonprofit drowning in spreadsheets, the small business with a terrible website, the farmer who needs an inventory system.");
-  if (skills.includes('organizing')) insights.push("Your organizational skills are invisible infrastructure. Most community groups and small operations fail not from lack of passion but from lack of the kind of structural thinking you do naturally.");
-  if (skills.includes('finance')) insights.push("Financial literacy is one of the most unevenly distributed capabilities. Your knowledge about money management could be life-changing for people who never had access to a financial advisor.");
-  if (skills.includes('driving')) insights.push("Having a vehicle and willingness to drive is latent logistics capacity. For people without transportation, your 20-minute drive could be the difference between accessing a service or not.");
-  if (skills.includes('healthcare')) insights.push("Your healthcare knowledge helps people navigate one of the most confusing systems they encounter. Just knowing how to talk to a doctor or read a medical bill is expertise most people lack.");
-  if (skills.includes('gardening')) insights.push("Gardening knowledge maps to food security, mental health, community building, and environmental education. What feels like 'just a hobby' to you is a bundle of latent capacities.");
-  if (skills.includes('design')) insights.push("Visual communication changes how organizations are perceived and trusted. The local food bank with a hand-drawn flyer could reach 10x more people with your design eye — but they'd never think to ask.");
-  if (skills.includes('legal')) insights.push("Legal knowledge is one of the most asymmetrically distributed forms of power. What you consider basic understanding of rights and contracts is, for most people, inaccessible expertise behind a paywall.");
-  if (skills.includes('languages')) insights.push("Bilingual ability isn't just translation — it's cultural bridge-building. In every community, there are families struggling to navigate systems because they lack someone who speaks both their language and the system's language.");
-
-  if (insights.length === 0) {
-    insights.push("Every skill you've developed through life experience — even the ones you'd never put on a resume — represents latent value that someone nearby almost certainly needs. The problem isn't willingness. It's visibility.");
-  }
-
-  return insights.slice(0, 2).join(" ");
-}
-
-// ── Network canvas visualization ──
-let canvasAnim;
-function runNetCanvas(matchedNames) {
-  const canvas = document.getElementById('net-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width = Math.min(560, window.innerWidth - 40);
-  const H = canvas.height = 380;
-  const cx = W/2, cy = H/2;
-
-  // Build nodes: you in center, community around
-  const nodes = [{x:cx, y:cy, r:12, color:'#E9C46A', label:'You', matched:true}];
-  communityMembers.forEach((m, i) => {
-    const angle = (i / communityMembers.length) * Math.PI * 2 - Math.PI/2;
-    const baseR = 110 + Math.random() * 40;
-    nodes.push({
-      x: cx + Math.cos(angle) * baseR,
-      y: cy + Math.sin(angle) * baseR,
-      r: matchedNames.has(m.name) ? 9 : 5,
-      color: matchedNames.has(m.name) ? '#2A9D8F' : 'rgba(255,255,255,0.1)',
-      label: m.name,
-      matched: matchedNames.has(m.name),
-      emoji: m.emoji,
-    });
+function draw(){
+  const w=W/dpr,h=H/dpr;cx2d.clearRect(0,0,w,h);af++;
+  // Grid
+  cx2d.strokeStyle='rgba(42,157,143,.03)';cx2d.lineWidth=.5;
+  for(let x=0;x<w;x+=40){cx2d.beginPath();cx2d.moveTo(x,0);cx2d.lineTo(x,h);cx2d.stroke()}
+  for(let y=0;y<h;y+=40){cx2d.beginPath();cx2d.moveTo(0,y);cx2d.lineTo(w,y);cx2d.stroke()}
+  // Drift
+  nodes.forEach(n=>{if(n.type==='you')return;n.x+=n.vx;n.y+=n.vy;n.pulse+=.02;
+    if(n.x<30||n.x>w-30)n.vx*=-1;if(n.y<30||n.y>h-30)n.vy*=-1});
+  // Edges
+  if(revealProgress>0)nodes.forEach(n=>{
+    if(n.type!=='community'||!matchedSet.has(n.idx))return;
+    const you=nodes[0],al=Math.min(revealProgress,1)*.4;
+    const gr=cx2d.createLinearGradient(you.x,you.y,n.x,n.y);
+    gr.addColorStop(0,`rgba(233,196,106,${al})`);gr.addColorStop(1,`rgba(42,157,143,${al})`);
+    cx2d.beginPath();cx2d.moveTo(you.x,you.y);cx2d.lineTo(n.x,n.y);cx2d.strokeStyle=gr;cx2d.lineWidth=1.5;cx2d.stroke();
+    const t=((af*.008+n.idx*.3)%1);
+    cx2d.beginPath();cx2d.arc(you.x+(n.x-you.x)*t,you.y+(n.y-you.y)*t,2.5,0,Math.PI*2);
+    cx2d.fillStyle=`rgba(42,157,143,${al*1.5})`;cx2d.fill();
   });
-
-  // Edges to matched nodes
-  const edges = [];
-  let ei = 0;
-  communityMembers.forEach((m, i) => {
-    if (matchedNames.has(m.name)) {
-      edges.push({from:0, to:i+1, delay:ei*350, alpha:0});
-      ei++;
-    }
+  // Nodes
+  nodes.forEach(n=>{
+    const isM=n.type==='community'&&matchedSet.has(n.idx),isY=n.type==='you';
+    let c,al,r;
+    if(isY){c=[233,196,106];al=.95;r=n.r+Math.sin(af*.03)*1.5}
+    else if(isM&&revealProgress>0){c=[42,157,143];al=.3+Math.min(revealProgress,1)*.6;r=n.r*(1+Math.sin(n.pulse)*.1)*(1+Math.min(revealProgress,1)*.3)}
+    else{c=[40,55,80];al=.2+Math.sin(n.pulse)*.05;r=n.r*(1+Math.sin(n.pulse)*.05)}
+    const gl=cx2d.createRadialGradient(n.x,n.y,0,n.x,n.y,r*3);
+    gl.addColorStop(0,`rgba(${c},${al*.25})`);gl.addColorStop(1,`rgba(${c},0)`);
+    cx2d.fillStyle=gl;cx2d.fillRect(n.x-r*3,n.y-r*3,r*6,r*6);
+    cx2d.beginPath();cx2d.arc(n.x,n.y,r,0,Math.PI*2);cx2d.fillStyle=`rgba(${c},${al})`;cx2d.fill();
+    if(isY||(isM&&revealProgress>.5)){cx2d.beginPath();cx2d.arc(n.x,n.y,r+3,0,Math.PI*2);cx2d.strokeStyle=`rgba(${c},${al*.3})`;cx2d.lineWidth=1;cx2d.stroke()}
+    if(isY||(isM&&revealProgress>.5)){cx2d.font=`500 ${isY?10:8}px "JetBrains Mono",monospace`;cx2d.textAlign='center';cx2d.fillStyle=`rgba(255,255,255,${al*.8})`;cx2d.fillText(n.label,n.x,n.y+r+14)}
+    if(isM&&revealProgress>.8){cx2d.font=`${r*1.1}px serif`;cx2d.textAlign='center';cx2d.textBaseline='middle';cx2d.fillText(n.emoji||'●',n.x,n.y)}
   });
-
-  let t0 = null;
-  function draw(ts) {
-    if (!t0) t0 = ts;
-    const el = ts - t0;
-    ctx.clearRect(0,0,W,H);
-
-    // Background
-    ctx.fillStyle = '#0F1A2E';
-    ctx.fillRect(0,0,W,H);
-
-    // Subtle grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.015)';
-    ctx.lineWidth = 1;
-    for (let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for (let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-
-    // Draw edges (animate in after 600ms)
-    edges.forEach(e => {
-      const t = Math.max(0, el - 600 - e.delay);
-      e.alpha = Math.min(1, t/400);
-      if (e.alpha <= 0) return;
-      const n0 = nodes[e.from], n1 = nodes[e.to];
-      const progress = Math.min(1, t/350);
-      const dx = n1.x-n0.x, dy = n1.y-n0.y;
-      const grad = ctx.createLinearGradient(n0.x,n0.y,n1.x,n1.y);
-      grad.addColorStop(0, 'rgba(233,196,106,'+e.alpha*0.6+')');
-      grad.addColorStop(1, 'rgba(42,157,143,'+e.alpha*0.6+')');
-      ctx.beginPath();
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 2;
-      ctx.moveTo(n0.x, n0.y);
-      ctx.lineTo(n0.x+dx*progress, n0.y+dy*progress);
-      ctx.stroke();
-      if (progress >= 1) {
-        ctx.beginPath();ctx.strokeStyle='rgba(42,157,143,'+e.alpha*0.12+')';ctx.lineWidth=6;
-        ctx.moveTo(n0.x,n0.y);ctx.lineTo(n1.x,n1.y);ctx.stroke();
-      }
-    });
-
-    // Draw nodes
-    nodes.forEach((n, i) => {
-      const appear = Math.min(1, el/(200+i*40));
-      ctx.globalAlpha = appear;
-      // Glow for matched
-      if (n.matched && i>0 && el > 600) {
-        ctx.beginPath();ctx.arc(n.x,n.y,(n.r+5)*appear,0,Math.PI*2);
-        ctx.fillStyle='rgba(42,157,143,0.12)';ctx.fill();
-      }
-      // You glow
-      if (i===0) {
-        ctx.beginPath();ctx.arc(n.x,n.y,20*appear,0,Math.PI*2);
-        ctx.fillStyle='rgba(233,196,106,0.08)';ctx.fill();
-      }
-      // Node
-      ctx.beginPath();ctx.arc(n.x,n.y,n.r*appear,0,Math.PI*2);
-      ctx.fillStyle=n.color;ctx.fill();
-      // Label
-      if (n.matched || i===0) {
-        ctx.fillStyle = i===0?'#E9C46A':'rgba(255,255,255,0.6)';
-        ctx.font = (i===0?'600 10':'500 8')+'px "DM Sans",sans-serif';
-        ctx.textAlign='center';
-        ctx.fillText(n.label, n.x, n.y+n.r+12);
-      }
-      ctx.globalAlpha = 1;
-    });
-
-    canvasAnim = requestAnimationFrame(draw);
-  }
-  cancelAnimationFrame(canvasAnim);
   requestAnimationFrame(draw);
 }
 
-// ── Discovery flow ──
-function startDiscovery() {
-  state.context = document.getElementById('context-input').value;
-  showScreen('screen-discovery');
-
-  // Pre-compute matches so we know who to highlight
-  const preMatches = generateMatches();
-  const matchedNames = new Set(preMatches.map(m => m.member.name));
-  runNetCanvas(matchedNames);
-
-  const statusEl = document.getElementById('scan-status');
-  const messages = [
-    'Analyzing your situation...',
-    'Identifying <span class="highlight">latent capabilities</span> you may not have recognized...',
-    'Scanning community of <span class="highlight">1,000 simulated neighbors</span>...',
-    'Finding <span class="highlight">cross-boundary matches</span>...',
-    'Discovering connections <span class="highlight">nobody searched for</span>...',
-    'Building your latent value map...',
-  ];
-
-  let i = 0;
-  const interval = setInterval(() => {
-    i++;
-    if (i < messages.length) {
-      statusEl.innerHTML = messages[i];
-    } else {
-      clearInterval(interval);
-      cancelAnimationFrame(canvasAnim);
-      showResults();
-    }
-  }, 1200);
+// ═══ PHASES ═══
+function goPhase(n){
+  state.phase=n;
+  document.querySelectorAll('.panel-phase').forEach(p=>p.classList.remove('active'));
+  document.getElementById('phase-'+n).classList.add('active');
+  document.querySelectorAll('.progress-seg').forEach((s,i)=>{s.classList.remove('done','active');if(i<n)s.classList.add('done');if(i===n)s.classList.add('active')});
+  if(n===0){revealProgress=0;matchedSet.clear();setS('');setB('')}
+  if(n===1)setS('Configuring profile...');
+  if(n===2)setS('Adding context...');
+  document.getElementById('you-label').classList.add('visible');
 }
+function setS(t){const e=document.getElementById('net-status');e.textContent=t;e.classList.toggle('visible',t.length>0)}
+function setB(t){const e=document.getElementById('match-badge');e.textContent=t;e.classList.toggle('visible',t.length>0)}
 
-function showResults() {
-  const matches = generateMatches();
-  showScreen('screen-results');
-
-  const container = document.getElementById('matches-container');
-  container.innerHTML = '';
-
-  // If no matches (user selected nothing), add some defaults
-  let displayMatches = matches;
-  if (displayMatches.length === 0) {
-    state.skills.add('organizing');
-    state.needs.add('community');
-    displayMatches = generateMatches();
-  }
-
-  displayMatches.forEach((match, i) => {
-    const { insight, bridge } = buildMatchNarrative(match);
-    const typeLabel = match.type === 'you-offer' ? 'You can help' : match.type === 'you-need' ? 'They can help you' : 'Mutual exchange';
-
-    // Build specific skill tags
-    const youCanHelp = [...state.skills].filter(s => match.member.needs.some(n => isRelated(s, n)));
-    const theyCanHelp = match.member.skills.filter(s => [...state.needs].some(n => isRelated(s, n)));
-    const specTags = [
-      ...youCanHelp.map(s => `<span style="display:inline-block;padding:2px 8px;margin:2px;font-size:.68rem;background:rgba(42,157,143,.08);color:#2A9D8F;border-radius:3px;font-family:var(--font-mono)">you offer: ${s.replace(/-/g,' ')}</span>`),
-      ...theyCanHelp.map(s => `<span style="display:inline-block;padding:2px 8px;margin:2px;font-size:.68rem;background:rgba(233,196,106,.15);color:#B8860B;border-radius:3px;font-family:var(--font-mono)">they offer: ${s.replace(/-/g,' ')}</span>`),
-    ].join('');
-
-    // Latent value insight for this member
-    const latentHtml = match.member.latent ? `<div style="margin-top:.5rem;padding:.45rem .7rem;background:rgba(42,157,143,.04);border-radius:5px;font-size:.76rem;color:#2A9D8F;font-style:italic">✦ ${match.member.latent}</div>` : '';
-
-    const card = document.createElement('div');
-    card.className = 'match-card';
-    card.innerHTML = `
-      <div class="match-type ${match.type}">${typeLabel}</div>
-      <div class="match-person">
-        <div class="match-avatar">${match.member.emoji}</div>
-        <div>
-          <div class="match-name">${match.member.name}, ${match.member.age}</div>
-          <div class="match-distance">${match.member.role} · ${match.member.distance} away</div>
-        </div>
-      </div>
-      <div class="match-insight">${insight}</div>
-      <div class="match-bridge">${bridge}</div>
-      <div style="margin-top:.4rem">${specTags}</div>
-      ${latentHtml}
-    `;
-    container.appendChild(card);
-
-    setTimeout(() => card.classList.add('visible'), 300 + i * 250);
+// ═══ CHIPS ═══
+document.querySelectorAll('.chip').forEach(ch=>{
+  ch.addEventListener('click',()=>{
+    ch.classList.toggle('selected');
+    const v=ch.dataset.v,isSkill=!!ch.closest('#skill-chips');
+    const set=isSkill?state.skills:state.needs;
+    if(ch.classList.contains('selected'))set.add(v);else set.delete(v);
+    if(state.skills.size>0||state.needs.size>0){
+      const preview=new Set();
+      members.forEach((m,i)=>{let sc=0;[...state.skills].forEach(s=>{if(m.needs.some(n=>isRelated(s,n)))sc++});m.skills.forEach(s=>{if([...state.needs].some(n=>isRelated(s,n)))sc++});if(sc>0)preview.add(i)});
+      matchedSet=preview;revealProgress=.15;
+    }
   });
+});
 
-  // Counter animation
-  const counterEl = document.getElementById('lv-counter');
-  const targetCount = Math.max(displayMatches.length * 12 + Math.floor(Math.random() * 20) + 15, 27);
-  let count = 0;
-  const counterInterval = setInterval(() => {
-    count += Math.ceil((targetCount - count) / 8);
-    if (count >= targetCount) { count = targetCount; clearInterval(counterInterval); }
-    counterEl.textContent = count;
-  }, 60);
-
-  // Latent insight
-  document.getElementById('latent-insight').textContent = buildLatentInsight();
-
-  // Add share button
-  const shareDiv = document.createElement('div');
-  shareDiv.style.cssText = 'text-align:center;margin:1.5rem 0;';
-  const shareText = `I discovered ${displayMatches.length} latent connections in the Latent Value Network demo — cooperative matches nobody would have searched for. Try it yourself:`;
-  const shareUrl = 'https://latent-value-network.netlify.app/demo';
-  if (navigator.share) {
-    shareDiv.innerHTML = `<button onclick="navigator.share({title:'My Latent Value Map',text:'${shareText}',url:'${shareUrl}'})" style="padding:.55rem 1.2rem;font-family:var(--font-body);font-size:.85rem;font-weight:600;background:var(--teal);color:white;border:none;border-radius:5px;cursor:pointer">Share Your Results</button>`;
-  } else {
-    shareDiv.innerHTML = `<button onclick="navigator.clipboard.writeText('${shareText} ${shareUrl}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Share Link',1500)})" style="padding:.55rem 1.2rem;font-family:var(--font-body);font-size:.85rem;font-weight:600;background:var(--teal);color:white;border:none;border-radius:5px;cursor:pointer">Copy Share Link</button>`;
+// ═══ DISCOVERY ═══
+function runDiscovery(){
+  state.context=document.getElementById('context-input').value;
+  if(state.skills.size===0)state.skills.add('organizing');
+  if(state.needs.size===0)state.needs.add('community');
+  const matches=[];
+  members.forEach((m,idx)=>{
+    let score=0;
+    const yh=[...state.skills].filter(s=>m.needs.some(n=>isRelated(s,n)));
+    const th=m.skills.filter(s=>[...state.needs].some(n=>isRelated(s,n)));
+    score+=yh.length*2+th.length*2;
+    const ctx=state.context.toLowerCase();
+    if(ctx.length>5){m.skills.forEach(s=>{if(ctx.includes(s.replace(/-/g,' ')))score+=1.5});m.needs.forEach(n=>{if(ctx.includes(n.replace(/-/g,' ')))score+=1.5})}
+    const ov=[...state.skills].filter(s=>new Set(m.skills).has(s)).length;
+    if(ov===0&&score>0)score+=3;
+    if(yh.length>0&&th.length>0)score+=2;
+    let type='mutual';if(yh.length>0&&th.length===0)type='you-offer';if(th.length>0&&yh.length===0)type='you-need';
+    if(score>0)matches.push({member:m,score,youHelp:yh,theyHelp:th,type,idx});
+  });
+  matches.sort((a,b)=>b.score-a.score);
+  state.matches=matches.slice(0,6);
+  matchedSet=new Set(state.matches.map(m=>m.idx));
+  revealProgress=0;setS('Scanning community signals...');
+  const t0=performance.now();
+  function anim(now){
+    const el=now-t0;revealProgress=Math.min(el/2500,1);
+    if(el<600)setS('Scanning community signals...');
+    else if(el<1200)setS('Computing complementarity...');
+    else if(el<1800)setS('Verifying trust paths...');
+    else setS('Connections found.');
+    if(el<1500)setB('');else setB(state.matches.length+' matches');
+    if(revealProgress<1)requestAnimationFrame(anim);
+    else{document.getElementById('net-legend').classList.add('visible');setTimeout(()=>{goPhase(3);renderResults()},400)}
   }
-  container.parentElement.insertBefore(shareDiv, container.nextSibling);
+  requestAnimationFrame(anim);
 }
 
-// ── Role finder ──
-function showRoleResult() {
-  const roles = [];
-  document.querySelectorAll('#role-chips .chip.selected').forEach(c => roles.push(c.dataset.v));
-  const interests = [];
-  document.querySelectorAll('#interest-chips .chip.selected').forEach(c => interests.push(c.dataset.v));
-
-  // Also pull in skills from the earlier profile to auto-suggest
-  const sk = state.skills;
-  if (sk.has('coding') || sk.has('tech-support')) roles.push('systems-arch');
-  if (sk.has('design')) roles.push('product');
-  if (sk.has('teaching') || sk.has('childcare')) roles.push('community-org');
-  if (sk.has('organizing') || sk.has('legal')) roles.push('policy');
-  if (sk.has('finance')) roles.push('economics');
-  if (sk.has('healthcare')) roles.push('social-work');
-  if (sk.has('farming') || sk.has('gardening') || sk.has('home-repair')) roles.push('community-org');
-  if (sk.has('writing')) roles.push('community-org');
-
-  const roleMap = {
-    'ml-ai': { group: 'AI Integration', focus: 'Context engines, embedding models, agent architectures', oqs: ['OQ-1: Embedding Model Governance', 'OQ-2: Semantic Matching Under Encryption'], provs: ['#2', '#8'], doc: 'WD-003' },
-    'crypto': { group: 'Privacy & Cryptography', focus: 'Signal protocol, ZK matching, threat modeling', oqs: ['OQ-2: Semantic Matching Under Encryption', 'OQ-4: Cross-Community Signal Compatibility'], provs: ['#2', '#3'], doc: 'WD-003' },
-    'economics': { group: 'Theory & Foundations', focus: 'Mechanism design, incentive structures, value exchange', oqs: ['OQ-5: Value Exchange Integration', 'OQ-6: Governance of Parameter Evolution'], provs: ['#5', '#9'], doc: 'WD-002' },
-    'network-sci': { group: 'Theory & Foundations', focus: 'Graph theory, topology optimization, diffusion dynamics', oqs: ['OQ-4: Cross-Community Signal Compatibility'], provs: ['#1', '#9'], doc: 'WD-002' },
-    'ethics': { group: 'Ethics & Equity', focus: 'Red-teaming, equity analysis, harm inversion', oqs: ['OQ-5: Value Exchange Integration', 'OQ-3: Cold Start for Individuals'], provs: ['#3', '#4', '#6'], doc: 'WD-005' },
-    'social-sci': { group: 'Ethics & Equity', focus: 'Trust formation, adoption research, behavioral analysis', oqs: ['OQ-3: Cold Start for Individuals'], provs: ['#6', '#4'], doc: 'WD-005' },
-    'systems-arch': { group: 'AI Integration', focus: 'Protocol design, MCP/A2A integration, distributed systems', oqs: ['OQ-4: Cross-Community Signal Compatibility', 'OQ-6: Governance of Parameter Evolution'], provs: ['#7', '#8'], doc: 'WD-003' },
-    'community-org': { group: 'Community & Practice', focus: 'Pilot design, practitioner input, impact measurement', oqs: ['OQ-3: Cold Start for Individuals', 'OQ-5: Value Exchange Integration'], provs: ['#10', '#4'], doc: 'WD-001' },
-    'social-work': { group: 'Community & Practice', focus: 'Grounding the architecture in real-world needs', oqs: ['OQ-3: Cold Start for Individuals'], provs: ['#4', '#10'], doc: 'WD-001' },
-    'product': { group: 'AI Integration', focus: 'User experience of progressive disclosure, consent flows', oqs: ['OQ-3: Cold Start for Individuals'], provs: ['#3', '#8'], doc: 'WD-003' },
-    'policy': { group: 'Ethics & Equity', focus: 'Regulatory considerations, governance frameworks', oqs: ['OQ-6: Governance of Parameter Evolution'], provs: ['#7', '#5'], doc: 'WD-005' },
-    'interested': { group: 'Community & Practice', focus: 'Discussion, feedback, spreading the word', oqs: [], provs: ['#9', '#10'], doc: 'WD-001' },
+// ═══ RESULTS ═══
+function renderResults(){
+  const grid=document.getElementById('matches-grid');grid.innerHTML='';
+  const total=state.matches.length;
+  const mutual=state.matches.filter(m=>m.type==='mutual').length;
+  const xb=state.matches.filter(m=>{const ov=[...state.skills].filter(s=>new Set(m.member.skills).has(s)).length;return ov===0}).length;
+  document.getElementById('summary-stats').innerHTML=`
+    <div class="summary-stat"><div class="summary-stat-num">${total}</div><div class="summary-stat-label">Connections surfaced</div></div>
+    <div class="summary-stat"><div class="summary-stat-num">${mutual}</div><div class="summary-stat-label">Mutual exchanges</div></div>
+    <div class="summary-stat"><div class="summary-stat-num">${xb}</div><div class="summary-stat-label">Cross-boundary</div></div>`;
+  document.getElementById('results-title').textContent=total+' Connections Found';
+  state.matches.forEach((match,i)=>{
+    const m=match.member;
+    const tl=match.type==='you-offer'?'You can help':match.type==='you-need'?'They can help you':'Mutual exchange';
+    const ot=match.youHelp.map(s=>`<span class="match-tag offer">you offer: ${s.replace(/-/g,' ')}</span>`).join('');
+    const nt=match.theyHelp.map(s=>`<span class="match-tag need">they offer: ${s.replace(/-/g,' ')}</span>`).join('');
+    const card=document.createElement('div');card.className='match-card';
+    card.innerHTML=`<span class="match-type-badge ${match.type}">${tl}</span>
+      <div class="match-header"><div class="match-emoji">${m.emoji}</div><div class="match-info"><div class="match-name">${m.name}, ${m.age}</div><div class="match-role">${m.role} · ${m.dist} away</div></div><div class="match-score">${Math.round(match.score*10)}%</div></div>
+      <div class="match-story">${m.story}</div><div class="match-tags">${ot}${nt}</div>
+      ${m.latent?`<div class="match-latent">✦ ${m.latent}</div>`:''}`;
+    grid.appendChild(card);setTimeout(()=>card.classList.add('visible'),200+i*200);
+  });
+  const ins=["Several of your skills map to needs people rarely search for directly. These connections would never surface on a traditional platform.",
+    "Your skill combination is unusual here — your cooperative potential is disproportionately high. These matches wouldn't exist on any search-based system.",
+    "The strongest matches are with people whose skills are completely different from yours. This is complementarity, not similarity — the LVN's core innovation."];
+  document.getElementById('insight-text').textContent=ins[Math.floor(Math.random()*ins.length)];
+  setB(total+' connections');
+  document.getElementById('share-btn').onclick=()=>{
+    const t=`I found ${total} hidden cooperative connections in the LVN demo. Try it: `;
+    const u='https://latent-value-network.netlify.app/demo.html';
+    if(navigator.share)navigator.share({title:'My Latent Value Map',text:t,url:u});
+    else{navigator.clipboard.writeText(t+u);document.getElementById('share-btn').textContent='Copied!';setTimeout(()=>document.getElementById('share-btn').textContent='Share Results',1500)}
   };
-
-  // Deduplicate roles
-  const uniqueRoles = [...new Set(roles)];
-
-  let html = '<div style="background:white;border-radius:12px;padding:2rem;border:1px solid rgba(0,0,0,0.06);box-shadow:0 2px 12px rgba(0,0,0,0.04);">';
-  html += '<h3 style="font-family:var(--font-display);font-size:1.4rem;color:var(--navy);margin-bottom:1rem;">Your Path Into the LVN</h3>';
-
-  if (uniqueRoles.length === 0 && interests.length === 0) {
-    html += '<p style="color:var(--mid-text);">Select some options above and we\'ll map your path!</p>';
-  } else {
-    const groups = new Map();
-    const allOqs = new Set();
-    const allProvs = new Set();
-    let startDoc = 'WD-001';
-    uniqueRoles.forEach(r => {
-      if (roleMap[r]) {
-        const rm = roleMap[r];
-        if (!groups.has(rm.group)) groups.set(rm.group, rm.focus);
-        rm.oqs.forEach(o => allOqs.add(o));
-        rm.provs.forEach(p => allProvs.add(p));
-        startDoc = rm.doc;
-      }
-    });
-
-    // Working groups with focus areas
-    html += '<div style="margin-bottom:1.2rem;">';
-    html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">Recommended Working Group(s)</div>';
-    [...groups.entries()].forEach(([g, focus]) => {
-      html += `<div style="margin-bottom:.5rem;padding:0.6rem 0.8rem;background:rgba(42,157,143,0.06);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;">`;
-      html += `<div style="font-weight:600;color:var(--teal);font-size:0.88rem;">${g}</div>`;
-      html += `<div style="font-size:0.78rem;color:var(--mid-text);margin-top:0.15rem;">${focus}</div>`;
-      html += `</div>`;
-    });
-    html += '</div>';
-
-    // Provocations to start with
-    if (allProvs.size > 0) {
-      html += '<div style="margin-bottom:1rem;">';
-      html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Start With These Provocations</div>';
-      html += '<div style="font-size:0.85rem;color:var(--mid-text);">Join the discussion on Provocations ';
-      html += [...allProvs].join(', ');
-      html += ' — <a href="provocations.html" style="color:var(--teal);">read them here</a> or <a href="https://github.com/sillinous/latent-value-network/discussions" style="color:var(--teal);">debate on GitHub</a>.</div>';
-      html += '</div>';
-    }
-
-    if (allOqs.size > 0) {
-      html += '<div style="margin-bottom:1rem;">';
-      html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--slate);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;">Open Research Questions For You</div>';
-      [...allOqs].forEach(oq => {
-        html += `<div style="padding:0.35rem 0;font-size:0.85rem;color:var(--mid-text);border-bottom:1px solid rgba(0,0,0,0.04);">${oq}</div>`;
-      });
-      html += '</div>';
-    }
-
-    // Non-GitHub path + GitHub path
-    html += '<div style="margin-top:1.5rem;padding:1rem;background:var(--warm-gray);border-radius:8px;">';
-    html += '<div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--navy);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">Your Next Steps</div>';
-    html += '<div style="font-size:0.88rem;color:var(--mid-text);line-height:1.6;">';
-    html += `<strong style="color:var(--navy);">1.</strong> Read <a href="https://github.com/sillinous/latent-value-network/blob/main/docs/${startDoc.replace('-','')}-${startDoc === 'WD-001' ? 'white-paper' : startDoc === 'WD-002' ? 'evidence-base' : startDoc === 'WD-003' ? 'signal-exchange-protocol' : 'trust-fabric'}.md" style="color:var(--teal);">${startDoc}</a> — the document most relevant to your path.<br>`;
-    html += `<strong style="color:var(--navy);">2.</strong> Pick a provocation and join the debate.<br>`;
-    html += `<strong style="color:var(--navy);">3.</strong> Introduce yourself:`;
-    html += '</div>';
-    html += '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;">';
-    html += '<a href="https://github.com/sillinous/latent-value-network/issues/new?template=introduction.md" style="display:inline-block;padding:.45rem 1rem;font-size:.82rem;font-weight:600;background:var(--navy);color:white;border-radius:5px;text-decoration:none;">Introduce on GitHub</a>';
-    html += '<a href="mailto:latentvaluenetwork@proton.me?subject=LVN Introduction&body=Hi! I\'m interested in contributing to the LVN.%0A%0AMy background: %0AMy interest: %0AWorking group: ' + encodeURIComponent([...groups.keys()].join(', ')) + '" style="display:inline-block;padding:.45rem 1rem;font-size:.82rem;font-weight:600;background:transparent;color:var(--navy);border:1.5px solid var(--navy);border-radius:5px;text-decoration:none;">Introduce via Email</a>';
-    html += '</div>';
-    html += '</div>';
-  }
-
-  html += '</div>';
-
-  const resultEl = document.getElementById('role-result');
-  resultEl.innerHTML = html;
-  resultEl.style.display = 'block';
-  resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  genRoles();
 }
 
-// Keyboard accessibility for chips
-document.addEventListener('keydown', function(e) {
-  if (e.target.classList.contains('chip') && (e.key === 'Enter' || e.key === ' ')) {
-    e.preventDefault();
-    e.target.click();
-    e.target.setAttribute('aria-checked', e.target.classList.contains('selected') ? 'true' : 'false');
+function genRoles(){
+  const r=document.getElementById('role-recs');const gs=[];
+  if(state.skills.has('coding')||state.skills.has('tech-support')||state.skills.has('design'))gs.push({n:'AI Integration',f:'Build MCP server, A2A agents, or community relay',i:'⚙️'});
+  if(state.skills.has('finance')||state.skills.has('legal'))gs.push({n:'Privacy & Cryptography',f:'Design the privacy layer and audit the protocol',i:'🔐'});
+  if(state.skills.has('teaching')||state.skills.has('writing'))gs.push({n:'Theory & Foundations',f:'Formalize complementarity function and taxonomy',i:'📐'});
+  if(state.needs.has('community')||state.needs.has('loneliness')||state.skills.has('organizing'))gs.push({n:'Community & Practice',f:'Identify pilot communities and design onboarding',i:'🏘'});
+  gs.push({n:'Ethics & Equity',f:'Red-team the specs and ensure equitable outcomes',i:'⚖️'});
+  r.innerHTML='<div class="chip-label" style="margin-bottom:.8rem">Based on your profile, these working groups could use you:</div>'+
+    gs.map(g=>`<div style="display:flex;gap:.7rem;align-items:flex-start;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="font-size:1.3rem">${g.i}</span><div><div style="font-weight:600;color:white;font-size:.88rem">${g.n}</div><div style="font-size:.78rem;color:var(--text-dim)">${g.f}</div></div></div>`).join('');
+}
+
+// ═══ INIT ═══
+resizeCanvas();initNodes();draw();
+window.addEventListener('resize',()=>{resizeCanvas();initNodes()});
+document.getElementById('you-label').classList.add('visible');
+
+
+// ═══ HOVER TOOLTIPS ON CANVAS ═══
+let hoveredNode = null;
+const ttEl = document.getElementById('canvas-tooltip');
+const stageEl = document.getElementById('network-stage');
+
+stageEl.addEventListener('mousemove', function(e) {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  
+  let closest = null, closestDist = Infinity;
+  nodes.forEach(n => {
+    if (n.type === 'you') return;
+    const d = Math.hypot(n.x - mx, n.y - my);
+    if (d < (n.r + 15) && d < closestDist) { closest = n; closestDist = d; }
+  });
+  
+  if (closest && closest.idx >= 0) {
+    hoveredNode = closest;
+    const m = members[closest.idx];
+    const isMatched = matchedSet.has(closest.idx);
+    
+    ttEl.querySelector('.ct-name').textContent = m.emoji + ' ' + m.name + ', ' + m.age;
+    ttEl.querySelector('.ct-role').textContent = m.role + ' · ' + m.dist;
+    
+    const skillsHtml = m.skills.map(s => '<span class="ct-skill">' + s.replace(/-/g,' ') + '</span>').join('');
+    const needsHtml = m.needs.map(n => '<span class="ct-need">' + n.replace(/-/g,' ') + '</span>').join('');
+    ttEl.querySelector('.ct-skills').innerHTML = skillsHtml + needsHtml;
+    
+    if (isMatched && revealProgress > 0.5) {
+      const match = state.matches.find(x => x.idx === closest.idx);
+      if (match) {
+        const parts = [];
+        if (match.youHelp.length) parts.push('You can help with: ' + match.youHelp.join(', '));
+        if (match.theyHelp.length) parts.push('They offer: ' + match.theyHelp.join(', '));
+        ttEl.querySelector('.ct-dim').textContent = '✦ ' + parts.join(' · ');
+      } else {
+        ttEl.querySelector('.ct-dim').textContent = '';
+      }
+    } else if (revealProgress < 0.1) {
+      ttEl.querySelector('.ct-dim').textContent = 'Connection unknown — run discovery to reveal';
+    } else {
+      ttEl.querySelector('.ct-dim').textContent = '';
+    }
+    
+    // Position tooltip
+    let tx = e.clientX - rect.left + 16;
+    let ty = e.clientY - rect.top - 10;
+    if (tx + 220 > rect.width) tx = e.clientX - rect.left - 230;
+    if (ty < 10) ty = 10;
+    ttEl.style.left = tx + 'px';
+    ttEl.style.top = ty + 'px';
+    ttEl.classList.add('show');
+    stageEl.style.cursor = 'pointer';
+  } else {
+    hoveredNode = null;
+    ttEl.classList.remove('show');
+    stageEl.style.cursor = 'default';
   }
 });
-</script>
 
+stageEl.addEventListener('mouseleave', () => {
+  hoveredNode = null;
+  ttEl.classList.remove('show');
+});
+
+// ═══ CLICK NODE → SCROLL TO MATCH CARD ═══
+stageEl.addEventListener('click', function(e) {
+  if (!hoveredNode || hoveredNode.idx < 0) return;
+  const m = members[hoveredNode.idx];
+  const cards = document.querySelectorAll('.match-card');
+  cards.forEach(card => {
+    card.classList.remove('highlighted');
+    if (card.querySelector('.match-name') && card.querySelector('.match-name').textContent.includes(m.name)) {
+      card.classList.add('highlighted');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => card.classList.remove('highlighted'), 2500);
+    }
+  });
+});
+
+// ═══ ENHANCED CHIP FEEDBACK ═══
+const origChipHandlers = [];
+document.querySelectorAll('.chip').forEach(ch => {
+  ch.addEventListener('click', function() {
+    // Pulse animation
+    ch.classList.remove('just-selected');
+    void ch.offsetWidth; // reflow
+    if (ch.classList.contains('selected')) ch.classList.add('just-selected');
+    
+    // Update live counter
+    updateLiveCounter();
+  });
+});
+
+function updateLiveCounter() {
+  const counter = document.getElementById('live-counter');
+  const numEl = document.getElementById('lc-num');
+  if (state.skills.size > 0 || state.needs.size > 0) {
+    counter.classList.add('visible');
+    numEl.textContent = matchedSet.size;
+  } else {
+    counter.classList.remove('visible');
+  }
+}
+
+// ═══ ENHANCED DRAW: hovered node highlight + connection labels ═══
+const origDraw = draw;
+// Patch draw to add hover highlight
+const _origDrawLoop = draw;
+
+// We need to modify the draw function to show hover effects
+// Since draw() is already running via requestAnimationFrame, we'll inject via a post-draw hook
+let postDrawHook = null;
+
+// Override the draw function
+const _baseDraw = draw;
+
+// ═══ ENHANCED DISCOVERY SEQUENCE ═══
+const _origRunDiscovery = runDiscovery;
+
+// After discovery, update before/after
+const _origRenderResults = renderResults;
+const patchedRenderResults = function() {
+  _origRenderResults();
+  
+  // Update before/after
+  const ba = document.getElementById('before-after');
+  if (ba) {
+    document.getElementById('ba-before').textContent = members.length + ' people';
+    document.getElementById('ba-after').textContent = state.matches.length + ' connections';
+  }
+  
+  // Show live counter with final count
+  const counter = document.getElementById('live-counter');
+  const numEl = document.getElementById('lc-num');
+  counter.classList.add('visible');
+  numEl.textContent = state.matches.length;
+};
+// Monkey-patch
+renderResults = patchedRenderResults;
+
+// ═══ DRAW OVERLAY: hover glow + connection info ═══
+// We'll add a second canvas layer for overlays
+const overlayCanvas = document.createElement('canvas');
+overlayCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5';
+stageEl.insertBefore(overlayCanvas, stageEl.firstChild.nextSibling);
+
+function drawOverlay() {
+  const rect = canvas.getBoundingClientRect();
+  const d = devicePixelRatio || 1;
+  overlayCanvas.width = rect.width * d;
+  overlayCanvas.height = rect.height * d;
+  overlayCanvas.style.width = rect.width + 'px';
+  overlayCanvas.style.height = rect.height + 'px';
+  const oc = overlayCanvas.getContext('2d');
+  oc.setTransform(d,0,0,d,0,0);
+  oc.clearRect(0, 0, rect.width, rect.height);
+  
+  // Draw hover ring
+  if (hoveredNode) {
+    const n = hoveredNode;
+    oc.beginPath();
+    oc.arc(n.x, n.y, n.r + 8, 0, Math.PI * 2);
+    oc.strokeStyle = 'rgba(233,196,106,0.4)';
+    oc.lineWidth = 2;
+    oc.setLineDash([4, 4]);
+    oc.stroke();
+    oc.setLineDash([]);
+    
+    // If matched, draw thick connection to center
+    if (matchedSet.has(n.idx) && revealProgress > 0.3) {
+      const you = nodes[0];
+      oc.beginPath();
+      oc.moveTo(you.x, you.y);
+      oc.lineTo(n.x, n.y);
+      oc.strokeStyle = 'rgba(233,196,106,0.3)';
+      oc.lineWidth = 3;
+      oc.stroke();
+      
+      // Label on midpoint
+      const mx = (you.x + n.x) / 2;
+      const my = (you.y + n.y) / 2 - 8;
+      const match = state.matches.find(x => x.idx === n.idx);
+      if (match) {
+        const label = match.type === 'mutual' ? '⟷ mutual' : match.type === 'you-offer' ? '→ you help' : '← they help';
+        oc.font = '500 9px "JetBrains Mono", monospace';
+        oc.textAlign = 'center';
+        oc.fillStyle = 'rgba(233,196,106,0.7)';
+        oc.fillText(label, mx, my);
+      }
+    }
+  }
+  
+  requestAnimationFrame(drawOverlay);
+}
+drawOverlay();
+
+</script>
 <script src="shared.js"></script>
-
-<script>
-// ── Item 15: Match Filtering/Sorting ──
-(function(){
-  // We inject filter controls when results are shown
-  const origShowScreen = window.showScreen;
-  
-  // Wrap results rendering to add filters
-  const origShowResults = window.showResults;
-  if (typeof window.showResults === 'function') {
-    // Monkey-patch is fragile, use MutationObserver instead
-  }
-  
-  // Watch for results screen activation
-  const observer = new MutationObserver(() => {
-    const resultsScreen = document.getElementById('screen-results');
-    if (!resultsScreen) return;
-    if (resultsScreen.classList.contains('active') && !document.getElementById('match-filters')) {
-      injectFilters();
-    }
-  });
-  observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
-  
-  function injectFilters() {
-    const resultsScreen = document.getElementById('screen-results');
-    const matchList = resultsScreen.querySelector('[id*="match"], .match-list, div[style*="margin-top"]');
-    // Find the first match card container
-    const allDivs = resultsScreen.querySelectorAll('div');
-    let container = null;
-    for (const d of allDivs) {
-      if (d.querySelector('.match-type') || d.children.length > 2) {
-        const hasCards = d.querySelector('[style*="border-radius"]');
-        if (hasCards && d.children.length >= 2) { container = d; break; }
-      }
-    }
-    if (!container) return;
-    
-    const filters = document.createElement('div');
-    filters.className = 'match-filters';
-    filters.id = 'match-filters';
-    filters.innerHTML = `
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="you-offer">You can help</button>
-      <button class="filter-btn" data-filter="you-need">They can help</button>
-      <button class="filter-btn" data-filter="mutual">Mutual exchange</button>
-      <select class="sort-select" id="match-sort">
-        <option value="score">Sort: Best match</option>
-        <option value="name">Sort: Name A-Z</option>
-      </select>
-    `;
-    container.parentNode.insertBefore(filters, container);
-    
-    // Filter logic
-    filters.addEventListener('click', e => {
-      const btn = e.target.closest('.filter-btn');
-      if (!btn) return;
-      filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      
-      const cards = container.children;
-      for (const card of cards) {
-        if (filter === 'all') { card.style.display = ''; continue; }
-        const types = card.querySelectorAll('.match-type');
-        let hasType = false;
-        types.forEach(t => { if (t.classList.contains(filter) || t.textContent.toLowerCase().includes(filter.replace('-', ' '))) hasType = true; });
-        // Also check for text content
-        const text = card.textContent.toLowerCase();
-        if (filter === 'you-offer' && (text.includes('you offer') || text.includes('you can help'))) hasType = true;
-        if (filter === 'you-need' && (text.includes('they offer') || text.includes('they can help'))) hasType = true;
-        if (filter === 'mutual' && text.includes('mutual')) hasType = true;
-        card.style.display = hasType ? '' : 'none';
-      }
-    });
-    
-    // Sort logic
-    document.getElementById('match-sort').addEventListener('change', function() {
-      const cards = [...container.children];
-      cards.sort((a, b) => {
-        if (this.value === 'name') {
-          const nameA = (a.querySelector('strong, h3, [style*="font-weight:700"]') || a).textContent;
-          const nameB = (b.querySelector('strong, h3, [style*="font-weight:700"]') || b).textContent;
-          return nameA.localeCompare(nameB);
-        }
-        return 0; // Default order = by score
-      });
-      cards.forEach(c => container.appendChild(c));
-    });
-  }
-})();
-
-// ── Item 18: Save/Resume Progress ──
-(function(){
-  const PROGRESS_KEY = 'lvn-demo-progress';
-  
-  window.saveProgress = function() {
-    const activeScreen = document.querySelector('.screen.active');
-    if (!activeScreen) return;
-    const data = {
-      screen: activeScreen.id,
-      timestamp: Date.now(),
-      // Save chip selections
-      chips: [...document.querySelectorAll('.chip[aria-checked="true"]')].map(c => c.dataset.v),
-      // Save text inputs
-      inputs: {}
-    };
-    document.querySelectorAll('input, textarea, select').forEach(el => {
-      if (el.id || el.name) data.inputs[el.id || el.name] = el.value;
-    });
-    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(data)); } catch {}
-  };
-  
-  window.resumeProgress = function() {
-    try {
-      const data = JSON.parse(localStorage.getItem(PROGRESS_KEY));
-      if (!data || !data.screen) return;
-      
-      // Restore chip selections
-      if (data.chips) {
-        data.chips.forEach(v => {
-          const chip = document.querySelector('.chip[data-v="' + v + '"]');
-          if (chip) { chip.setAttribute('aria-checked', 'true'); chip.classList.add('selected'); }
-        });
-      }
-      
-      // Restore text inputs
-      if (data.inputs) {
-        Object.entries(data.inputs).forEach(([key, val]) => {
-          const el = document.getElementById(key) || document.querySelector('[name="' + key + '"]');
-          if (el) el.value = val;
-        });
-      }
-      
-      // Navigate to saved screen
-      if (typeof showScreen === 'function') showScreen(data.screen);
-      dismissResume();
-    } catch {}
-  };
-  
-  window.dismissResume = function() {
-    const banner = document.getElementById('resume-banner');
-    if (banner) banner.classList.remove('show');
-  };
-  
-  // Auto-save on screen changes
-  const origShow = window.showScreen;
-  if (origShow) {
-    const wrappedShow = function(id) {
-      origShow(id);
-      setTimeout(saveProgress, 100);
-    };
-    // We can't easily replace showScreen since it's called inline, 
-    // so use a periodic save instead
-  }
-  setInterval(() => { if (document.querySelector('.screen.active:not(#screen-intro)')) saveProgress(); }, 5000);
-  
-  // Check for saved progress on load
-  try {
-    const data = JSON.parse(localStorage.getItem(PROGRESS_KEY));
-    if (data && data.screen && data.screen !== 'screen-intro') {
-      const age = Date.now() - (data.timestamp || 0);
-      if (age < 7 * 24 * 60 * 60 * 1000) { // Less than 7 days old
-        const banner = document.getElementById('resume-banner');
-        if (banner) banner.classList.add('show');
-      }
-    }
-  } catch {}
-})();
-</script>
-
-<script>
-// ── Match Card Expansion ──
-(function(){
-  const observer = new MutationObserver(() => {
-    const resultsScreen = document.getElementById('screen-results');
-    if (!resultsScreen || !resultsScreen.classList.contains('active')) return;
-    
-    // Find match cards that don't have expand buttons yet
-    resultsScreen.querySelectorAll('[style*="border-radius"][style*="border"]').forEach(card => {
-      if (card.querySelector('.match-expand-btn') || card.offsetHeight < 50) return;
-      
-      // Extract info from card
-      const name = (card.querySelector('strong, [style*="font-weight:700"]') || {}).textContent || '';
-      const tags = [...card.querySelectorAll('[style*="font-size:.68rem"]')].map(t => t.textContent);
-      const story = (card.querySelector('[style*="font-style:italic"]') || {}).textContent || '';
-      
-      // Create expandable details
-      const details = document.createElement('div');
-      details.className = 'match-details';
-      details.innerHTML = 
-        '<div class="match-details-section">' +
-          '<div class="match-details-label">Complementarity Analysis</div>' +
-          '<div class="match-details-value">' + (story || 'This match was surfaced because your skills and needs complement each other in ways that explicit search would never find.') + '</div>' +
-        '</div>' +
-        '<div class="match-details-section">' +
-          '<div class="match-details-label">Trust Path</div>' +
-          '<div class="match-details-value">Community-anchored · ' + Math.floor(Math.random() * 3 + 1) + ' shared connections</div>' +
-          '<div class="match-trust-bar"><div class="match-trust-fill" style="width:' + (60 + Math.floor(Math.random() * 30)) + '%"></div></div>' +
-        '</div>' +
-        '<div class="match-details-section">' +
-          '<div class="match-details-label">Handshake Status</div>' +
-          '<div class="match-details-value" style="color:var(--teal)">✦ Ready for first disclosure — both parties would need to opt in</div>' +
-        '</div>';
-      
-      const btn = document.createElement('button');
-      btn.className = 'match-expand-btn';
-      btn.textContent = 'Show details ↓';
-      btn.addEventListener('click', function() {
-        const isOpen = details.classList.toggle('open');
-        btn.textContent = isOpen ? 'Hide details ↑' : 'Show details ↓';
-      });
-      
-      card.appendChild(btn);
-      card.appendChild(details);
-    });
-  });
-  
-  observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
-})();
-</script>
 </body>
 </html>
