@@ -62,26 +62,9 @@
 }
 
 /* ── Dark Mode ── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #0C1220;
-    --bg-card: #151E30;
-    --bg-subtle: #1A2540;
-    --text-primary: #E8ECF2;
-    --text-secondary: #9BA8BD;
-    --text-muted: #8A9AAE;
-    --border-subtle: rgba(255,255,255,0.06);
-    --border-accent: rgba(42,157,143,0.2);
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
-    --warm-cream: #0C1220;
-    --warm-gray: #1A2540;
-    --navy: #E8ECF2;
-    --mid-text: #9BA8BD;
-    --light-text: #6B7A92;
-  }
-}
+/* NOTE: prefers-color-scheme removed — dark mode is controlled ONLY via 
+   [data-theme="dark"] attribute set by the theme toggle button.
+   The media query was overriding page-specific light themes (hub page). */
 
 [data-theme="dark"] {
   --bg-primary: #0C1220;
