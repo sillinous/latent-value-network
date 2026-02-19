@@ -16,7 +16,7 @@
 :root {
   --navy: #1B2A4A; --deep: #0F1A2E; --slate: #3D5A80; --teal: #2A9D8F;
   --teal-glow: #34D1BF; --gold: #E9C46A; --cream: #FAF8F5; --warm: #F0EDE8;
-  --mid: #5A6577; --light: #8B95A5; --dark: #2C2C2C;
+  --mid: #5A6577; --light: #64707E; --dark: #2C2C2C;
   --f-display: 'Cormorant Garamond', Georgia, serif;
   --f-body: 'DM Sans', system-ui, sans-serif;
   --f-mono: 'JetBrains Mono', monospace;
@@ -35,7 +35,7 @@ nav .inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justif
 nav .logo{font-family:var(--f-display);font-size:1.15rem;font-weight:700;color:white}
 nav .logo span{color:var(--teal-glow)}
 nav .links{display:flex;gap:1.5rem;align-items:center}
-nav .links a{font-size:.8rem;font-weight:500;color:rgba(255,255,255,.6);transition:color .2s;text-decoration:none}
+nav .links a{font-size:.8rem;font-weight:500;color:rgba(255,255,255,.75);transition:color .2s;text-decoration:none}
 nav .links a:hover{color:white}
 nav .links .cta-nav{padding:.4rem 1rem;background:var(--teal);color:white;border-radius:4px;font-weight:600;font-size:.75rem}
 nav .links .cta-nav:hover{background:var(--teal-glow)}
@@ -58,7 +58,7 @@ nav .links .cta-nav:hover{background:var(--teal-glow)}
 .hero .stat-row{display:flex;gap:2rem;justify-content:center;margin-top:3rem;flex-wrap:wrap}
 .hero .stat{text-align:center}
 .hero .stat .num{font-family:var(--f-display);font-size:2rem;font-weight:700;color:var(--gold)}
-.hero .stat .lbl{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.2rem;font-family:var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.hero .stat .lbl{font-size:.7rem;color:rgba(255,255,255,.7);margin-top:.2rem;font-family:var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
 
 /* ── Sections ── */
 section{padding:5rem 1.5rem}
@@ -140,15 +140,15 @@ section{padding:5rem 1.5rem}
 /* ── CTA ── */
 #join{background:linear-gradient(135deg,var(--navy),var(--deep));padding:5rem 1.5rem;text-align:center;color:white}
 #join h2{font-family:var(--f-display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;margin-bottom:.6rem}
-#join p{font-size:1rem;color:rgba(255,255,255,.6);max-width:550px;margin:0 auto 2rem;line-height:1.7}
+#join p{font-size:1rem;color:rgba(255,255,255,.78);max-width:550px;margin:0 auto 2rem;line-height:1.7}
 #join .btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
 
 /* ── Footer ── */
 footer{background:var(--deep);padding:2.5rem 1.5rem;text-align:center;border-top:1px solid rgba(42,157,143,.1)}
 footer .f-logo{font-family:var(--f-display);font-size:1.1rem;color:white;margin-bottom:.4rem}
 footer .f-logo span{color:var(--teal-glow)}
-footer p{font-size:.7rem;color:rgba(255,255,255,.25);line-height:1.6}
-footer a{color:rgba(255,255,255,.4)}
+footer p{font-size:.7rem;color:rgba(255,255,255,.58);line-height:1.6}
+footer a{color:rgba(255,255,255,.68)}
 
 
 /* ── Why Section ── */
@@ -169,7 +169,7 @@ footer a{color:rgba(255,255,255,.4)}
 .why-label.evol{color:#8B5CF6}
 .why-thread h3{font-family:var(--f-display);font-size:1.25rem;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:.5rem}
 .why-thread p{font-size:.88rem;color:var(--mid);line-height:1.7;margin-bottom:.5rem}
-.why-thread .why-cite{font-family:var(--f-mono);font-size:.65rem;color:var(--light-text,#8B95A5);margin-top:.4rem}
+.why-thread .why-cite{font-family:var(--f-mono);font-size:.65rem;color:var(--light-text,#64707E);margin-top:.4rem}
 .why-thread blockquote{margin:.8rem 0;padding:.6rem 1rem;border-left:2px solid rgba(42,157,143,.2);
   font-style:italic;font-size:.84rem;color:var(--mid);line-height:1.6;background:rgba(42,157,143,.02);border-radius:0 8px 8px 0}
 
@@ -179,7 +179,7 @@ footer a{color:rgba(255,255,255,.4)}
 .thesis-banner::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(42,157,143,.1),transparent);pointer-events:none}
 .thesis-banner .thesis-label{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--teal-glow,#34D1BF);margin-bottom:.8rem}
 .thesis-banner h3{font-family:var(--f-display);font-size:clamp(1.3rem,3vw,1.8rem);font-weight:700;line-height:1.3;margin-bottom:.8rem}
-.thesis-banner p{font-size:.9rem;color:rgba(255,255,255,.65);line-height:1.7}
+.thesis-banner p{font-size:.9rem;color:rgba(255,255,255,.8);line-height:1.7}
 
 /* ── Cascade diagram ── */
 .cascade{display:grid;grid-template-columns:1fr;gap:0;margin:2rem 0;position:relative;padding-left:2rem}
@@ -191,7 +191,7 @@ footer a{color:rgba(255,255,255,.4)}
 .cascade-step:nth-child(4)::before{border-color:#E76F51}
 .cascade-step:nth-child(5)::before{border-color:#8B5CF6}
 .cascade-step strong{color:var(--navy);font-size:.92rem}
-.cascade-step p{font-size:.82rem;color:var(--mid);line-height:1.5;margin-top:.2rem}
+.cascade-step p{font-size:.82rem;color:var(--light);line-height:1.5;margin-top:.2rem}
 
 @media(max-width:768px){
   .why-threads{gap:1.5rem}
@@ -602,7 +602,7 @@ footer a{color:rgba(255,255,255,.4)}
       freelancer. The idle kitchen next to the neighborhood with no gathering space. The bilingual nurse 
       whose translation skills could help dozens of families — if anyone knew to ask.
     </p>
-    <p class="lead hero-reveal" style="font-size:.92rem;color:var(--mid);margin-top:-.5rem">
+    <p class="lead hero-reveal" style="font-size:.92rem;color:rgba(255,255,255,.78);margin-top:-.5rem">
       This isn't a technology problem. It's a <em>perception</em> problem — and it's costing humanity trillions.
     </p>
     <div class="btns">
@@ -814,7 +814,7 @@ footer a{color:rgba(255,255,255,.4)}
 
     <div style="margin-top:2rem">
       <div class="section-eyebrow" style="margin-bottom:.6rem">The Failure Cascade</div>
-      <p style="font-size:.88rem;color:var(--mid);line-height:1.6;margin-bottom:1rem">
+      <p style="font-size:.88rem;color:var(--light);line-height:1.6;margin-bottom:1rem">
         Each level compounds the others. You can't fix the gap by addressing any single layer alone.
       </p>
       <div class="cascade reveal">
@@ -1229,7 +1229,7 @@ footer a{color:rgba(255,255,255,.4)}
     not a platform. We need cryptographers, economists, ethicists, engineers, organizers, 
     librarians, social workers, and anyone who knows what cooperation looks like on the ground.
   </p>
-  <p style="font-size:.88rem;color:var(--mid);margin-top:.6rem">
+  <p style="font-size:.88rem;color:rgba(255,255,255,.78);margin-top:.6rem">
     The most important thing you can do right now isn't build — it's <strong>challenge</strong>. 
     Tell us what's wrong with this approach. The protocol gets stronger every time someone finds a flaw.
   </p>
@@ -1259,7 +1259,7 @@ footer a{color:rgba(255,255,255,.4)}
     <div class="footer-brand">
       <div class="footer-logo">Latent <span>Value</span> Network</div>
       <p>An open collaborative initiative designing the cooperative intelligence protocol. Not a company. Not a platform. A protocol for human cooperation.</p>
-      <p style="color:rgba(255,255,255,0.25);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.4)">CC BY-SA 4.0</a></p>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.68)">CC BY-SA 4.0</a></p>
     </div>
     <div class="footer-col">
       <h4>Explore</h4>

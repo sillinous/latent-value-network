@@ -16,7 +16,7 @@
   --warm-cream: #FAF8F5;
   --warm-gray: #F0EDE8;
   --mid-text: #5A6577;
-  --light-text: #8B95A5;
+  --light-text: #64707E;
   
   /* Semantic colors */
   --bg-primary: var(--warm-cream);
@@ -69,7 +69,7 @@
     --bg-subtle: #1A2540;
     --text-primary: #E8ECF2;
     --text-secondary: #9BA8BD;
-    --text-muted: #6B7A92;
+    --text-muted: #8A9AAE;
     --border-subtle: rgba(255,255,255,0.06);
     --border-accent: rgba(42,157,143,0.2);
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
@@ -89,7 +89,7 @@
   --bg-subtle: #1A2540;
   --text-primary: #E8ECF2;
   --text-secondary: #9BA8BD;
-  --text-muted: #6B7A92;
+  --text-muted: #8A9AAE;
   --border-subtle: rgba(255,255,255,0.06);
   --border-accent: rgba(42,157,143,0.2);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
@@ -181,7 +181,7 @@ body {
 .lvn-nav-links a {
   font-size: 0.72rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.78);
   text-decoration: none;
   padding: 0.35rem 0.65rem;
   border-radius: var(--radius-sm);
@@ -212,7 +212,7 @@ body {
 .lvn-nav-theme {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.7);
   cursor: pointer;
   font-size: 1rem;
   padding: 0.3rem;
@@ -372,7 +372,7 @@ body::before {
 [data-theme="dark"] .doc-card { background: var(--bg-card); border-color: var(--border-subtle); }
 [data-theme="dark"] .doc-card:hover { border-color: var(--teal); }
 [data-theme="dark"] header, [data-theme="dark"] .hero { background: #080E1A; }
-[data-theme="dark"] .conn-label { color: rgba(255,255,255,0.4); }
+[data-theme="dark"] .conn-label { color: rgba(255,255,255,0.68); }
 [data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select {
   background: var(--bg-subtle); color: var(--text-primary); border-color: var(--border-subtle);
 }
@@ -571,7 +571,7 @@ body::before {
 /* ── Enhanced Footer ── */
 .lvn-footer-full {
   background: var(--deep, #0F1A2E);
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.7);
   padding: 3rem 1.5rem 2rem;
   border-top: 1px solid rgba(42,157,143,0.1);
 }
@@ -592,7 +592,7 @@ body::before {
 .footer-brand p {
   font-size: 0.75rem;
   line-height: 1.6;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.78);
   margin-bottom: 0.8rem;
 }
 .footer-col h4 {
@@ -606,7 +606,7 @@ body::before {
 .footer-col a {
   display: block;
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.68);
   text-decoration: none;
   padding: 0.2rem 0;
   transition: color 200ms;
@@ -623,7 +623,7 @@ body::before {
 }
 .footer-bottom p {
   font-size: 0.68rem;
-  color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.55);
   line-height: 1.6;
 }
 

@@ -37,12 +37,12 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
 
 .layer-main h3{font-family:var(--f-d);font-size:1.2rem;font-weight:700;color:white;margin-bottom:.3rem}
 .layer-main .subtitle{font-size:.8rem;color:var(--teal);margin-bottom:.5rem;font-weight:500}
-.layer-main p{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.5}
+.layer-main p{font-size:.82rem;color:rgba(255,255,255,.72);line-height:1.5}
 
 .layer-detail{font-size:.75rem;background:rgba(0,0,0,.2);border-radius:6px;padding:0 .8rem;max-height:0;overflow:hidden;opacity:0;transition:all 400ms cubic-bezier(0.16, 1, 0.3, 1)}
 .layer.active .layer-detail{max-height:400px;padding:.8rem;opacity:1}
-.layer .expand-hint{font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.3);margin-top:.3rem;transition:color 200ms}
-.layer:hover .expand-hint{color:rgba(255,255,255,.5)}
+.layer .expand-hint{font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.62);margin-top:.3rem;transition:color 200ms}
+.layer:hover .expand-hint{color:rgba(255,255,255,.72)}
 .layer.active .expand-hint{display:none}
 .detail-link{display:inline-block;margin-top:.5rem;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.6rem;background:rgba(42,157,143,.2);color:var(--teal-glow);border-radius:4px;text-decoration:none;transition:background 200ms}
 .detail-link:hover{background:rgba(42,157,143,.35)}
@@ -67,7 +67,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
 .int-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem}
 .int-card{background:rgba(0,0,0,.2);border-radius:6px;padding:.8rem;border:1px solid rgba(255,255,255,.04)}
 .int-card .int-name{font-weight:600;font-size:.85rem;color:var(--teal-glow);margin-bottom:.3rem}
-.int-card .int-maps{font-size:.72rem;color:rgba(255,255,255,.4);line-height:1.4}
+.int-card .int-maps{font-size:.72rem;color:rgba(255,255,255,.68);line-height:1.4}
 .int-card .int-maps strong{color:rgba(255,255,255,.6)}
 
 /* Data flow diagram */
@@ -120,7 +120,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
   margin-top: 1rem;
   font-size: 0.68rem;
   font-family: var(--font-mono, monospace);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.68);
 }
 .diagram-legend span { display: flex; align-items: center; gap: 0.3rem; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -148,7 +148,7 @@ header p{font-size:.85rem;color:var(--light);margin-top:.3rem}
   font-size: 0.55rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.72);
   pointer-events: none;
 }
 
@@ -472,7 +472,7 @@ document.querySelectorAll('.layer').forEach(l => {
     <div class="footer-brand">
       <div class="footer-logo">Latent <span>Value</span> Network</div>
       <p>An open collaborative initiative designing the cooperative intelligence protocol. Not a company. Not a platform. A protocol for human cooperation.</p>
-      <p style="color:rgba(255,255,255,0.25);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.4)">CC BY-SA 4.0</a></p>
+      <p style="color:rgba(255,255,255,0.58);font-size:0.68rem">Released under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:rgba(255,255,255,0.68)">CC BY-SA 4.0</a></p>
     </div>
     <div class="footer-col">
       <h4>Explore</h4>
