@@ -14,9 +14,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --navy: #1B2A4A; --deep: #0F1A2E; --slate: #3D5A80; --teal: #2A9D8F;
+  --navy: #0F1A2E; --deep: #0F1A2E; --slate: #3D5A80; --teal: #2A9D8F;
   --teal-glow: #34D1BF; --gold: #E9C46A; --cream: #FAF8F5; --warm: #F0EDE8;
-  --mid: #5A6577; --light: #64707E; --dark: #2C2C2C;
+  --mid: #384455; --light: #4F5B69; --dark: #2C2C2C;
   --f-display: 'Cormorant Garamond', Georgia, serif;
   --f-body: 'DM Sans', system-ui, sans-serif;
   --f-mono: 'JetBrains Mono', monospace;
@@ -26,7 +26,7 @@ html{scroll-behavior:smooth}
 body{font-family:var(--f-body);color:var(--navy);background:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
 ::selection{background:rgba(42,157,143,.2)}
-a{color:var(--teal);text-decoration:none}
+a{color:#1E786E;text-decoration:none}
 a:hover{text-decoration:underline}
 
 /* ── Nav ── */
@@ -64,8 +64,8 @@ nav .links .cta-nav:hover{background:var(--teal-glow)}
 section{padding:5rem 1.5rem}
 .section-container{max-width:900px;margin:0 auto}
 .section-narrow{max-width:700px;margin:0 auto}
-.section-eyebrow{font-family:var(--f-mono);font-size:.65rem;color:var(--teal);letter-spacing:.25em;text-transform:uppercase;margin-bottom:.8rem}
-.section-title{font-family:var(--f-display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;color:var(--navy);line-height:1.15;margin-bottom:1rem}
+.section-eyebrow{font-family:var(--f-mono);font-size:.65rem;color:#1B7A6F;letter-spacing:.25em;text-transform:uppercase;margin-bottom:.8rem}
+.section-title{font-family:var(--f-display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;color:var(--navy);-webkit-text-stroke:0.2px currentColor;line-height:1.15;margin-bottom:1rem}
 .section-lead{font-size:1rem;color:var(--mid);line-height:1.7;margin-bottom:2rem}
 
 /* ── Problem Section ── */
@@ -169,7 +169,7 @@ footer a{color:rgba(255,255,255,.68)}
 .why-label.evol{color:#8B5CF6}
 .why-thread h3{font-family:var(--f-display);font-size:1.25rem;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:.5rem}
 .why-thread p{font-size:.88rem;color:var(--mid);line-height:1.7;margin-bottom:.5rem}
-.why-thread .why-cite{font-family:var(--f-mono);font-size:.65rem;color:var(--light-text,#64707E);margin-top:.4rem}
+.why-thread .why-cite{font-family:var(--f-mono);font-size:.65rem;color:var(--light-text,#4F5B69);margin-top:.4rem}
 .why-thread blockquote{margin:.8rem 0;padding:.6rem 1rem;border-left:2px solid rgba(42,157,143,.2);
   font-style:italic;font-size:.84rem;color:var(--mid);line-height:1.6;background:rgba(42,157,143,.02);border-radius:0 8px 8px 0}
 

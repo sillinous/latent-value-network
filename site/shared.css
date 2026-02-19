@@ -7,7 +7,7 @@
 /* ── Theme Variables ── */
 :root {
   /* Core palette */
-  --navy: #1B2A4A;
+  --navy: #0F1A2E;
   --deep: #0F1A2E;
   --slate: #3D5A80;
   --teal: #2A9D8F;
@@ -15,8 +15,8 @@
   --gold: #E9C46A;
   --warm-cream: #FAF8F5;
   --warm-gray: #F0EDE8;
-  --mid-text: #5A6577;
-  --light-text: #64707E;
+  --mid-text: #384455;
+  --light-text: #4F5B69;
   
   /* Semantic colors */
   --bg-primary: var(--warm-cream);
