@@ -16,11 +16,19 @@
     if (themeBtn) themeBtn.textContent = mode === 'dark' ? '☀' : '☽';
   }
   
-  // Initialize: use stored preference, else follow system
-  if (stored) {
-    setTheme(stored);
-  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  // One-time fix: clear auto-detected dark mode (v2 migration)
+  if (stored === 'dark' && !localStorage.getItem('lvn-theme-explicit')) {
+    localStorage.removeItem('lvn-theme');
+    localStorage.setItem('lvn-theme-explicit', '1');
+  }
+  const storedAfterMigration = localStorage.getItem('lvn-theme');
+
+  // Initialize: only use dark mode if user EXPLICITLY chose it via toggle
+  // Do NOT auto-detect OS dark mode — the hub page is designed for light mode
+  if (storedAfterMigration === 'dark') {
     setTheme('dark');
+  } else {
+    setTheme('light');
   }
   
   if (themeBtn) {
