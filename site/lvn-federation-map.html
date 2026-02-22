@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVN Federation Map — WD-013</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090e;--s1:#0d1018;--s2:#12151f;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --text:#e4e2dc;--muted:rgba(228,226,220,.42);
+  --green:#3ecf8e;--blue:#5b9cf6;--purple:#c084fc;
+  --amber:#f59e0b;--red:#f87171;--teal:#2dd4bf;
+  --mono:'DM Mono',monospace;--serif:'DM Serif Display',Georgia,serif;
+  --sans:'Instrument Sans',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden}
+
+#app{display:flex;flex-direction:column;height:100vh}
+#hdr{
+  flex-shrink:0;border-bottom:1px solid var(--border);
+  padding:.7rem 1.5rem;display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,#0d1018,#090b12);
+}
+#hdr h1{font-family:var(--serif);font-style:italic;font-size:1rem}
+#hdr p{font-family:var(--mono);font-size:.55rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.1rem}
+.tab-row{display:flex;gap:.3rem}
+.tab{font-family:var(--mono);font-size:.58rem;padding:.22rem .55rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+.tab:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.tab.active{border-color:var(--teal);color:var(--teal);background:rgba(45,212,191,.07)}
+
+#main{flex:1;display:flex;overflow:hidden}
+
+#canvas-wrap{flex:1;position:relative;overflow:hidden}
+#cvs{display:block;width:100%;height:100%;cursor:default;transition:opacity .25s}
+#cvs.fading{opacity:0}
+
+/* ── Floating hover tooltip ── */
+#node-tooltip{
+  position:fixed;pointer-events:none;z-index:300;
+  background:rgba(10,12,20,.96);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;padding:.7rem .9rem;
+  box-shadow:0 12px 40px rgba(0,0,0,.55);
+  opacity:0;transition:opacity .1s;
+  width:210px;
+}
+#node-tooltip.visible{opacity:1}
+.tt-name{font-family:var(--sans);font-size:.84rem;font-weight:600;margin-bottom:.45rem;line-height:1.2}
+.tt-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:.2rem;
+}
+.tt-key{font-family:var(--mono);font-size:.58rem;color:var(--muted)}
+.tt-val{font-family:var(--mono);font-size:.6rem;color:var(--text)}
+.tt-divider{height:1px;background:rgba(255,255,255,.07);margin:.4rem 0}
+.tt-hint{font-family:var(--mono);font-size:.54rem;color:var(--muted);font-style:italic}
+
+/* ── Sidebar ── */
+#sidebar{
+  width:280px;flex-shrink:0;border-left:1px solid var(--border);
+  overflow-y:auto;background:var(--s1);display:flex;flex-direction:column;
+}
+#sidebar::-webkit-scrollbar{width:3px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border)}
+.sb-section{padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+.sb-label{font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.5rem}
+
+.comm-card{
+  background:var(--s2);border:1px solid var(--border);border-radius:6px;
+  padding:.6rem .75rem;margin-bottom:.4rem;cursor:pointer;transition:all .18s;
+}
+.comm-card:hover{border-color:var(--border2);background:rgba(255,255,255,.03)}
+.comm-card.selected{border-color:var(--teal);background:rgba(45,212,191,.05)}
+.cc-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem}
+.cc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:transform .2s}
+.comm-card:hover .cc-dot{transform:scale(1.3)}
+.cc-name{font-family:var(--sans);font-size:.78rem;font-weight:600}
+.cc-type{font-family:var(--mono);font-size:.55rem;color:var(--muted)}
+.cc-stats{display:flex;gap:.5rem;flex-wrap:wrap}
+.cc-stat{font-family:var(--mono);font-size:.56rem;padding:.1rem .3rem;border-radius:3px;background:rgba(255,255,255,.04)}
+
+#detail-panel{flex:1;padding:.75rem 1rem;font-family:var(--mono);font-size:.62rem;color:var(--muted);min-height:120px;transition:opacity .2s}
+#detail-panel.updating{opacity:0}
+.dp-row{display:flex;justify-content:space-between;margin-bottom:.3rem}
+.dp-key{color:var(--muted)}
+.dp-val{color:var(--text)}
+
+.legend-item{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem}
+.leg-line{width:24px;height:2px;flex-shrink:0}
+.leg-label{font-family:var(--mono);font-size:.57rem;color:var(--muted)}
+.cc-dot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+.chip{font-family:var(--mono);font-size:.55rem;padding:.12rem .4rem;border-radius:3px;display:inline-block;margin:.1rem}
+.chip-ok{background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.25);color:var(--green)}
+.chip-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber)}
+.chip-risk{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--red)}
+.chip-blue{background:rgba(91,156,246,.1);border:1px solid rgba(91,156,246,.25);color:var(--blue)}
+
+/* ── Scenario label overlay ── */
+#scenario-label{
+  position:absolute;bottom:1rem;left:1rem;
+  background:rgba(10,12,20,.85);border:1px solid var(--border);border-radius:6px;
+  padding:.5rem .75rem;pointer-events:none;
+  font-family:var(--mono);font-size:.6rem;color:var(--muted);
+  transition:opacity .3s;
+}
+#scenario-label strong{display:block;color:var(--text);font-size:.65rem;margin-bottom:.15rem}
+
+/* ── Hint bar ── */
+#hint-bar{
+  position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:.58rem;color:rgba(228,226,220,.3);
+  pointer-events:none;white-space:nowrap;
+  transition:opacity .5s;
+}
+
+@keyframes pulse-ring{
+  0%{transform:scale(1);opacity:.6}
+  100%{transform:scale(1.7);opacity:0}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hdr">
+    <div>
+      <h1>Federation Map</h1>
+      <p>WD-013 — Protocol Federation · Topology Visualizer</p>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" onclick="loadScenario('healthy')">Healthy Federation</button>
+      <button class="tab" onclick="loadScenario('asymmetric')">Size Asymmetry</button>
+      <button class="tab" onclick="loadScenario('captured')">Protocol Capture</button>
+      <button class="tab" onclick="loadScenario('exit')">Community Exit</button>
+    </div>
+  </header>
+  <div id="main">
+    <div id="canvas-wrap">
+      <canvas id="cvs"></canvas>
+      <div id="scenario-label"><strong id="sl-title">—</strong><span id="sl-desc">—</span></div>
+      <div id="hint-bar">Hover nodes to preview · Click to inspect</div>
+    </div>
+    <div id="sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Communities</div>
+        <div id="comm-list"></div>
+      </div>
+      <div id="detail-panel">
+        <div style="color:var(--muted);font-style:italic;font-size:.65rem;line-height:1.6">
+          Hover a node on the map to preview.<br>Click to see full details and risk assessment.
+        </div>
+      </div>
+      <div class="sb-section" style="margin-top:auto">
+        <div class="sb-label">Legend</div>
+        <div class="legend-item"><div class="leg-line" style="background:var(--green)"></div><div class="leg-label">Full federation (bidirectional trust)</div></div>
+        <div class="legend-item"><div class="leg-line" style="background:var(--amber);border-top:1px dashed var(--amber)"></div><div class="leg-label">Bridged (partial trust)</div></div>
+        <div class="legend-item"><div class="leg-line" style="background:var(--red)"></div><div class="leg-label">Captured / problematic link</div></div>
+        <div class="legend-item"><div class="leg-line" style="background:rgba(192,132,252,.5);border-top:1px dashed rgba(192,132,252,.5)"></div><div class="leg-label">Dissolving (exit in progress)</div></div>
+        <div style="margin-top:.5rem">
+          <div class="legend-item"><div class="cc-dot-sm" style="background:var(--green)"></div><div class="leg-label">Healthy governance</div></div>
+          <div class="legend-item"><div class="cc-dot-sm" style="background:var(--amber)"></div><div class="leg-label">Governance drift</div></div>
+          <div class="legend-item"><div class="cc-dot-sm" style="background:var(--red)"></div><div class="leg-label">Capture risk / failing</div></div>
+          <div class="legend-item"><div class="cc-dot-sm" style="background:var(--blue)"></div><div class="leg-label">Seeding / developing</div></div>
+          <div class="legend-item"><div class="cc-dot-sm" style="background:var(--purple)"></div><div class="leg-label">Exit in progress</div></div>
+        </div>
+        <div style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border)">
+          <div style="font-family:var(--mono);font-size:.54rem;color:var(--muted);line-height:1.55">
+            Outer ring = R₀ status<br>
+            Node size = community size (n)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hover tooltip -->
+<div id="node-tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-row"><span class="tt-key">Type</span><span class="tt-val" id="tt-type"></span></div>
+  <div class="tt-row"><span class="tt-key">Participants</span><span class="tt-val" id="tt-size"></span></div>
+  <div class="tt-row"><span class="tt-key">R₀</span><span class="tt-val" id="tt-r0"></span></div>
+  <div class="tt-row"><span class="tt-key">Governance</span><span class="tt-val" id="tt-gov"></span></div>
+  <div class="tt-row"><span class="tt-key">Fed. links</span><span class="tt-val" id="tt-links"></span></div>
+  <div class="tt-divider"></div>
+  <div class="tt-hint">Click to inspect full detail →</div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// SCENARIOS (same data as before)
+// ════════════════════════════════════════════════
+const SCENARIOS = {
+healthy:{
+  title:'Healthy Federation',
+  desc:'Diverse sizes · balanced governance · active PSC',
+  communities:[
+    {id:'A',name:'Oakdale Neighbors',type:'neighborhood',size:340,r0:1.3,phase:'supercritical',gov:'healthy',x:.35,y:.30},
+    {id:'B',name:'Riverside Mutual Aid',type:'mutual aid',size:210,r0:1.1,phase:'supercritical',gov:'healthy',x:.60,y:.22},
+    {id:'C',name:'Westside Workers Coop',type:'professional',size:180,r0:.9,phase:'approaching',gov:'healthy',x:.72,y:.48},
+    {id:'D',name:'Sunrise Housing Coop',type:'housing',size:95,r0:.7,phase:'subcritical',gov:'healthy',x:.55,y:.65},
+    {id:'E',name:'Downtown Skills Exchange',type:'skills',size:420,r0:1.5,phase:'supercritical',gov:'healthy',x:.25,y:.58},
+    {id:'F',name:'Eastside Care Network',type:'care',size:130,r0:.8,phase:'approaching',gov:'drift',x:.15,y:.38},
+    {id:'G',name:'Youth Builders',type:'youth',size:60,r0:.4,phase:'subcritical',gov:'healthy',x:.42,y:.72},
+    {id:'H',name:'Immigrant Solidarity',type:'affinity',size:175,r0:1.0,phase:'approaching',gov:'healthy',x:.78,y:.72},
+  ],
+  edges:[
+    {a:'A',b:'B',type:'full'},{a:'A',b:'E',type:'full'},{a:'A',b:'F',type:'bridged'},
+    {a:'B',b:'C',type:'full'},{a:'B',b:'H',type:'bridged'},{a:'C',b:'D',type:'full'},
+    {a:'D',b:'G',type:'bridged'},{a:'E',b:'F',type:'full'},{a:'E',b:'G',type:'bridged'},
+    {a:'C',b:'H',type:'full'},
+  ],
+  alerts:[
+    {type:'ok',text:'PSC composition: 43% small community reps ✓'},
+    {type:'ok',text:'All full-federated pairs passed governance equivalence review ✓'},
+    {type:'warn',text:'Eastside Care Network: governance drift — monitoring'},
+    {type:'ok',text:'Exit rights: all communities have export capability verified ✓'},
+  ]
+},
+asymmetric:{
+  title:'Size Asymmetry',
+  desc:'Hub community accumulating dominance · dependency risk',
+  communities:[
+    {id:'HUB',name:'Metro Commons',type:'citywide',size:4800,r0:2.1,phase:'supercritical',gov:'healthy',x:.48,y:.42},
+    {id:'S1',name:'Oak Grove',type:'neighborhood',size:120,r0:.7,phase:'subcritical',gov:'healthy',x:.20,y:.22},
+    {id:'S2',name:'Harbor District',type:'neighborhood',size:95,r0:.6,phase:'subcritical',gov:'healthy',x:.72,y:.20},
+    {id:'S3',name:'Milltown Neighbors',type:'neighborhood',size:140,r0:.8,phase:'approaching',gov:'healthy',x:.80,y:.55},
+    {id:'S4',name:'Fairview Mutual',type:'mutual aid',size:88,r0:.5,phase:'subcritical',gov:'drift',x:.72,y:.78},
+    {id:'S5',name:'East End Skills',type:'skills',size:105,r0:.6,phase:'subcritical',gov:'healthy',x:.28,y:.75},
+    {id:'S6',name:'Riverside Care',type:'care',size:77,r0:.5,phase:'subcritical',gov:'drift',x:.18,y:.58},
+    {id:'M1',name:'Northside Coop',type:'housing',size:550,r0:1.2,phase:'supercritical',gov:'healthy',x:.32,y:.30},
+  ],
+  edges:[
+    {a:'HUB',b:'S1',type:'bridged'},{a:'HUB',b:'S2',type:'bridged'},{a:'HUB',b:'S3',type:'bridged'},
+    {a:'HUB',b:'S4',type:'bridged'},{a:'HUB',b:'S5',type:'bridged'},{a:'HUB',b:'S6',type:'bridged'},
+    {a:'HUB',b:'M1',type:'full'},{a:'M1',b:'S1',type:'bridged'},{a:'S3',b:'S2',type:'bridged'},
+  ],
+  alerts:[
+    {type:'risk',text:'ASYMMETRY ALERT: Metro Commons is sole partner for 75% of communities (threshold: 40%)'},
+    {type:'risk',text:'Cross-community power balance: small communities −0.31 vs Metro +0.09'},
+    {type:'warn',text:'Two small communities show governance drift — suspected correlation with dependency'},
+    {type:'blue',text:'PSC: support M1 as alternative regional hub'},
+  ]
+},
+captured:{
+  title:'Protocol Capture',
+  desc:'Large communities dominate PSC · equity collapsing',
+  communities:[
+    {id:'L1',name:'TechDistrict Network',type:'professional',size:3200,r0:2.4,phase:'supercritical',gov:'captured',x:.30,y:.28},
+    {id:'L2',name:'Uptown Commons',type:'neighborhood',size:2800,r0:2.0,phase:'supercritical',gov:'captured',x:.68,y:.30},
+    {id:'L3',name:'Innovation Hub Coop',type:'professional',size:1900,r0:1.7,phase:'supercritical',gov:'drift',x:.48,y:.48},
+    {id:'S1',name:'Riverside Workers',type:'mutual aid',size:88,r0:.5,phase:'subcritical',gov:'drift',x:.18,y:.52},
+    {id:'S2',name:'Eastview Neighbors',type:'neighborhood',size:105,r0:.6,phase:'subcritical',gov:'healthy',x:.82,y:.55},
+    {id:'S3',name:'Fairgrounds Care',type:'care',size:72,r0:.4,phase:'subcritical',gov:'failing',x:.35,y:.72},
+    {id:'S4',name:'Southside Mutual',type:'mutual aid',size:94,r0:.5,phase:'subcritical',gov:'failing',x:.62,y:.72},
+    {id:'ISO',name:'Harbor Collective',type:'neighborhood',size:145,r0:.8,phase:'approaching',gov:'healthy',x:.82,y:.75},
+  ],
+  edges:[
+    {a:'L1',b:'L2',type:'captured'},{a:'L1',b:'L3',type:'captured'},{a:'L2',b:'L3',type:'captured'},
+    {a:'L1',b:'S1',type:'captured'},{a:'L2',b:'S2',type:'captured'},
+    {a:'L3',b:'S3',type:'captured'},{a:'L3',b:'S4',type:'captured'},
+  ],
+  alerts:[
+    {type:'risk',text:'PSC CAPTURE: Large communities hold 61% of seats (max: 25%)'},
+    {type:'risk',text:'Threshold changes: standards weakened 4× in past year'},
+    {type:'risk',text:'Small communities avg −0.48 cross-community power balance'},
+    {type:'warn',text:'Harbor Collective isolated — response to governance capture'},
+    {type:'blue',text:'External audit initiated. Protocol certification mark under review.'},
+  ]
+},
+exit:{
+  title:'Community Exit',
+  desc:'Harbor Collective exercising exit right cleanly · data sovereignty protocol active',
+  communities:[
+    {id:'A',name:'Oakdale Neighbors',type:'neighborhood',size:340,r0:1.3,phase:'supercritical',gov:'healthy',x:.35,y:.30},
+    {id:'B',name:'Riverside Mutual Aid',type:'mutual aid',size:210,r0:1.1,phase:'supercritical',gov:'healthy',x:.60,y:.22},
+    {id:'C',name:'Westside Workers',type:'professional',size:180,r0:.9,phase:'approaching',gov:'healthy',x:.72,y:.45},
+    {id:'E',name:'Downtown Skills',type:'skills',size:420,r0:1.5,phase:'supercritical',gov:'healthy',x:.25,y:.58},
+    {id:'EXIT',name:'Harbor Collective',type:'neighborhood',size:145,r0:.8,phase:'approaching',gov:'exiting',x:.55,y:.68},
+    {id:'NEW1',name:'Bayfront Neighbors',type:'neighborhood',size:65,r0:.4,phase:'subcritical',gov:'healthy',x:.75,y:.72},
+  ],
+  edges:[
+    {a:'A',b:'B',type:'full'},{a:'A',b:'E',type:'full'},{a:'B',b:'C',type:'full'},
+    {a:'EXIT',b:'A',type:'dissolving'},{a:'EXIT',b:'E',type:'dissolving'},
+  ],
+  alerts:[
+    {type:'blue',text:'EXIT IN PROGRESS: Harbor Collective — data export complete (4hrs)'},
+    {type:'ok',text:'Exit is non-punitive: retains protocol access, can re-federate ✓'},
+    {type:'ok',text:'Participant notification complete: 145 members informed ✓'},
+    {type:'warn',text:'6 active cross-community relationships affected. Transition support activated.'},
+    {type:'ok',text:'100% of Harbor Collective data returned/purged from federation nodes ✓'},
+  ]
+},
+};
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+const GOV_COLORS={healthy:'#3ecf8e',drift:'#f59e0b',captured:'#f87171',failing:'#f87171',exiting:'#c084fc',ok:'#3ecf8e'};
+const PHASE_LABEL={supercritical:'R₀>1',approaching:'R₀→1',subcritical:'R₀<1'};
+
+const cvs=document.getElementById('cvs');
+const ctx=cvs.getContext('2d');
+const tooltip=document.getElementById('node-tooltip');
+
+let currentScenario=null;
+let selectedId=null;
+let hoveredId=null;
+let dashOffset=0;
+let animFrame=null;
+let lastTime=0;
+
+// ════════════════════════════════════════════════
+// GEOMETRY
+// ════════════════════════════════════════════════
+function resize(){
+  const w=document.getElementById('canvas-wrap');
+  cvs.width=w.clientWidth*devicePixelRatio;
+  cvs.height=w.clientHeight*devicePixelRatio;
+  cvs.style.width=w.clientWidth+'px';
+  cvs.style.height=w.clientHeight+'px';
+}
+function nodeXY(node){
+  const w=document.getElementById('canvas-wrap');
+  const pad=90;
+  return{
+    x:(pad+node.x*(w.clientWidth-pad*2))*devicePixelRatio,
+    y:(pad+node.y*(w.clientHeight-pad*2))*devicePixelRatio,
+  };
+}
+function nodeRadius(node){
+  return Math.max(14,Math.min(56,Math.sqrt(node.size)*0.9))*devicePixelRatio;
+}
+function hitTest(mx,my,node){
+  const{x,y}=nodeXY(node);
+  const r=nodeRadius(node);
+  return Math.hypot(mx-x,my-y)<r+8*devicePixelRatio;
+}
+
+// ════════════════════════════════════════════════
+// DRAW
+// ════════════════════════════════════════════════
+function draw(ts=0){
+  const dt=ts-lastTime; lastTime=ts;
+  dashOffset=(dashOffset+dt*0.012)%32;
+
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  const s=currentScenario;
+  if(!s)return;
+
+  // ── Edges ──
+  s.edges.forEach(e=>{
+    const a=s.communities.find(c=>c.id===e.a);
+    const b=s.communities.find(c=>c.id===e.b);
+    if(!a||!b)return;
+    const pa=nodeXY(a),pb=nodeXY(b);
+    const isHighlighted=hoveredId&&(e.a===hoveredId||e.b===hoveredId);
+    const isSelected=selectedId&&(e.a===selectedId||e.b===selectedId);
+    const active=isHighlighted||isSelected;
+
+    ctx.save();
+    ctx.globalAlpha=active?1:0.5;
+
+    if(e.type==='full'){
+      ctx.strokeStyle=active?'rgba(62,207,142,0.9)':'rgba(62,207,142,0.45)';
+      ctx.lineWidth=(active?2.5:1.8)*devicePixelRatio;
+      ctx.setLineDash([]);
+    } else if(e.type==='bridged'){
+      ctx.strokeStyle=active?'rgba(245,158,11,0.8)':'rgba(245,158,11,0.35)';
+      ctx.lineWidth=(active?2:1.4)*devicePixelRatio;
+      ctx.setLineDash([7*devicePixelRatio,5*devicePixelRatio]);
+      ctx.lineDashOffset=-dashOffset*devicePixelRatio;
+    } else if(e.type==='captured'){
+      ctx.strokeStyle=active?'rgba(248,113,113,0.9)':'rgba(248,113,113,0.45)';
+      ctx.lineWidth=(active?2.5:1.8)*devicePixelRatio;
+      ctx.setLineDash([]);
+    } else if(e.type==='dissolving'){
+      ctx.strokeStyle=active?'rgba(192,132,252,0.7)':'rgba(192,132,252,0.25)';
+      ctx.lineWidth=(active?2:1.2)*devicePixelRatio;
+      ctx.setLineDash([4*devicePixelRatio,10*devicePixelRatio]);
+      ctx.lineDashOffset=-dashOffset*0.5*devicePixelRatio;
+    }
+
+    // Draw edge with glow if active
+    if(active){
+      ctx.shadowColor=ctx.strokeStyle;
+      ctx.shadowBlur=8*devicePixelRatio;
+    }
+    ctx.beginPath();
+    ctx.moveTo(pa.x,pa.y);
+    ctx.lineTo(pb.x,pb.y);
+    ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Flow particle along active full edges
+    if(active&&e.type==='full'){
+      const t=(Date.now()%2000)/2000;
+      const px=pa.x+(pb.x-pa.x)*t;
+      const py=pa.y+(pb.y-pa.y)*t;
+      ctx.beginPath();
+      ctx.arc(px,py,3*devicePixelRatio,0,Math.PI*2);
+      ctx.fillStyle='rgba(62,207,142,0.9)';
+      ctx.fill();
+    }
+  });
+
+  // ── Nodes ──
+  s.communities.forEach(c=>{
+    const{x,y}=nodeXY(c);
+    const r=nodeRadius(c);
+    const col=GOV_COLORS[c.gov]||'#888';
+    const isSelected=selectedId===c.id;
+    const isHovered=hoveredId===c.id;
+    const isActive=isSelected||isHovered;
+
+    // Outer glow ring
+    if(isActive||c.gov==='failing'||c.gov==='captured'||c.gov==='exiting'){
+      const pulseScale=isActive?1+(Math.sin(Date.now()/400)*0.06):1;
+      const g=ctx.createRadialGradient(x,y,r*0.6,x,y,r*(2.4+pulseScale*0.1));
+      g.addColorStop(0,col+(isActive?'55':'33'));
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;
+      ctx.beginPath();
+      ctx.arc(x,y,r*(2.4+pulseScale*0.1),0,Math.PI*2);
+      ctx.fill();
+    }
+
+    // Node body
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=isActive?'#141825':'#0d1018';
+    ctx.fill();
+    ctx.strokeStyle=isSelected?col:isHovered?(col+'cc'):(col+'88');
+    ctx.lineWidth=(isSelected?2.8:isHovered?2.2:1.5)*devicePixelRatio;
+    if(isActive){ctx.shadowColor=col;ctx.shadowBlur=10*devicePixelRatio;}
+    ctx.stroke();
+    ctx.shadowBlur=0;
+
+    // Phase ring
+    const phaseColor=c.phase==='supercritical'?'#3ecf8e':c.phase==='approaching'?'#f59e0b':'rgba(255,255,255,.12)';
+    const ringR=r+6*devicePixelRatio;
+    ctx.beginPath();
+    ctx.arc(x,y,ringR,-Math.PI/2,Math.PI*1.5);
+    ctx.strokeStyle=phaseColor+(isActive?'88':'44');
+    ctx.lineWidth=2*devicePixelRatio;
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    // ID label
+    const fs=Math.max(7,Math.min(13,r/devicePixelRatio*0.42));
+    ctx.fillStyle=isActive?col:(col+'cc');
+    ctx.font=`600 ${fs*devicePixelRatio}px 'DM Mono'`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(c.id,x,y);
+
+    // Name label
+    ctx.fillStyle=isActive?'#e4e2dc':'rgba(228,226,220,0.55)';
+    ctx.font=`${9*devicePixelRatio}px 'Instrument Sans'`;
+    ctx.fillText(c.name,x,y+r+14*devicePixelRatio);
+
+    // n= label
+    ctx.fillStyle=isActive?'rgba(228,226,220,.5)':'rgba(228,226,220,.2)';
+    ctx.font=`${7.5*devicePixelRatio}px 'DM Mono'`;
+    ctx.fillText(`n=${c.size}`,x,y+r+24*devicePixelRatio);
+  });
+
+  animFrame=requestAnimationFrame(draw);
+}
+
+// ════════════════════════════════════════════════
+// TOOLTIP
+// ════════════════════════════════════════════════
+function showTooltip(c,mx,my){
+  const edges=currentScenario.edges.filter(e=>e.a===c.id||e.b===c.id);
+  document.getElementById('tt-name').textContent=c.name;
+  document.getElementById('tt-name').style.color=GOV_COLORS[c.gov];
+  document.getElementById('tt-type').textContent=c.type;
+  document.getElementById('tt-size').textContent=c.size+' participants';
+  document.getElementById('tt-r0').textContent=`${c.r0} (${PHASE_LABEL[c.phase]})`;
+  document.getElementById('tt-r0').style.color=c.phase==='supercritical'?'#3ecf8e':c.phase==='approaching'?'#f59e0b':'#5b9cf6';
+  document.getElementById('tt-gov').textContent=c.gov;
+  document.getElementById('tt-gov').style.color=GOV_COLORS[c.gov];
+  document.getElementById('tt-links').textContent=edges.length||'isolated';
+
+  const tx=mx+18, ty=my-10;
+  const tw=210, th=130;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  tooltip.style.left=(tx+tw>vw?mx-tw-12:tx)+'px';
+  tooltip.style.top=(ty+th>vh?my-th-8:ty)+'px';
+  tooltip.classList.add('visible');
+}
+function hideTooltip(){tooltip.classList.remove('visible')}
+
+// ════════════════════════════════════════════════
+// MOUSE EVENTS
+// ════════════════════════════════════════════════
+cvs.addEventListener('mousemove',e=>{
+  if(!currentScenario)return;
+  const rect=cvs.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)*devicePixelRatio;
+  const my=(e.clientY-rect.top)*devicePixelRatio;
+  let hit=null;
+  for(const c of currentScenario.communities){
+    if(hitTest(mx,my,c)){hit=c;break;}
+  }
+  if(hit){
+    if(hoveredId!==hit.id){
+      hoveredId=hit.id;
+    }
+    cvs.style.cursor='pointer';
+    showTooltip(hit,e.clientX,e.clientY);
+  } else {
+    hoveredId=null;
+    cvs.style.cursor='default';
+    hideTooltip();
+  }
+});
+cvs.addEventListener('mouseleave',()=>{hoveredId=null;hideTooltip();cvs.style.cursor='default'});
+
+cvs.addEventListener('click',e=>{
+  if(!currentScenario)return;
+  const rect=cvs.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)*devicePixelRatio;
+  const my=(e.clientY-rect.top)*devicePixelRatio;
+  for(const c of currentScenario.communities){
+    if(hitTest(mx,my,c)){selectCommunity(c.id);return;}
+  }
+  selectedId=null;
+  renderSidebar(currentScenario);
+});
+
+// ════════════════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════════════════
+function renderSidebar(s){
+  const list=document.getElementById('comm-list');
+  list.innerHTML='';
+  s.communities.forEach(c=>{
+    const card=document.createElement('div');
+    card.className='comm-card'+(selectedId===c.id?' selected':'');
+    card.innerHTML=`
+      <div class="cc-top">
+        <div class="cc-dot" style="background:${GOV_COLORS[c.gov]}"></div>
+        <div>
+          <div class="cc-name">${c.name}</div>
+          <div class="cc-type">${c.id} · ${c.type}</div>
+        </div>
+      </div>
+      <div class="cc-stats">
+        <span class="cc-stat">n=${c.size}</span>
+        <span class="cc-stat" style="color:${c.phase==='supercritical'?'#3ecf8e':c.phase==='approaching'?'#f59e0b':'#5b9cf6'}">${PHASE_LABEL[c.phase]}</span>
+        <span class="cc-stat" style="color:${GOV_COLORS[c.gov]}">${c.gov}</span>
+      </div>
+    `;
+    card.addEventListener('click',()=>selectCommunity(c.id));
+    list.appendChild(card);
+  });
+
+  const detail=document.getElementById('detail-panel');
+  detail.innerHTML=`<div class="sb-label" style="margin-bottom:.5rem">Scenario Alerts</div>`+
+    s.alerts.map(a=>{
+      const cls=a.type==='ok'?'chip-ok':a.type==='warn'?'chip-warn':a.type==='risk'?'chip-risk':'chip-blue';
+      return`<div class="chip ${cls}" style="display:block;margin-bottom:.35rem;white-space:normal;line-height:1.5">${a.text}</div>`;
+    }).join('')+
+    `<div style="margin-top:.75rem;color:var(--muted);font-style:italic;font-size:.58rem">${s.desc}</div>`;
+}
+
+function selectCommunity(id){
+  selectedId=id;
+  const s=currentScenario;
+  const c=s.communities.find(c=>c.id===id);
+  const edges=s.edges.filter(e=>e.a===id||e.b===id);
+  const partners=edges.map(e=>e.a===id?e.b:e.a);
+
+  const detail=document.getElementById('detail-panel');
+  detail.classList.add('updating');
+  setTimeout(()=>{
+    detail.innerHTML=`
+      <div class="sb-label" style="margin-bottom:.5rem">Detail — ${c.id}</div>
+      <div style="font-family:var(--sans);font-size:.85rem;font-weight:600;margin-bottom:.55rem;color:${GOV_COLORS[c.gov]}">${c.name}</div>
+      <div class="dp-row"><span class="dp-key">Type</span><span class="dp-val">${c.type}</span></div>
+      <div class="dp-row"><span class="dp-key">Participants</span><span class="dp-val">${c.size}</span></div>
+      <div class="dp-row"><span class="dp-key">Cooperative R₀</span><span class="dp-val" style="color:${c.phase==='supercritical'?'#3ecf8e':c.phase==='approaching'?'#f59e0b':'#5b9cf6'}">${c.r0} — ${PHASE_LABEL[c.phase]}</span></div>
+      <div class="dp-row"><span class="dp-key">Governance</span><span class="dp-val" style="color:${GOV_COLORS[c.gov]}">${c.gov}</span></div>
+      <div class="dp-row"><span class="dp-key">Federation links</span><span class="dp-val">${edges.length||'none'}</span></div>
+      <div class="dp-row"><span class="dp-key">Edge types</span><span class="dp-val">${edges.length?[...new Set(edges.map(e=>e.type))].join(', '):'isolated'}</span></div>
+      ${partners.length?`<div class="dp-row"><span class="dp-key">Partners</span><span class="dp-val">${partners.join(', ')}</span></div>`:''}
+      <div style="margin-top:.65rem">${getFederationRisk(c,edges,s)}</div>
+    `;
+    detail.classList.remove('updating');
+  },150);
+
+  renderSidebar(s);
+}
+
+function getFederationRisk(c,edges,s){
+  const risks=[];
+  if(c.gov==='captured'||c.gov==='failing') risks.push(`<div class="chip chip-risk">Governance ${c.gov}</div>`);
+  if(c.phase==='subcritical') risks.push(`<div class="chip chip-blue">Pre-transition — federation limited value</div>`);
+  if(edges.length>=5) risks.push(`<div class="chip chip-warn">High degree — monitor for hub dynamics</div>`);
+  if(c.size>2000&&edges.length>3) risks.push(`<div class="chip chip-warn">Large community: anti-absorption rule applies</div>`);
+  if(c.gov==='exiting') risks.push(`<div class="chip chip-blue">Exit in progress — data sovereignty protocol active</div>`);
+  if(c.size>3000&&edges.length>5) risks.push(`<div class="chip chip-risk">Monopoly risk: exceeds 40% regional threshold</div>`);
+  if(risks.length===0) risks.push(`<div class="chip chip-ok">No active risks detected</div>`);
+  return risks.join('');
+}
+
+// ════════════════════════════════════════════════
+// SCENARIO LOADING
+// ════════════════════════════════════════════════
+function loadScenario(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`.tab[onclick="loadScenario('${name}')"]`).classList.add('active');
+
+  cvs.classList.add('fading');
+  setTimeout(()=>{
+    selectedId=null; hoveredId=null; hideTooltip();
+    currentScenario=SCENARIOS[name];
+    document.getElementById('sl-title').textContent=currentScenario.title;
+    document.getElementById('sl-desc').textContent=currentScenario.desc;
+    renderSidebar(currentScenario);
+    cvs.classList.remove('fading');
+  },200);
+}
+
+window.addEventListener('resize',()=>{resize();});
+resize();
+
+// Start animation loop
+requestAnimationFrame(draw);
+loadScenario('healthy');
+</script>
+</body>
+</html>

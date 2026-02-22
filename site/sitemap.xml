@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://latent-value-network.netlify.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/lvn-suite-launcher.html</loc><changefreq>monthly</changefreq><priority>0.95</priority></url>
   <url><loc>https://latent-value-network.netlify.app/demo.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://latent-value-network.netlify.app/provocations.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://latent-value-network.netlify.app/architecture.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/WD-000-architecture.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/lvn-temporal-simulator.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/lvn-pilot-navigator.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/lvn-equity-monitor.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/lvn-federation-map.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/lvn-meaning-explorer.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://latent-value-network.netlify.app/lvn-ontology-graph.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

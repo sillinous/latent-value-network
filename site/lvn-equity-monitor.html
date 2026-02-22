@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVN Equity Monitor — WD-010</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@300;400;500;600&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#07090e;--s1:#0d1018;--s2:#12151f;--s3:#171b26;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#e4e2dc;--muted:rgba(228,226,220,0.42);
+  --green:#3ecf8e;--blue:#5b9cf6;--purple:#c084fc;
+  --amber:#f59e0b;--red:#f87171;--teal:#2dd4bf;--orange:#fb923c;
+  --mono:'DM Mono',monospace;--serif:'DM Serif Display',Georgia,serif;
+  --sans:'Instrument Sans',sans-serif;
+}
+
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans)}
+
+/* ── Header ── */
+#hdr{
+  border-bottom:1px solid var(--border);padding:.9rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,#0d1018,#090b12);position:sticky;top:0;z-index:100;
+}
+#hdr h1{font-family:var(--serif);font-style:italic;font-size:1.05rem}
+#hdr p{font-family:var(--mono);font-size:.57rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.12rem}
+
+.hdr-right{display:flex;gap:.5rem;align-items:center}
+.mode-tab{
+  font-family:var(--mono);font-size:.6rem;padding:.25rem .65rem;
+  border:1px solid var(--border);border-radius:4px;
+  background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;
+  transition:all .15s;
+}
+.mode-tab:hover{border-color:rgba(255,255,255,.18);color:var(--text)}
+.mode-tab.active{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.08)}
+
+/* ── Layout ── */
+#page{max-width:1400px;margin:0 auto;padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1.25rem}
+
+/* ── Alert banner ── */
+.alert-banner{
+  border-radius:8px;padding:.75rem 1.1rem;
+  display:flex;align-items:center;gap:.75rem;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.04em;
+}
+.alert-banner.warn{
+  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);color:var(--amber)
+}
+.alert-banner.danger{
+  background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);color:var(--red)
+}
+.alert-banner.ok{
+  background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.3);color:var(--green)
+}
+.alert-icon{font-size:1rem;flex-shrink:0}
+.alert-body{flex:1}
+.alert-title{font-weight:500;margin-bottom:.1rem}
+.alert-desc{opacity:.75;font-size:.6rem}
+
+/* ── Grid ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+
+/* ── Cards ── */
+.card{
+  background:var(--s1);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;
+}
+.card-hdr{
+  padding:.65rem 1rem;border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:.57rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-body{padding:1rem}
+
+/* ── Stat tiles ── */
+.stat-tile{
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:.8rem 1rem;display:flex;flex-direction:column;gap:.2rem;
+}
+.st-label{font-family:var(--mono);font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.st-val{font-family:var(--serif);font-size:1.6rem}
+.st-sub{font-family:var(--mono);font-size:.58rem;color:var(--muted)}
+.st-trend{font-family:var(--mono);font-size:.6rem;margin-top:.1rem}
+.trend-up{color:var(--red)}.trend-dn{color:var(--green)}.trend-ok{color:var(--muted)}
+
+/* ── Distribution bar ── */
+.distrib-row{
+  display:flex;align-items:center;gap:.6rem;margin-bottom:.45rem;
+}
+.dr-label{font-family:var(--mono);font-size:.62rem;color:var(--muted);width:22px;flex-shrink:0;text-align:right}
+.dr-track{
+  flex:1;height:22px;background:rgba(255,255,255,.04);border-radius:3px;
+  position:relative;overflow:hidden;
+}
+.dr-fill{
+  height:100%;border-radius:3px;
+  display:flex;align-items:center;padding-left:.4rem;
+  font-family:var(--mono);font-size:.58rem;
+  transition:width .8s cubic-bezier(.16,1,.3,1);
+}
+.dr-val{font-family:var(--mono);font-size:.62rem;width:34px;text-align:right;flex-shrink:0}
+
+/* ── Power histogram ── */
+#hist-canvas{display:block;width:100%;border-radius:4px}
+
+/* ── Relationship table ── */
+.rel-table{width:100%;border-collapse:collapse}
+.rel-table th{
+  font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);padding:.4rem .5rem;border-bottom:1px solid var(--border);text-align:left;
+}
+.rel-table td{
+  padding:.45rem .5rem;border-bottom:1px solid rgba(255,255,255,.04);
+  font-family:var(--mono);font-size:.62rem;color:var(--text);vertical-align:middle;
+}
+.rel-table tr:hover td{background:rgba(255,255,255,.02)}
+
+.pb-bar-wrap{
+  width:90px;height:6px;background:rgba(255,255,255,.06);border-radius:3px;
+  position:relative;overflow:visible;display:inline-block;vertical-align:middle;
+}
+.pb-bar{
+  position:absolute;top:0;height:100%;border-radius:3px;
+}
+.pb-zero{position:absolute;left:50%;top:-3px;width:1px;height:12px;background:rgba(255,255,255,.2)}
+
+.status-pill{
+  font-family:var(--mono);font-size:.53rem;padding:.1rem .35rem;border-radius:3px;
+  display:inline-block;
+}
+.sp-ok{background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.25);color:var(--green)}
+.sp-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber)}
+.sp-danger{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--red)}
+
+/* ── Governance ladder ── */
+.ladder-row{
+  display:flex;align-items:flex-start;gap:.75rem;padding:.65rem 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.ladder-row:last-child{border-bottom:none}
+.ladder-level{
+  width:26px;height:26px;border-radius:5px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.7rem;font-weight:500;
+}
+.ladder-body{flex:1}
+.ladder-title{font-family:var(--sans);font-size:.8rem;font-weight:600;margin-bottom:.15rem}
+.ladder-desc{font-family:var(--mono);font-size:.6rem;color:var(--muted);line-height:1.5}
+.ladder-trigger{
+  font-family:var(--mono);font-size:.58rem;padding:.15rem .4rem;
+  border-radius:3px;display:inline-block;margin-top:.25rem;
+}
+
+/* ── Network quartile chart ── */
+.quartile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.25rem}
+.q-cell{
+  background:var(--s2);border:1px solid var(--border);border-radius:6px;
+  padding:.6rem .75rem;text-align:center;
+}
+.q-label{font-family:var(--mono);font-size:.55rem;color:var(--muted);margin-bottom:.3rem}
+.q-val{font-family:var(--serif);font-size:1.2rem;margin-bottom:.15rem}
+.q-bar{height:4px;border-radius:2px;margin-top:.25rem;transition:width .6s}
+.q-acts{font-family:var(--mono);font-size:.56rem;color:var(--muted);margin-top:.2rem}
+
+/* ── Anti-capture checklist ── */
+.acm-row{
+  display:flex;align-items:flex-start;gap:.65rem;padding:.55rem 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.acm-row:last-child{border-bottom:none}
+.acm-check{
+  width:18px;height:18px;border-radius:4px;flex-shrink:0;margin-top:.05rem;
+  display:flex;align-items:center;justify-content:center;font-size:.7rem;
+}
+.acm-check.ok{background:rgba(62,207,142,.15);border:1px solid rgba(62,207,142,.3)}
+.acm-check.warn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3)}
+.acm-check.fail{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3)}
+.acm-body{flex:1}
+.acm-title{font-family:var(--sans);font-size:.75rem;font-weight:500;margin-bottom:.1rem}
+.acm-detail{font-family:var(--mono);font-size:.58rem;color:var(--muted);line-height:1.5}
+
+/* ── Capture risk meter ── */
+.capture-meter{
+  height:8px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.06);
+  margin:1rem 0 .4rem;
+}
+.cm-fill{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,#3ecf8e,#f59e0b,#f87171);
+  transition:width .8s cubic-bezier(.16,1,.3,1);
+}
+.cm-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:var(--muted)}
+
+/* ── Metric definition tooltip ── */
+.metric-tooltip{
+  position:fixed;z-index:400;pointer-events:none;
+  background:rgba(10,12,20,.97);border:1px solid rgba(255,255,255,.15);
+  border-radius:9px;padding:.65rem .85rem;
+  box-shadow:0 12px 36px rgba(0,0,0,.5);
+  opacity:0;transition:opacity .12s;
+  max-width:240px;
+}
+.metric-tooltip.visible{opacity:1}
+.mt-term{font-family:var(--sans);font-size:.78rem;font-weight:600;color:var(--teal);margin-bottom:.3rem}
+.mt-def{font-family:var(--mono);font-size:.6rem;color:rgba(228,226,220,.75);line-height:1.6}
+.mt-thresh{font-family:var(--mono);font-size:.58rem;color:var(--amber);margin-top:.35rem;padding-top:.35rem;border-top:1px solid rgba(255,255,255,.08)}
+
+/* ── [?] help icons on card headers ── */
+.help-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  font-family:var(--mono);font-size:.52rem;color:var(--muted);
+  cursor:help;margin-left:.35rem;flex-shrink:0;
+  transition:all .15s;
+}
+.help-icon:hover{background:rgba(45,212,191,.15);border-color:rgba(45,212,191,.4);color:var(--teal)}
+
+/* ── Scenario context ribbon ── */
+#scenario-ribbon{
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:.75rem 1.1rem;display:flex;gap:1.25rem;align-items:flex-start;
+  font-family:var(--mono);font-size:.62rem;line-height:1.6;
+  transition:opacity .25s;
+}
+#scenario-ribbon.fading{opacity:0}
+.sr-label{
+  font-family:var(--sans);font-size:.8rem;font-weight:600;margin-bottom:.25rem;
+}
+.sr-body{color:rgba(228,226,220,.65);flex:1}
+.sr-stats{
+  display:flex;flex-direction:column;gap:.35rem;flex-shrink:0;
+  border-left:1px solid var(--border);padding-left:1.25rem;
+  min-width:160px;
+}
+.sr-stat-row{display:flex;justify-content:space-between;gap:.75rem}
+.sr-stat-key{color:var(--muted)}
+.sr-stat-val{font-weight:500}
+
+/* ── Page-level fade for scenario switch ── */
+#page{transition:opacity .2s}
+#page.fading{opacity:0}
+
+/* ── Mobile ── */
+@media(max-width:640px){
+  #scenario-ribbon{flex-direction:column;gap:.75rem}
+  .sr-stats{border-left:none;padding-left:0;border-top:1px solid var(--border);padding-top:.65rem;min-width:auto;flex-direction:row;flex-wrap:wrap;gap:.5rem}
+}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  #page{padding:1rem}
+}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div>
+    <h1>Equity Monitor</h1>
+    <p>WD-010 — Power Balance Governance · Community Dashboard</p>
+  </div>
+  <div class="hdr-right">
+    <button class="mode-tab active" onclick="setScenario('healthy')">Healthy Network</button>
+    <button class="mode-tab" onclick="setScenario('drift')">Equity Drift</button>
+    <button class="mode-tab" onclick="setScenario('captured')">Governance Captured</button>
+  </div>
+</header>
+
+<div id="page">
+
+  <!-- Scenario context ribbon -->
+  <div id="scenario-ribbon"></div>
+
+  <!-- Alert banner -->
+  <div id="alert-banner"></div>
+
+  <!-- Top stats -->
+  <div class="grid-4" id="stat-grid"></div>
+
+  <!-- Histogram + Quartile breakdown -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-hdr">
+        <span>Power Balance Distribution — All Acts (90 days)</span>
+        <span id="hist-note" style="color:var(--muted);font-size:.57rem"></span>
+      </div>
+      <div class="card-body">
+        <canvas id="hist-canvas" height="160"></canvas>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:var(--muted);margin-top:.4rem">
+          <span>← Extraction (−1.0)</span><span>Symmetric (0.0)</span><span>Reverse (1.0) →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span>Average Power Balance by Network Quartile</span>
+        <span style="color:var(--muted);font-size:.57rem">lower = weaker party disadvantaged</span>
+      </div>
+      <div class="card-body">
+        <div class="quartile-grid" id="quartile-grid"></div>
+        <div style="margin-top:.75rem;font-family:var(--mono);font-size:.6rem;color:var(--muted);line-height:1.6" id="quartile-note"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Relationship table + Governance ladder -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-hdr">
+        <span>Flagged Relationships — Active Review Queue</span>
+        <span id="rel-count" style="color:var(--muted)"></span>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table class="rel-table" id="rel-table">
+          <thead>
+            <tr>
+              <th>Participants</th>
+              <th>Avg PB</th>
+              <th>Dependency</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="rel-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><span>Governance Response Ladder</span></div>
+      <div class="card-body" style="padding:.5rem .75rem" id="ladder-body"></div>
+    </div>
+  </div>
+
+  <!-- Q1/Q4 act rate + Anti-capture checklist -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-hdr"><span>Participation Equity — Act Frequency by Quartile</span></div>
+      <div class="card-body" id="participation-body"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span>Anti-Capture Architecture Status</span>
+        <span id="capture-risk-label" style="font-size:.6rem"></span>
+      </div>
+      <div class="card-body">
+        <div class="capture-meter"><div class="cm-fill" id="cm-fill"></div></div>
+        <div class="cm-labels"><span>Low Risk</span><span>Moderate</span><span>High Risk</span></div>
+        <div id="acm-list" style="margin-top:.75rem"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Metric definition tooltip -->
+<div class="metric-tooltip" id="metric-tooltip">
+  <div class="mt-term" id="mt-term"></div>
+  <div class="mt-def" id="mt-def"></div>
+  <div class="mt-thresh" id="mt-thresh"></div>
+</div>
+
+<script>
+
+// ── Metric definitions ──
+const METRIC_DEFS = {
+  'Power Balance Distribution': {
+    def: 'Per-act score from −1.0 (full extraction by the stronger party) to +1.0 (reverse extraction). 0.0 is perfectly symmetric. Healthy communities cluster tightly around 0.',
+    thresh: 'Governance flag when any dyad\'s rolling average exceeds ±0.35 for 14+ days'
+  },
+  'Network Quartile': {
+    def: 'Participants ranked by total cooperative acts. Q1 = bottom 25% (least connected), Q4 = top 25% (most connected). Equity target: Q1+Q2 hold ≥35% of governance seats.',
+    thresh: 'Alert if Q4 average power balance > +0.25 relative to Q1'
+  },
+  'Anti-Capture Architecture': {
+    def: 'Structural safeguards that prevent any individual or group from capturing governance. Includes: term limits, representation floors, transparency requirements, ombudsperson independence.',
+    thresh: 'Any failed mechanism requires immediate remediation before expanding community size'
+  },
+  'Flagged Relationships': {
+    def: 'Dyadic relationships with persistent power imbalance signals: one party consistently providing more value than they receive, dependency signals, or declining reciprocity over 21+ days.',
+    thresh: 'Ombudsperson review required when dependency index > 0.6 for 14 days'
+  },
+  'Governance Response Ladder': {
+    def: 'Graduated intervention protocol: monitoring → threshold alert → coordinator conversation → formal review → relationship pause. Escalates only when lower rungs have been attempted.',
+    thresh: 'Rung 4+ (formal review) requires ombudsperson involvement'
+  },
+};
+
+const metricTooltipEl = document.getElementById('metric-tooltip');
+
+function showMetricTooltip(term, el, e) {
+  const def = METRIC_DEFS[term];
+  if (!def) return;
+  document.getElementById('mt-term').textContent = term;
+  document.getElementById('mt-def').textContent = def.def;
+  const threshEl = document.getElementById('mt-thresh');
+  if (def.thresh) { threshEl.textContent = '⚑ ' + def.thresh; threshEl.style.display='block'; }
+  else threshEl.style.display='none';
+  positionTooltip(e.clientX, e.clientY);
+  metricTooltipEl.classList.add('visible');
+}
+function hideMetricTooltip() { metricTooltipEl.classList.remove('visible'); }
+function positionTooltip(cx, cy) {
+  const tw=240, th=140, vw=window.innerWidth, vh=window.innerHeight;
+  let tx=cx+14, ty=cy-10;
+  if(tx+tw>vw) tx=cx-tw-10;
+  if(ty+th>vh) ty=cy-th-6;
+  metricTooltipEl.style.left=tx+'px';
+  metricTooltipEl.style.top=ty+'px';
+}
+
+// ── Scenario narratives ──
+const SCENARIO_NARRATIVES = {
+  healthy: {
+    label: 'Healthy Network — 8 months post-seeding',
+    body: 'Cooperative activity is self-sustaining. Power balance distribution is tight around zero. Q1 participants are active and showing meaning state improvements. No relationships in formal review.',
+    stats: { 'R₀': '1.31', 'Act/member/mo': '2.8', 'Q1 governance': '38%', 'Capture risk': 'Low' },
+    accentColor: '#3ecf8e'
+  },
+  drift: {
+    label: 'Equity Drift — Warning signals present',
+    body: 'The most connected participants (Q4) are averaging higher value extraction than they\'re providing. Q1 activity declining. Two relationships in coordinator review. Governance participation skewing toward Q3/Q4.',
+    stats: { 'R₀': '1.08', 'Act/member/mo': '1.9', 'Q1 governance': '24%', 'Capture risk': 'Moderate' },
+    accentColor: '#f59e0b'
+  },
+  captured: {
+    label: 'Governance Captured — Intervention required',
+    body: 'Power asymmetry has compounded. Q4 participants hold disproportionate governance influence. Three anti-capture mechanisms have failed. Q1 participation collapsed. Ombudsperson review initiated.',
+    stats: { 'R₀': '0.87', 'Act/member/mo': '0.9', 'Q1 governance': '11%', 'Capture risk': 'Critical' },
+    accentColor: '#f87171'
+  }
+};
+
+function renderScenarioRibbon(scenarioKey) {
+  const n = SCENARIO_NARRATIVES[scenarioKey];
+  const ribbon = document.getElementById('scenario-ribbon');
+  ribbon.classList.add('fading');
+  setTimeout(() => {
+    ribbon.style.borderColor = n.accentColor + '44';
+    ribbon.innerHTML = `
+      <div style="flex:1">
+        <div class="sr-label" style="color:${n.accentColor}">${n.label}</div>
+        <div class="sr-body">${n.body}</div>
+      </div>
+      <div class="sr-stats">
+        ${Object.entries(n.stats).map(([k,v])=>`
+          <div class="sr-stat-row">
+            <span class="sr-stat-key">${k}</span>
+            <span class="sr-stat-val" style="color:${n.accentColor}">${v}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    ribbon.classList.remove('fading');
+  }, 180);
+}
+
+// ── Help icons on card headers ──
+function addHelpIcons() {
+  document.querySelectorAll('.card-hdr').forEach(hdr => {
+    const titleSpan = hdr.querySelector('span');
+    if (!titleSpan) return;
+    const title = titleSpan.textContent.trim();
+    // Find matching def
+    const match = Object.keys(METRIC_DEFS).find(k => title.includes(k.split(' ').slice(0,2).join(' ')));
+    if (!match) return;
+    const icon = document.createElement('span');
+    icon.className = 'help-icon';
+    icon.textContent = '?';
+    icon.title = '';
+    icon.addEventListener('mouseenter', e => showMetricTooltip(match, icon, e));
+    icon.addEventListener('mousemove', e => positionTooltip(e.clientX, e.clientY));
+    icon.addEventListener('mouseleave', hideMetricTooltip);
+    titleSpan.appendChild(icon);
+  });
+}
+
+// Patch setScenario to also update ribbon and animate
+const _origSetScenario = window.setScenario;
+
+const SCENARIOS = {
+  healthy: {
+    label: 'Healthy Network',
+    alert: {
+      type: 'ok',
+      icon: '✓',
+      title: 'Equity metrics within healthy bounds — no active governance alerts',
+      desc: 'Power balance distribution is approximately symmetric. Q1 participation within 20% of Q4. Anti-capture mechanisms fully operational.',
+    },
+    stats: [
+      { label: 'Extraction Signal', val: '0.08', sub: 'Q4 avg − Q1 avg', trend: 'ok', note: '↔ stable (30d)', color: '#3ecf8e' },
+      { label: 'Gini Cooperative', val: '0.31', sub: 'Value distribution', trend: 'dn', note: '↓ −0.03 (30d)', color: '#3ecf8e' },
+      { label: 'Q1 Act Frequency', val: '78%', sub: 'of Q4 baseline', trend: 'dn', note: '↑ +4% (30d)', color: '#5b9cf6' },
+      { label: 'Active Flags', val: '2', sub: 'Level 1–2 only', trend: 'ok', note: '0 at Level 3+', color: '#f59e0b' },
+    ],
+    histDist: [
+      0, 1, 2, 4, 7, 12, 18, 26, 34, 38, 42, 46, 48, 46, 42, 38, 34, 26, 18, 12, 7, 4, 2, 1, 0
+    ],
+    quartiles: [
+      { label: 'Q1 (Lowest)', val: -0.06, acts: 142, color: '#5b9cf6' },
+      { label: 'Q2', val: -0.03, acts: 178, color: '#3ecf8e' },
+      { label: 'Q3', val: 0.01, acts: 203, color: '#c084fc' },
+      { label: 'Q4 (Highest)', val: 0.02, acts: 183, color: '#fb923c' },
+    ],
+    quartileNote: 'Healthy signal: Q1 participants show only modest negative balance (−0.06). Q4 participants show near-zero or slight reverse balance (0.02). Extraction signal = 0.08 — well below 0.30 alert threshold.',
+    relationships: [
+      { a: 'Kenji (Q2)', b: 'Rosa (Q1)', pb: -0.27, dep: 0.48, days: 52, status: 'warn', level: 1 },
+      { a: 'DaShawn (Q3)', b: 'Ingrid (Q1)', pb: -0.21, dep: 0.31, days: 38, status: 'warn', level: 1 },
+    ],
+    participation: [
+      { q: 'Q1 (0–25th)', acts: 142, color: '#5b9cf6', pct: 78 },
+      { q: 'Q2 (25–50th)', acts: 178, color: '#3ecf8e', pct: 97 },
+      { q: 'Q3 (50–75th)', acts: 203, color: '#c084fc', pct: 111 },
+      { q: 'Q4 (75–100th)', acts: 183, color: '#fb923c', pct: 100 },
+    ],
+    acm: [
+      { status: 'ok', title: 'Governance body representation', detail: 'Q1+Q2 hold 41% of seats (min: 35%). Q4 holds 22% (max: 25%). ✓ Within bounds.' },
+      { status: 'ok', title: 'Threshold Lock intact', detail: 'No threshold changes in past 12 months. Lock mechanism has not been tested.' },
+      { status: 'ok', title: 'EquityOmbudsperson independence', detail: 'Current ombudsperson: Q1 participant. No active conflicts. Last quarterly report published on time.' },
+      { status: 'ok', title: 'Public dashboard transparency', detail: 'All aggregate equity data public. Individual relationship data participant-only. ✓' },
+      { status: 'ok', title: 'External audit status', detail: 'Last audit: 8 months ago. Rating: Satisfactory. Next audit due in 16 months.' },
+    ],
+    captureRisk: 12,
+  },
+
+  drift: {
+    label: 'Equity Drift',
+    alert: {
+      type: 'warn',
+      icon: '⚠',
+      title: 'Equity drift detected — extraction signal approaching alert threshold',
+      desc: 'Q1 participants receiving systematically lower power balance scores over 60+ days. Q4 act frequency 2.3× Q1. Community governance review recommended.',
+    },
+    stats: [
+      { label: 'Extraction Signal', val: '0.27', sub: 'Q4 avg − Q1 avg', trend: 'up', note: '↑ +0.11 (30d)', color: '#f59e0b' },
+      { label: 'Gini Cooperative', val: '0.43', sub: 'Value distribution', trend: 'up', note: '↑ +0.08 (30d)', color: '#f59e0b' },
+      { label: 'Q1 Act Frequency', val: '44%', sub: 'of Q4 baseline', trend: 'up', note: '↓ −12% (30d)', color: '#f87171' },
+      { label: 'Active Flags', val: '9', sub: 'Including 2 Level-3', trend: 'up', note: '↑ +5 (30d)', color: '#f87171' },
+    ],
+    histDist: [
+      2, 4, 7, 12, 18, 28, 38, 44, 50, 48, 44, 38, 30, 22, 16, 11, 7, 4, 3, 2, 1, 1, 0, 0, 0
+    ],
+    quartiles: [
+      { label: 'Q1 (Lowest)', val: -0.28, acts: 87, color: '#5b9cf6' },
+      { label: 'Q2', val: -0.14, acts: 134, color: '#3ecf8e' },
+      { label: 'Q3', val: 0.04, acts: 188, color: '#c084fc' },
+      { label: 'Q4 (Highest)', val: 0.01, acts: 199, color: '#fb923c' },
+    ],
+    quartileNote: '⚠ Warning: Q1 participants averaging −0.28 power balance (approaching −0.30 threshold). Q4 act frequency 2.3× Q1 — exclusion threshold is 4×, but trend is moving toward it. Drift has been accelerating for 60 days.',
+    relationships: [
+      { a: 'Alex (Q4)', b: 'Sam (Q1)', pb: -0.44, dep: 0.71, days: 89, status: 'danger', level: 3 },
+      { a: 'Mira (Q3)', b: 'Tevita (Q1)', pb: -0.38, dep: 0.58, days: 74, status: 'danger', level: 3 },
+      { a: 'Lena (Q3)', b: 'Omar (Q1)', pb: -0.26, dep: 0.44, days: 51, status: 'warn', level: 2 },
+      { a: 'Hiroshi (Q4)', b: 'Blessing (Q2)', pb: -0.22, dep: 0.39, days: 63, status: 'warn', level: 2 },
+      { a: 'Priya (Q2)', b: 'Dan (Q1)', pb: -0.19, dep: 0.28, days: 41, status: 'warn', level: 1 },
+    ],
+    participation: [
+      { q: 'Q1 (0–25th)', acts: 87, color: '#5b9cf6', pct: 44 },
+      { q: 'Q2 (25–50th)', acts: 134, color: '#3ecf8e', pct: 67 },
+      { q: 'Q3 (50–75th)', acts: 188, color: '#c084fc', pct: 94 },
+      { q: 'Q4 (75–100th)', acts: 199, color: '#fb923c', pct: 100 },
+    ],
+    acm: [
+      { status: 'warn', title: 'Governance body representation', detail: 'Q1+Q2 hold 31% of seats (min: 35%). ⚠ Below required threshold. Q4 holds 29% (max: 25%). Over limit.' },
+      { status: 'ok', title: 'Threshold Lock intact', detail: 'No threshold changes. Lock mechanism intact.' },
+      { status: 'warn', title: 'EquityOmbudsperson independence', detail: '⚠ Current ombudsperson has 3 active cooperative relationships with Q4 participants. Conflict of interest flagged. Recusal required for those reviews.' },
+      { status: 'ok', title: 'Public dashboard transparency', detail: 'Dashboard current. All aggregate data published.' },
+      { status: 'warn', title: 'External audit status', detail: '⚠ Audit overdue by 4 months. Scheduling delay attributed to "resource constraints." External auditor recommends priority scheduling.' },
+    ],
+    captureRisk: 51,
+  },
+
+  captured: {
+    label: 'Governance Captured',
+    alert: {
+      type: 'danger',
+      icon: '⛔',
+      title: 'Governance capture detected — equity mechanism has been compromised',
+      desc: 'Multiple anti-capture mechanisms have failed. Extraction signal at 0.58. Veto thresholds raised 3× in past year. Ombudsperson accountable to Q4 majority. External audit refused.',
+    },
+    stats: [
+      { label: 'Extraction Signal', val: '0.58', sub: 'Q4 avg − Q1 avg', trend: 'up', note: '↑ +0.29 (60d)', color: '#f87171' },
+      { label: 'Gini Cooperative', val: '0.61', sub: 'Value distribution', trend: 'up', note: '↑ +0.18 (60d)', color: '#f87171' },
+      { label: 'Q1 Act Frequency', val: '19%', sub: 'of Q4 baseline', trend: 'up', note: '↓ −25% (60d)', color: '#f87171' },
+      { label: 'Active Flags', val: '0', sub: '(thresholds raised)', trend: 'ok', note: 'Mechanism disabled', color: '#f87171' },
+    ],
+    histDist: [
+      8, 14, 22, 34, 46, 52, 54, 50, 44, 36, 26, 18, 11, 7, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0
+    ],
+    quartiles: [
+      { label: 'Q1 (Lowest)', val: -0.51, acts: 31, color: '#5b9cf6' },
+      { label: 'Q2', val: -0.32, acts: 78, color: '#3ecf8e' },
+      { label: 'Q3', val: 0.08, acts: 162, color: '#c084fc' },
+      { label: 'Q4 (Highest)', val: 0.07, acts: 164, color: '#fb923c' },
+    ],
+    quartileNote: '⛔ CRITICAL: Q1 participants averaging −0.51 power balance — severe systematic extraction. Q1 cooperative activity at 19% of Q4 — approaching network abandonment by lowest-quartile participants. The network is actively serving its most powerful members at the expense of those it was designed to help.',
+    relationships: [
+      { a: 'Coalition (Q4×5)', b: 'Multiple Q1', pb: -0.62, dep: 0.88, days: 180, status: 'danger', level: 0 },
+      { a: 'Viktor (Q4)', b: 'Amara (Q1)', pb: -0.57, dep: 0.91, days: 140, status: 'danger', level: 0 },
+      { a: 'Corp (Q4)', b: 'Gig workers (Q1)', pb: -0.49, dep: 0.85, days: 210, status: 'danger', level: 0 },
+    ],
+    participation: [
+      { q: 'Q1 (0–25th)', acts: 31, color: '#5b9cf6', pct: 19 },
+      { q: 'Q2 (25–50th)', acts: 78, color: '#3ecf8e', pct: 48 },
+      { q: 'Q3 (50–75th)', acts: 162, color: '#c084fc', pct: 99 },
+      { q: 'Q4 (75–100th)', acts: 164, color: '#fb923c', pct: 100 },
+    ],
+    acm: [
+      { status: 'fail', title: 'Governance body representation', detail: '⛔ FAILED. Q4 holds 48% of governance seats. Q1+Q2 hold 18%. Representation requirements were "suspended" 6 months ago by Q4 majority vote.' },
+      { status: 'fail', title: 'Threshold Lock bypassed', detail: '⛔ FAILED. Veto thresholds raised 3× in past year via governance votes. Each raise was procedurally valid under current (captured) governance.' },
+      { status: 'fail', title: 'EquityOmbudsperson captured', detail: '⛔ FAILED. Ombudsperson appointed by Q4-majority board. Cannot review Q4 participants. Has "not found grounds" to flag any Level-3 relationship in 6 months.' },
+      { status: 'fail', title: 'Public dashboard suppressed', detail: '⛔ FAILED. Community-level power distribution data removed from public dashboard. "Privacy concerns" cited. Only accessible to governance board.' },
+      { status: 'fail', title: 'External audit refused', detail: '⛔ FAILED. External audit blocked for 14 months. Governance board cites "operational disruption." Protocol certification mark revocation initiated.' },
+    ],
+    captureRisk: 94,
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════════════════════════
+
+let currentScenario = 'healthy';
+
+function setScenario(id) {
+  currentScenario = id;
+  document.querySelectorAll('.mode-tab').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().toLowerCase().replace(' ','_') === id ||
+      (id==='healthy' && b.textContent.includes('Healthy')) ||
+      (id==='drift' && b.textContent.includes('Drift')) ||
+      (id==='captured' && b.textContent.includes('Captured'))
+    );
+  });
+  const page = document.getElementById('page');
+  page.classList.add('fading');
+  setTimeout(() => {
+    render();
+    page.classList.remove('fading');
+  }, 180);
+}
+
+function render() {
+  const s = SCENARIOS[currentScenario];
+  renderScenarioRibbon(currentScenario);
+  renderAlert(s);
+  renderStats(s);
+  renderHistogram(s);
+  renderQuartiles(s);
+  renderRelationships(s);
+  renderLadder(s);
+  renderParticipation(s);
+  renderACM(s);
+  // Add help icons after DOM is populated
+  setTimeout(addHelpIcons, 50);
+}
+
+function renderAlert(s) {
+  const el = document.getElementById('alert-banner');
+  el.className = `alert-banner ${s.alert.type}`;
+  el.innerHTML = `
+    <span class="alert-icon">${s.alert.icon}</span>
+    <div class="alert-body">
+      <div class="alert-title">${s.alert.title}</div>
+      <div class="alert-desc">${s.alert.desc}</div>
+    </div>
+  `;
+}
+
+function renderStats(s) {
+  const grid = document.getElementById('stat-grid');
+  grid.innerHTML = '';
+  s.stats.forEach(st => {
+    const div = document.createElement('div');
+    div.className = 'stat-tile';
+    div.innerHTML = `
+      <div class="st-label">${st.label}</div>
+      <div class="st-val" style="color:${st.color}">${st.val}</div>
+      <div class="st-sub">${st.sub}</div>
+      <div class="st-trend trend-${st.trend === 'up' ? 'up' : st.trend === 'dn' ? 'dn' : 'ok'}">${st.note}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function renderHistogram(s) {
+  const canvas = document.getElementById('hist-canvas');
+  const W = canvas.offsetWidth || 400;
+  canvas.width = W * window.devicePixelRatio;
+  canvas.height = 160 * window.devicePixelRatio;
+  canvas.style.height = '160px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  const data = s.histDist;
+  const maxVal = Math.max(...data);
+  const n = data.length;
+  const barW = (W - 20) / n;
+  const H = 130;
+  const PAD = 15;
+
+  ctx.clearRect(0, 0, W, 160);
+
+  // Zero line
+  const zeroX = PAD + (n / 2) * barW;
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(zeroX, 0);
+  ctx.lineTo(zeroX, H + 5);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Ideal Gaussian overlay
+  ctx.strokeStyle = 'rgba(62,207,142,0.2)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const ideal = maxVal * Math.exp(-0.5 * Math.pow((i - n/2) / (n/6), 2));
+    const x = PAD + i * barW + barW / 2;
+    const y = H - (ideal / maxVal) * (H - 10);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Bars
+  data.forEach((v, i) => {
+    const x = PAD + i * barW + 1;
+    const bH = (v / maxVal) * (H - 10);
+    const y = H - bH;
+    const center = n / 2;
+    let col;
+    if (i < center - 3) col = '#f87171';
+    else if (i < center) col = '#f59e0b';
+    else if (i < center + 3) col = '#3ecf8e';
+    else col = '#5b9cf6';
+
+    ctx.fillStyle = col + 'aa';
+    ctx.beginPath();
+    ctx.roundRect(x, y, barW - 2, bH, 2);
+    ctx.fill();
+  });
+
+  // Threshold lines
+  if (currentScenario !== 'healthy') {
+    const alertX = PAD + (n / 2 - n * 0.30 / 2) * barW;
+    ctx.strokeStyle = 'rgba(248,113,113,0.5)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(alertX, 0);
+    ctx.lineTo(alertX, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(248,113,113,0.7)';
+    ctx.font = '8px DM Mono';
+    ctx.fillText('alert', alertX - 2, 10);
+  }
+
+  const noteEl = document.getElementById('hist-note');
+  noteEl.textContent = currentScenario === 'healthy'
+    ? 'Symmetric — centered on 0.0 ✓'
+    : currentScenario === 'drift'
+    ? 'Left-skewed — systematic extraction signal'
+    : 'Severely left-skewed — governance collapse';
+}
+
+function renderQuartiles(s) {
+  const grid = document.getElementById('quartile-grid');
+  grid.innerHTML = '';
+  s.quartiles.forEach(q => {
+    const cell = document.createElement('div');
+    cell.className = 'q-cell';
+    const pct = Math.min(100, Math.abs(q.val) * 100 / 0.7 * 100);
+    const col = q.val < -0.30 ? '#f87171' : q.val < -0.15 ? '#f59e0b' : '#3ecf8e';
+    cell.innerHTML = `
+      <div class="q-label">${q.label}</div>
+      <div class="q-val" style="color:${col}">${q.val >= 0 ? '+' : ''}${q.val.toFixed(2)}</div>
+      <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${q.val < 0 ? '#f87171' : '#3ecf8e'};border-radius:2px;transition:width .6s"></div>
+      </div>
+      <div class="q-acts" style="margin-top:.25rem">${q.acts} acts</div>
+    `;
+    grid.appendChild(cell);
+  });
+  document.getElementById('quartile-note').textContent = s.quartileNote;
+}
+
+function renderRelationships(s) {
+  const tbody = document.getElementById('rel-tbody');
+  tbody.innerHTML = '';
+  document.getElementById('rel-count').textContent = `${s.relationships.length} flagged`;
+
+  if (s.relationships.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:1rem">No relationships flagged</td></tr>`;
+    return;
+  }
+
+  s.relationships.forEach(r => {
+    const tr = document.createElement('tr');
+    const pbPct = Math.round(Math.abs(r.pb) * 45);
+    const pbX = r.pb < 0 ? `right:50%;width:${pbPct}px;background:#f87171` : `left:50%;width:${pbPct}px;background:#3ecf8e`;
+    const statusClass = r.status === 'ok' ? 'sp-ok' : r.status === 'warn' ? 'sp-warn' : 'sp-danger';
+    const statusText = r.level === 0 ? 'No flag (captured)' : `Level ${r.level}`;
+
+    tr.innerHTML = `
+      <td>${r.a}<br><span style="color:var(--muted);font-size:.55rem">↕ ${r.b}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.35rem">
+          <span style="font-size:.65rem;color:${r.pb < -0.30 ? '#f87171' : r.pb < -0.15 ? '#f59e0b' : '#3ecf8e'}">${r.pb.toFixed(2)}</span>
+          <div class="pb-bar-wrap">
+            <div class="pb-zero"></div>
+            <div class="pb-bar" style="${pbX}"></div>
+          </div>
+        </div>
+      </td>
+      <td style="color:${r.dep > 0.7 ? '#f87171' : r.dep > 0.5 ? '#f59e0b' : 'var(--muted)'}">${r.dep.toFixed(2)}</td>
+      <td style="color:var(--muted)">${r.days}d</td>
+      <td><span class="status-pill ${statusClass}">${statusText}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderLadder(s) {
+  const body = document.getElementById('ladder-body');
+  const levels = [
+    { n: 0, label: 'Monitoring', desc: 'Single act powerBalance < −0.15. Added to watch list.', col: '#5b9cf6', trigCol: '#5b9cf6', active: s.stats[3].val !== '0' },
+    { n: 1, label: 'Soft Notification', desc: '30-day rolling avg < −0.20. Equity check-in sent to both parties.', col: '#3ecf8e', trigCol: '#3ecf8e', active: true },
+    { n: 2, label: 'Pause & Review', desc: '45-day avg < −0.30 or high dependency. Relay routing paused. Ombudsperson review.', col: '#f59e0b', trigCol: '#f59e0b', active: currentScenario !== 'healthy' },
+    { n: 3, label: 'Ethics Panel', desc: 'Extreme imbalance or dangerous dependency. Full panel review. Possible matching pause.', col: '#f87171', trigCol: '#f87171', active: currentScenario === 'drift' || currentScenario === 'captured' },
+    { n: 4, label: 'Community Governance', desc: 'Community-level alerts. Structural protocol adjustments. Public report.', col: '#c084fc', trigCol: '#c084fc', active: currentScenario === 'captured' },
+  ];
+
+  body.innerHTML = '';
+  levels.forEach(lv => {
+    const row = document.createElement('div');
+    row.className = 'ladder-row';
+    const activeStyle = lv.active
+      ? `background:${lv.col}22;border:1px solid ${lv.col}44;color:${lv.col}`
+      : 'background:rgba(255,255,255,.04);border:1px solid transparent;color:var(--muted)';
+    const trigText = currentScenario === 'captured' && lv.n <= 3
+      ? `<span class="ladder-trigger" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171">Disabled by captured governance</span>`
+      : lv.active
+      ? `<span class="ladder-trigger" style="background:${lv.col}15;border:1px solid ${lv.col}35;color:${lv.col}">ACTIVE</span>`
+      : '';
+
+    row.innerHTML = `
+      <div class="ladder-level" style="${activeStyle}">L${lv.n}</div>
+      <div class="ladder-body">
+        <div class="ladder-title" style="color:${lv.active ? lv.col : 'var(--muted)'}">${lv.label}</div>
+        <div class="ladder-desc">${lv.desc}</div>
+        ${trigText}
+      </div>
+    `;
+    body.appendChild(row);
+  });
+}
+
+function renderParticipation(s) {
+  const body = document.getElementById('participation-body');
+  const max = Math.max(...s.participation.map(p => p.acts));
+  body.innerHTML = s.participation.map(p => {
+    const pct = Math.round(p.acts / max * 100);
+    const col = p.pct < 25 ? '#f87171' : p.pct < 50 ? '#f59e0b' : '#3ecf8e';
+    return `
+      <div class="distrib-row">
+        <div class="dr-label" style="color:${p.color};width:80px;font-size:.58rem">${p.q}</div>
+        <div class="dr-track">
+          <div class="dr-fill" style="width:${pct}%;background:${p.color}33">
+            <span style="color:${p.color}">${p.acts} acts</span>
+          </div>
+        </div>
+        <div class="dr-val" style="color:${col}">${p.pct}%</div>
+      </div>
+    `;
+  }).join('');
+
+  const q1 = s.participation[0];
+  const note = q1.pct < 25
+    ? `<div style="margin-top:.5rem;font-family:var(--mono);font-size:.6rem;color:#f87171">⛔ Q1 participation at ${q1.pct}% of Q4 — exclusion threshold is 25%. Alert triggered.</div>`
+    : q1.pct < 50
+    ? `<div style="margin-top:.5rem;font-family:var(--mono);font-size:.6rem;color:#f59e0b">⚠ Q1 participation at ${q1.pct}% of Q4. Approaching concern threshold (25%).</div>`
+    : `<div style="margin-top:.5rem;font-family:var(--mono);font-size:.6rem;color:#3ecf8e">✓ Q1 participation within healthy range relative to Q4.</div>`;
+  body.innerHTML += note;
+}
+
+function renderACM(s) {
+  const list = document.getElementById('acm-list');
+  list.innerHTML = '';
+  s.acm.forEach(a => {
+    const icon = a.status === 'ok' ? '✓' : a.status === 'warn' ? '⚠' : '⛔';
+    const row = document.createElement('div');
+    row.className = 'acm-row';
+    row.innerHTML = `
+      <div class="acm-check ${a.status}">${icon}</div>
+      <div class="acm-body">
+        <div class="acm-title">${a.title}</div>
+        <div class="acm-detail">${a.detail}</div>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  const riskEl = document.getElementById('cm-fill');
+  const riskLabel = document.getElementById('capture-risk-label');
+  riskEl.style.width = `${s.captureRisk}%`;
+  riskLabel.textContent = `Risk score: ${s.captureRisk}/100`;
+  riskLabel.style.color = s.captureRisk > 70 ? '#f87171' : s.captureRisk > 40 ? '#f59e0b' : '#3ecf8e';
+}
+
+// Boot
+render();
+window.addEventListener('resize', () => renderHistogram(SCENARIOS[currentScenario]));
+</script>
+</body>
+</html>

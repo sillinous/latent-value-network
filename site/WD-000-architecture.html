@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Latent Value Network — The Complete Architecture</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#0e0d0b;--paper:#f4f0e8;--paper2:#ede8dc;--paper3:#e5dfd0;
+  --rule:rgba(14,13,11,.12);--rule2:rgba(14,13,11,.06);
+  --accent:#b5341a;--accent2:#1a4b6b;--accent3:#2d6b3a;
+  --gold:#8b6914;--gold2:#c49a1e;
+  --serif:'Playfair Display',Georgia,serif;
+  --mono:'Space Mono',monospace;
+  --body:'Crimson Pro',Georgia,serif;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:16px;line-height:1.65;
+  overflow-x:hidden;
+}
+
+/* ── Grain overlay ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ── Masthead ── */
+#masthead{
+  border-bottom:2px solid var(--ink);
+  padding:2rem 3rem 1.5rem;
+  display:grid;grid-template-columns:1fr auto;align-items:end;
+  gap:2rem;
+}
+.mast-left{}
+.mast-tag{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);border-bottom:1px solid var(--accent);
+  display:inline-block;padding-bottom:.2rem;margin-bottom:.7rem;
+}
+#masthead h1{
+  font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.8rem);
+  font-weight:900;line-height:1.05;letter-spacing:-.02em;
+}
+#masthead h1 em{font-style:italic;color:var(--accent)}
+.mast-sub{
+  font-family:var(--body);font-size:1.05rem;color:rgba(14,13,11,.55);
+  font-style:italic;margin-top:.4rem;
+}
+.mast-right{
+  text-align:right;border-left:1px solid var(--rule);padding-left:2rem;
+  min-width:160px;
+}
+.mast-doc{font-family:var(--mono);font-size:.65rem;color:var(--accent);letter-spacing:.1em}
+.mast-date{font-family:var(--mono);font-size:.6rem;color:rgba(14,13,11,.4);margin-top:.2rem}
+.mast-edition{font-family:var(--serif);font-size:1.4rem;font-style:italic;color:rgba(14,13,11,.3);margin-top:.5rem}
+
+/* ── Column rule layout ── */
+#page{max-width:1280px;margin:0 auto;padding:0 3rem 4rem}
+
+.rule-bar{
+  height:1px;background:var(--ink);margin:0;
+}
+.rule-bar.thin{background:var(--rule)}
+.rule-bar.double{
+  height:3px;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+  background:transparent;
+}
+
+/* ── Section headers ── */
+.sec-head{
+  display:flex;align-items:center;gap:1rem;padding:1.1rem 0 .9rem;
+  border-bottom:1px solid var(--rule);margin-bottom:1.5rem;
+}
+.sec-num{
+  font-family:var(--mono);font-size:.58rem;color:var(--accent);
+  letter-spacing:.2em;text-transform:uppercase;
+  border:1px solid var(--accent);padding:.2rem .5rem;border-radius:2px;
+  white-space:nowrap;
+}
+.sec-title{
+  font-family:var(--serif);font-size:1.5rem;font-weight:700;
+  letter-spacing:-.01em;
+}
+.sec-title em{font-style:italic;color:var(--accent)}
+
+/* ── Pull quote ── */
+.pull{
+  border-left:3px solid var(--accent);
+  padding:.75rem 0 .75rem 1.25rem;
+  margin:2rem 0;
+}
+.pull p{
+  font-family:var(--serif);font-size:1.35rem;font-style:italic;
+  font-weight:400;line-height:1.4;color:var(--ink);
+}
+.pull cite{
+  display:block;font-family:var(--mono);font-size:.6rem;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(14,13,11,.45);margin-top:.5rem;
+}
+
+/* ── Body prose ── */
+.prose p{margin-bottom:1rem;font-size:1.02rem}
+.prose p:last-child{margin-bottom:0}
+.prose strong{font-weight:600}
+.prose em{font-style:italic}
+
+/* ── Two-column grid ── */
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;margin:1.5rem 0}
+.col3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;margin:1.5rem 0}
+
+/* ── Architecture diagram ── */
+#arch-diagram{
+  margin:2rem 0;padding:2rem;
+  background:var(--paper2);border:1px solid var(--rule);
+  position:relative;
+}
+#arch-canvas{display:block;width:100%}
+
+/* ── Number callouts ── */
+.callout-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1.5rem;margin:1.5rem 0;
+}
+.callout{
+  padding:1.25rem;border:1px solid var(--rule);
+  position:relative;background:var(--paper2);
+}
+.callout::before{
+  content:attr(data-n);
+  position:absolute;top:-1px;right:.75rem;
+  font-family:var(--serif);font-size:3.5rem;font-weight:900;font-style:italic;
+  color:var(--paper3);line-height:1;pointer-events:none;z-index:0;
+}
+.callout-head{
+  font-family:var(--serif);font-size:1.05rem;font-weight:700;
+  margin-bottom:.4rem;position:relative;z-index:1;
+}
+.callout-text{
+  font-family:var(--body);font-size:.92rem;color:rgba(14,13,11,.7);
+  line-height:1.5;position:relative;z-index:1;
+}
+
+/* ── Phase timeline ── */
+.phase-timeline{
+  display:flex;gap:0;margin:1.5rem 0;
+  border:1px solid var(--rule);overflow:hidden;
+}
+.phase{
+  flex:1;padding:.9rem .75rem;border-right:1px solid var(--rule);
+  cursor:pointer;transition:background .2s;
+  position:relative;
+}
+.phase:last-child{border-right:none}
+.phase:hover{background:var(--paper3)}
+.phase.active{background:var(--ink)}
+.phase.active .ph-n,.phase.active .ph-title,.phase.active .ph-desc{color:var(--paper)}
+.phase.active .ph-bar{background:var(--gold2)}
+.ph-n{font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+.ph-title{font-family:var(--serif);font-size:.95rem;font-weight:700;margin-bottom:.25rem}
+.ph-desc{font-family:var(--body);font-size:.8rem;color:rgba(14,13,11,.55);line-height:1.4}
+.ph-bar{height:3px;background:var(--rule);margin-top:.6rem;border-radius:2px}
+.phase.active .ph-n{color:rgba(244,240,232,.5)}
+.phase.active .ph-desc{color:rgba(244,240,232,.65)}
+
+/* ── Document cards ── */
+.doc-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  margin:1.5rem 0;
+}
+.doc-card{
+  background:var(--paper);padding:1rem;
+  transition:background .15s;cursor:pointer;
+  border-bottom:3px solid transparent;
+}
+.doc-card:hover{background:var(--paper2)}
+.dc-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--accent);margin-bottom:.35rem}
+.dc-title{font-family:var(--serif);font-size:.95rem;font-weight:700;line-height:1.25;margin-bottom:.3rem}
+.dc-q{font-family:var(--body);font-size:.82rem;color:rgba(14,13,11,.55);font-style:italic;line-height:1.4}
+
+/* ── Failure modes ── */
+.fm-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1rem;margin:1.5rem 0;
+}
+.fm-item{
+  padding:.85rem 1rem;border:1px solid var(--rule);
+  border-left:3px solid var(--rule);
+  transition:border-color .15s;
+}
+.fm-item:hover{border-left-color:var(--accent)}
+.fm-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--accent);margin-bottom:.2rem}
+.fm-name{font-family:var(--serif);font-size:.95rem;font-weight:700;margin-bottom:.25rem}
+.fm-note{font-family:var(--body);font-size:.82rem;color:rgba(14,13,11,.6);line-height:1.4}
+
+/* ── Stack diagram ── */
+.stack{
+  display:flex;flex-direction:column;gap:0;
+  margin:1.5rem 0;border:1px solid var(--ink);overflow:hidden;
+}
+.stack-layer{
+  padding:1.1rem 1.5rem;border-bottom:1px solid var(--rule2);
+  display:flex;gap:1.25rem;align-items:flex-start;
+  transition:background .15s;
+}
+.stack-layer:last-child{border-bottom:none}
+.stack-layer:hover{background:var(--paper3)}
+.sl-tag{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:.2rem .5rem;border-radius:2px;
+  white-space:nowrap;margin-top:.15rem;flex-shrink:0;
+}
+.sl-body{flex:1}
+.sl-title{font-family:var(--serif);font-size:1.1rem;font-weight:700;margin-bottom:.2rem}
+.sl-desc{font-family:var(--body);font-size:.88rem;color:rgba(14,13,11,.65);line-height:1.5}
+
+/* ── Number boxes ── */
+.number-row{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin:1.5rem 0;
+}
+@media(max-width:1100px){.number-row{grid-template-columns:repeat(3,1fr)}}
+.num-box{
+  flex:1;min-width:140px;
+  padding:1rem;border:1px solid var(--rule);
+  text-align:center;background:var(--paper2);
+}
+.nb-val{
+  font-family:var(--serif);font-size:2.2rem;font-weight:900;
+  font-style:italic;color:var(--accent);line-height:1;
+  margin-bottom:.25rem;
+}
+.nb-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(14,13,11,.5)}
+.nb-note{font-family:var(--body);font-size:.78rem;font-style:italic;color:rgba(14,13,11,.45);margin-top:.2rem}
+
+/* ── Map / loop diagram ── */
+.loop-wrap{
+  margin:1.5rem 0;padding:1.75rem;
+  background:var(--paper2);border:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:.75rem;
+}
+.loop-step{
+  display:flex;align-items:center;gap:.75rem;
+}
+.ls-num{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.65rem;font-weight:700;flex-shrink:0;
+}
+.ls-arrow{
+  font-family:var(--mono);font-size:.7rem;color:var(--accent);
+  flex-shrink:0;width:20px;text-align:center;
+}
+.ls-text{font-family:var(--body);font-size:.92rem;line-height:1.4}
+.ls-text strong{font-weight:600}
+
+/* ── Inline rule ── */
+.rule-inline{
+  border:none;border-top:1px solid var(--rule);
+  margin:2rem 0;
+}
+hr.ornament{
+  border:none;text-align:center;margin:2rem 0;
+  color:var(--rule);font-size:1.2rem;
+}
+hr.ornament::before{content:"✦  ✦  ✦";color:rgba(14,13,11,.2)}
+
+/* ── Footer ── */
+#footer{
+  border-top:2px solid var(--ink);padding:1.5rem 3rem;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:.6rem;color:rgba(14,13,11,.4);
+  letter-spacing:.08em;
+}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{opacity:0;animation:fadeUp .7s ease forwards}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  #masthead{grid-template-columns:1fr;gap:1rem}
+  .mast-right{border-left:none;padding-left:0;text-align:left;border-top:1px solid var(--rule);padding-top:1rem}
+  #page{padding:0 1.25rem 3rem}
+  .col2,.callout-grid{grid-template-columns:1fr}
+  .col3{grid-template-columns:1fr}
+  .doc-grid{grid-template-columns:1fr 1fr}
+  .fm-grid{grid-template-columns:1fr}
+  .phase-timeline{flex-direction:column}
+  .number-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  #masthead{padding:1.5rem 1.25rem 1rem}
+  h1{font-size:2.2rem}
+  .number-row{grid-template-columns:1fr}
+  .doc-grid{grid-template-columns:1fr}
+  .phase{padding:.75rem .85rem}
+  .ph-title{font-size:.85rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Masthead -->
+<header id="masthead">
+  <div class="mast-left">
+    <div class="mast-tag">Latent Value Network · Working Document Series</div>
+    <h1>The <em>Complete</em><br>Architecture</h1>
+    <p class="mast-sub">An integration of WD-007 through WD-012 — the full case for cooperative civilization infrastructure</p>
+  </div>
+  <div class="mast-right">
+    <div class="mast-doc">WD-000</div>
+    <div class="mast-date">Working Draft · 2026</div>
+    <div class="mast-edition">Post-Labor<br>Economics</div>
+  </div>
+</header>
+
+<div id="page">
+
+  <!-- Opening number row -->
+  <div style="height:1.5rem"></div>
+  <div class="number-row">
+    <div class="num-box">
+      <div class="nb-val">$1.3T</div>
+      <div class="nb-label">Annual latent value gap</div>
+      <div class="nb-note">Static estimate. Dynamic cost is 10× larger.</div>
+    </div>
+    <div class="num-box">
+      <div class="nb-val">15.7×</div>
+      <div class="nb-label">Temporal value multiplier</div>
+      <div class="nb-note">Maria–James canonical match, 12-month horizon</div>
+    </div>
+    <div class="num-box">
+      <div class="nb-val">6</div>
+      <div class="nb-label">Bundle components lost at job loss</div>
+      <div class="nb-note">Income + 5 others. Policy replaces only 1.</div>
+    </div>
+    <div class="num-box">
+      <div class="nb-val">3–5%</div>
+      <div class="nb-label">Communities reaching stable infrastructure</div>
+      <div class="nb-note">At 18 months. Honest baseline for underprepared deployments.</div>
+    </div>
+    <div class="num-box">
+      <div class="nb-val">R₀&gt;1</div>
+      <div class="nb-label">Phase transition threshold</div>
+      <div class="nb-note">When cooperation becomes self-sustaining</div>
+    </div>
+  </div>
+
+  <div class="rule-bar double" style="margin:1.5rem 0"></div>
+
+  <!-- Section I: The Problem -->
+  <div class="sec-head">
+    <span class="sec-num">Part I</span>
+    <h2 class="sec-title">The <em>Problem</em> — Four Compounding Failures</h2>
+  </div>
+
+  <div class="pull">
+    <p>"The most anti-social act is not crime. It is the waste of what a person could have been."</p>
+    <cite>Adapted from a 1943 British wartime pamphlet on cooperative community</cite>
+  </div>
+
+  <div class="col2">
+    <div class="prose">
+      <p>Every day, in every community on earth, a retired engineer with forty years of specialized knowledge spends her afternoon alone because no one knows she exists or that they need her.</p>
+      <p>Across the street, a young homeowner is about to pay $4,000 for a contractor to diagnose a problem that would take her twenty minutes.</p>
+      <p>They will never meet. Not because the connection is hard to imagine — it's obvious once you see it — but because the infrastructure to make it visible doesn't exist.</p>
+      <p>This is not a rare exception. It is the rule. And it compounds.</p>
+    </div>
+    <div class="prose">
+      <p>A 2019 analysis estimated the annual value of these missing connections at <strong>$1.3 trillion</strong> — cooperative transactions that should happen and don't, every year, because people can't find each other across the cognitive and social barriers that separate them.</p>
+      <p>That number understates the real cost by roughly <strong>an order of magnitude</strong>. It counts only the immediate value of the missing transaction. It doesn't count what happens after two people connect: trust that compounds, knowledge that transfers, meaning that restores, identity that reconstructs.</p>
+      <p>The dynamic cost — including emergence, cascade, and meaning restoration — is in the range of $6–15 trillion annually.</p>
+    </div>
+  </div>
+
+  <div class="callout-grid">
+    <div class="callout" data-n="01">
+      <div class="callout-head" style="color:var(--accent)">The Knowledge Failure</div>
+      <div class="callout-text">Most people don't know what they have to offer. Forty years of expertise looks, from the inside, like "just stuff I know." The Curse of Knowledge makes latent capacity invisible to the person who holds it.</div>
+    </div>
+    <div class="callout" data-n="02">
+      <div class="callout-head" style="color:var(--accent2)">The Visibility Failure</div>
+      <div class="callout-text">Even when people know what they have to offer, the channels for making it visible are absent or mismatched. Formal job boards, social media, and neighborhood apps all optimize for the wrong things.</div>
+    </div>
+    <div class="callout" data-n="03">
+      <div class="callout-head" style="color:var(--accent3)">The Trust Failure</div>
+      <div class="callout-text">Cooperative exchange requires baseline trust. Two people who could help each other may be one introduction apart and never receive it. Trust in modern communities is distributed unevenly and built slowly.</div>
+    </div>
+    <div class="callout" data-n="04">
+      <div class="callout-head" style="color:var(--gold)">The Meaning Failure</div>
+      <div class="callout-text">Even when a connection forms, it often fails to activate the full value available in it. The match that could be transformative stays transactional because no one was watching for the deeper opportunity.</div>
+    </div>
+    <div class="callout" data-n="05" style="grid-column:span 2">
+      <div class="callout-head">What Automation Is Doing to This</div>
+      <div class="callout-text">Automation is disrupting not just jobs but the entire <em>bundle</em> that jobs provide: income, time structure, social contact, collective purpose, identity, and social standing. Income-replacement policies address only the first component. The other five require different infrastructure. The LVN is that infrastructure.</div>
+    </div>
+  </div>
+
+  <div class="rule-bar thin" style="margin:2rem 0"></div>
+
+  <!-- Section II: Architecture -->
+  <div class="sec-head">
+    <span class="sec-num">Part II</span>
+    <h2 class="sec-title">The <em>Architecture</em> — Three Interlocking Components</h2>
+  </div>
+
+  <div class="stack">
+    <div class="stack-layer">
+      <div class="sl-tag" style="background:rgba(181,52,26,.1);border:1px solid rgba(181,52,26,.3);color:var(--accent)">Relay</div>
+      <div class="sl-body">
+        <div class="sl-title">The Cooperative Matching Protocol</div>
+        <div class="sl-desc">Routes connections between people whose capacities and needs are complementary, across the cognitive and social barriers that normally prevent them from finding each other. Not a marketplace — optimizes for cooperative value, not platform engagement or transaction fees.</div>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="sl-tag" style="background:rgba(26,75,107,.1);border:1px solid rgba(26,75,107,.3);color:var(--accent2)">PCE</div>
+      <div class="sl-body">
+        <div class="sl-title">PersonalContextEngine — The Intelligence Layer</div>
+        <div class="sl-desc">Builds a model of each participant's latent capacities, unmet needs, and meaning state from behavioral signals in natural conversation. No profile required. Observes what people talk about, how they talk about it, and what they don't say — building an increasingly accurate picture of the full cooperative potential they hold.</div>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="sl-tag" style="background:rgba(45,107,58,.1);border:1px solid rgba(45,107,58,.3);color:var(--accent3)">Flourishing</div>
+      <div class="sl-body">
+        <div class="sl-title">The Flourishing Layer — What Makes It Different</div>
+        <div class="sl-desc">Models not just task needs and capacities but meaning needs — purpose, belonging, recognition, agency, competence, generativity, narrative identity. Routes connections that address both task needs and meaning needs simultaneously. The synergy multiplier: a single cooperative act initiates a transformation that no amount of task-matching alone would produce.</div>
+      </div>
+    </div>
+    <div class="stack-layer" style="background:var(--paper2)">
+      <div class="sl-tag" style="background:rgba(139,105,20,.1);border:1px solid rgba(139,105,20,.3);color:var(--gold)">Governance</div>
+      <div class="sl-body">
+        <div class="sl-title">Power Balance Governance — The Anti-Capture Architecture</div>
+        <div class="sl-desc">Tracks the distribution of cooperative value across network position quartiles. Detects extraction patterns that conventional metrics miss. Triggers graduated governance response at defined thresholds. Designed against its own capture: the equity ombudsperson is selected by and accountable to the participants they protect, not those they constrain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The virtuous loop -->
+  <div style="margin-top:1.5rem">
+    <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem">The Virtuous Loop — How Value Compounds</div>
+    <div class="loop-wrap">
+      <div class="loop-step">
+        <div class="ls-num">1</div>
+        <div class="ls-text"><strong>Cooperative act</strong> — task value created, meaning activated</div>
+      </div>
+      <div class="loop-step">
+        <div class="ls-num">→</div>
+        <div class="ls-text">Trust accumulated, network position grows</div>
+      </div>
+      <div class="loop-step">
+        <div class="ls-num">→</div>
+        <div class="ls-text">Better match quality for future connections</div>
+      </div>
+      <div class="loop-step">
+        <div class="ls-num">→</div>
+        <div class="ls-text">Higher-value cooperative acts, stronger meaning state</div>
+      </div>
+      <div class="loop-step">
+        <div class="ls-num">→</div>
+        <div class="ls-text">More time and energy available for cooperation</div>
+      </div>
+      <div class="loop-step">
+        <div class="ls-num">↩</div>
+        <div class="ls-text" style="color:var(--accent);font-style:italic">Return to step 1 — each iteration richer than the last</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule-bar thin" style="margin:2rem 0"></div>
+
+  <!-- Section III: The Transition -->
+  <div class="sec-head">
+    <span class="sec-num">Part III</span>
+    <h2 class="sec-title">The <em>Transition</em> — Five Phases of Cooperative Engagement</h2>
+  </div>
+
+  <div class="prose" style="margin-bottom:1rem">
+    <p>The relationship between LVN cooperative engagement and formal labor market participation is neither simple complement nor simple substitute. It is <strong>phase-dependent</strong> — the relationship changes character as cooperative engagement deepens.</p>
+  </div>
+
+  <div class="phase-timeline" id="phase-timeline">
+    <div class="phase" data-ph="1" onclick="setPhase(1)">
+      <div class="ph-n">Phase 1</div>
+      <div class="ph-title">Supplemental</div>
+      <div class="ph-desc">0–5% of time. Occasional cooperation alongside formal employment. Fully complementary.</div>
+      <div class="ph-bar" style="width:5%"></div>
+    </div>
+    <div class="phase" data-ph="2" onclick="setPhase(2)">
+      <div class="ph-n">Phase 2</div>
+      <div class="ph-title">Enrichment</div>
+      <div class="ph-desc">5–20% of time. Regular cooperative relationships. Meaningfully addresses bundle Components 2–4.</div>
+      <div class="ph-bar" style="width:20%"></div>
+    </div>
+    <div class="phase" data-ph="3" onclick="setPhase(3)">
+      <div class="ph-n">Phase 3</div>
+      <div class="ph-title">Integration</div>
+      <div class="ph-desc">20–50% of time. Transition zone. Labor decisions now made with cooperative value as input.</div>
+      <div class="ph-bar" style="width:50%"></div>
+    </div>
+    <div class="phase" data-ph="4" onclick="setPhase(4)">
+      <div class="ph-n">Phase 4</div>
+      <div class="ph-title">Primary</div>
+      <div class="ph-desc">50–80% of time. Cooperative work is primary organizer. Formal labor is supplement.</div>
+      <div class="ph-bar" style="width:75%"></div>
+    </div>
+    <div class="phase" data-ph="5" onclick="setPhase(5)">
+      <div class="ph-n">Phase 5</div>
+      <div class="ph-title">Economic</div>
+      <div class="ph-desc">Cooperative activity also provides income. Full post-labor transition. Requires stable community.</div>
+      <div class="ph-bar" style="width:100%"></div>
+    </div>
+  </div>
+
+  <div id="phase-detail" style="padding:1rem 1.25rem;background:var(--paper2);border:1px solid var(--rule);border-left:3px solid var(--rule);font-family:var(--body);font-size:.92rem;line-height:1.6;min-height:80px;transition:opacity .2s">
+    <span style="font-family:var(--mono);font-size:.62rem;color:rgba(14,13,11,.4);letter-spacing:.06em">← Select a phase to see its labor market dynamics and primary risks</span>
+  </div>
+
+  <!-- The infrastructure stack -->
+  <div style="margin-top:2rem">
+    <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem">The Infrastructure Stack — Three Interlocking Requirements</div>
+    <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--ink)">
+      <div style="padding:1rem 1.5rem;background:var(--paper3);border-bottom:1px solid var(--ink)">
+        <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.2rem">Commons Dividend</div>
+        <div style="font-family:var(--serif);font-size:1rem;font-weight:700;margin-bottom:.2rem">Distributes cooperative value to all community members equally</div>
+        <div style="font-family:var(--body);font-size:.85rem;color:rgba(14,13,11,.6)">Ensures those who benefit least from direct cooperative activity share in the value the commons creates. The distributive justice mechanism.</div>
+      </div>
+      <div style="padding:1rem 1.5rem;background:var(--paper2);border-bottom:1px solid var(--ink)">
+        <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:.2rem">Latent Value Network</div>
+        <div style="font-family:var(--serif);font-size:1rem;font-weight:700;margin-bottom:.2rem">Activates latent cooperative capacity across cognitive and social barriers</div>
+        <div style="font-family:var(--body);font-size:.85rem;color:rgba(14,13,11,.6)">Generates the emergent value, meaning activation, and trust infrastructure that formal markets cannot produce. The discovery layer.</div>
+      </div>
+      <div style="padding:1rem 1.5rem;background:var(--paper)">
+        <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--accent2);text-transform:uppercase;margin-bottom:.2rem">Universal Basic Income</div>
+        <div style="font-family:var(--serif);font-size:1rem;font-weight:700;margin-bottom:.2rem">Secures Component 1 — material income — unconditionally</div>
+        <div style="font-family:var(--body);font-size:.85rem;color:rgba(14,13,11,.6)">Removes the survival constraint from cooperative participation. Enables Phase 3+ transitions for everyone. The foundation layer.</div>
+      </div>
+    </div>
+    <div style="font-family:var(--body);font-size:.85rem;font-style:italic;color:rgba(14,13,11,.5);margin-top:.5rem;padding-left:.25rem">These are not three separate policy ideas that happen to be compatible. They are three mutually reinforcing components of a single infrastructure stack, each significantly less effective without the others.</div>
+  </div>
+
+  <div class="rule-bar thin" style="margin:2rem 0"></div>
+
+  <!-- Section IV: Document Index -->
+  <div class="sec-head">
+    <span class="sec-num">Part IV</span>
+    <h2 class="sec-title">The <em>Corpus</em> — Six Working Documents</h2>
+  </div>
+
+  <div class="doc-grid">
+    <div class="doc-card" style="border-bottom-color:var(--accent)">
+      <div class="dc-num">WD-007</div>
+      <div class="dc-title">Metamodel</div>
+      <div class="dc-q">What entities exist in this world and how do they relate? 30+ types, 50+ relationships, 7 structural gaps.</div>
+    </div>
+    <div class="doc-card" style="border-bottom-color:var(--accent3)">
+      <div class="dc-num">WD-008</div>
+      <div class="dc-title">The Flourishing Layer</div>
+      <div class="dc-q">How does the system serve human flourishing, not just task efficiency? MeaningElement as first-class entity.</div>
+    </div>
+    <div class="doc-card" style="border-bottom-color:var(--accent2)">
+      <div class="dc-num">WD-009</div>
+      <div class="dc-title">Temporal Modeling</div>
+      <div class="dc-q">Why does the $1.3T figure understate the case by 10×? Decay, growth, emergence, compounding.</div>
+    </div>
+    <div class="doc-card" style="border-bottom-color:var(--gold)">
+      <div class="dc-num">WD-010</div>
+      <div class="dc-title">Power Balance Governance</div>
+      <div class="dc-q">How does the system prevent itself from replicating the inequities it addresses? Anti-capture architecture.</div>
+    </div>
+    <div class="doc-card" style="border-bottom-color:var(--accent)">
+      <div class="dc-num">WD-011</div>
+      <div class="dc-title">Phase Transition Playbook</div>
+      <div class="dc-q">What do you actually do on Tuesday? Deployment phases, failure modes, honest probability estimates.</div>
+    </div>
+    <div class="doc-card" style="border-bottom-color:var(--accent3)">
+      <div class="dc-num">WD-012</div>
+      <div class="dc-title">Labor Market Interface</div>
+      <div class="dc-q">How does cooperative engagement interact with formal employment? The six-component bundle; phase-dependency model.</div>
+    </div>
+    <div class="doc-card" style="border-bottom-color:rgba(14,13,11,.2);opacity:.55">
+      <div class="dc-num">WD-013</div>
+      <div class="dc-title">Protocol Federation</div>
+      <div class="dc-q">How do LVN communities connect without merging? Trust portability, reputation migration. <em>Forthcoming.</em></div>
+    </div>
+    <div class="doc-card" style="border-bottom-color:var(--accent2)">
+      <div class="dc-num">WD-000</div>
+      <div class="dc-title">The Complete Argument</div>
+      <div class="dc-q">This document. The synthesis readable by someone who hasn't read any of the others.</div>
+    </div>
+  </div>
+
+  <div class="rule-bar thin" style="margin:2rem 0"></div>
+
+  <!-- Section V: What Can Go Wrong -->
+  <div class="sec-head">
+    <span class="sec-num">Part V</span>
+    <h2 class="sec-title">What Can Go <em>Wrong</em> — Four Failure Categories</h2>
+  </div>
+
+  <div class="prose" style="margin-bottom:1.25rem">
+    <p>Honest advocacy requires naming failure modes. The LVN can fail in at least four important ways — not from malice, but from the predictable dynamics of cooperative systems that scale without adequate governance.</p>
+  </div>
+
+  <div class="fm-grid">
+    <div class="fm-item" style="border-left-color:var(--accent)">
+      <div class="fm-num">01</div>
+      <div class="fm-name">Equity Failure</div>
+      <div class="fm-note">The system serves the most connected participants at the expense of the least connected, replicating the inequities it claims to address. The power balance governance is the primary defense.</div>
+    </div>
+    <div class="fm-item" style="border-left-color:var(--accent2)">
+      <div class="fm-num">02</div>
+      <div class="fm-name">Depth Failure</div>
+      <div class="fm-note">The network remains a task-matching system that never activates the meaning layer, never generates compounding emergence, never crosses the community phase transition. A technically excellent system that stays shallow.</div>
+    </div>
+    <div class="fm-item" style="border-left-color:var(--accent3)">
+      <div class="fm-num">03</div>
+      <div class="fm-name">Safety Failure</div>
+      <div class="fm-note">Governance structures captured by the most powerful participants, or the meaning inference system weaponized to exploit psychological vulnerability. Must be configured before deployment, not retrofitted after damage.</div>
+    </div>
+    <div class="fm-item" style="border-left-color:var(--gold)">
+      <div class="fm-num">04</div>
+      <div class="fm-name">Policy Gap Failure</div>
+      <div class="fm-note">Providing cooperative and meaning infrastructure to people whose material needs are not met, in a policy environment that has not provided income security. The income displacement loop becomes lethal without UBI.</div>
+    </div>
+  </div>
+
+  <hr class="ornament">
+
+  <!-- Closing -->
+  <div class="pull" style="border-left-color:var(--accent2)">
+    <p>The cooperative connections that should have happened and didn't — the retired engineer and the homeowner across the street — represent not just economic waste but human waste. Forty years of expertise, dying unused. A community that could be more resilient than it is. A person who could be more flourishing than she is.</p>
+    <p style="margin-top:.75rem">The infrastructure that would have made this visible costs very little relative to the value it would generate. The obstacle is not technical. It is the absence of will to build it.</p>
+    <cite>— WD-000 §5, The Minimum Viable Argument</cite>
+  </div>
+
+  <div class="col3" style="margin-top:2rem">
+    <div>
+      <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--rule);padding-bottom:.4rem;margin-bottom:.65rem">For Communities</div>
+      <div style="font-family:var(--body);font-size:.88rem;color:rgba(14,13,11,.7);line-height:1.55">Start with the readiness assessment in WD-011. Be honest about your answers. The 3–5% success rate reflects underprepared deployments — a prepared community has dramatically better odds.</div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);border-bottom:1px solid var(--rule);padding-bottom:.4rem;margin-bottom:.65rem">For Policymakers</div>
+      <div style="font-family:var(--body);font-size:.88rem;color:rgba(14,13,11,.7);line-height:1.55">The UBI–LVN–Commons Dividend infrastructure stack is coherent and self-reinforcing. The economic analysis suggests cooperative value generated by a UBI-enabled deployment likely exceeds the cost of the UBI itself.</div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent3);border-bottom:1px solid var(--rule);padding-bottom:.4rem;margin-bottom:.65rem">For Technologists</div>
+      <div style="font-family:var(--body);font-size:.88rem;color:rgba(14,13,11,.7);line-height:1.55">The architecture is specified. The gaps are known. The ethical constraints are not afterthoughts. Most important open questions: cultural calibration of behavioral inference, inference validation methodology, and protocol federation.</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<footer id="footer">
+  <span>Latent Value Network · Working Document Series · WD-000</span>
+  <span>Released under CC BY-SA 4.0 — fork, critique, extend</span>
+  <span>The LVN is humanity's concept, not ours</span>
+</footer>
+
+<script>
+const PHASE_DATA = {
+  1: { color:'#2d6b3a', text:'<strong>Supplemental (0–5% of waking time).</strong> Cooperative activity is an occasional supplement to a life organized primarily around formal employment. Fully complementary — no tension with labor market participation. The cooperative activity is invisible at the scale of labor market decisions. <em>Primary risk:</em> Too thin to initiate the virtuous compounding loop. At risk of the Meaning Layer Bypass failure mode.' },
+  2: { color:'#1a4b6b', text:'<strong>Enrichment (5–20% of waking time).</strong> Regular, meaningful cooperative relationships. Time structure, social contact, and early movement on identity and recognition. Complementary — the cooperative engagement enriches formal labor rather than competing with it. <em>Primary risk:</em> Phase 2 plateau. Comfortable equilibrium that doesn\'t make the case for post-labor transition infrastructure.' },
+  3: { color:'#8b6914', text:'<strong>Integration (20–50% of waking time).</strong> Transition zone. Cooperative schedule competes with formal labor schedule. Labor market decisions now made with cooperative value as genuine input. <strong>The relationship is no longer simply complementary.</strong> <em>Critical dependency:</em> Income security must be present or the income displacement loop activates — deepening cooperative engagement while income collapses.' },
+  4: { color:'#b5341a', text:'<strong>Primary (50–80% of waking time).</strong> Cooperative work is the primary psychological organizer. Formal labor is the supplement — something done for income, not meaning. Full bundle provision (Components 2–6) through cooperative economy. <em>Critical dependency:</em> Stability requires that Component 1 (income) is secured independently. A Phase 4 person who loses income security is acutely fragile.' },
+  5: { color:'#0e0d0b', text:'<strong>Economic (cooperative engagement providing income).</strong> Full post-labor transition — the cooperative economy provides the complete bundle including Component 1. <em>Stable only when:</em> value provided has genuine market-adjacent worth; income flows are diversified; policy backstop (UBI) exists; cooperative network has achieved post-transition stability (R₀ > 1).' },
+};
+
+function setPhase(n) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.phase[data-ph="${n}"]`).classList.add('active');
+  const d = PHASE_DATA[n];
+  const detail = document.getElementById('phase-detail');
+  detail.style.opacity = 0;
+  setTimeout(() => {
+    detail.innerHTML = d.text;
+    detail.style.borderLeft = `3px solid ${d.color}`;
+    detail.style.opacity = 1;
+  }, 130);
+}
+
+// Start on phase 1 then auto-advance to 3 to hint at interactivity
+setPhase(1);
+let _autoPhase = 1;
+const _autoInterval = setInterval(() => {
+  _autoPhase++;
+  if (_autoPhase > 3) { clearInterval(_autoInterval); return; }
+  setPhase(_autoPhase);
+}, 800);
+
+// Clear auto-advance on first user click
+document.getElementById('phase-timeline').addEventListener('click', () => clearInterval(_autoInterval), { once: true });
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const active = document.querySelector('.phase.active');
+  if (!active) return;
+  const n = parseInt(active.dataset.ph);
+  if (e.key === 'ArrowRight' && n < 5) { clearInterval(_autoInterval); setPhase(n + 1); }
+  if (e.key === 'ArrowLeft'  && n > 1) { clearInterval(_autoInterval); setPhase(n - 1); }
+});
+
+// Fade in on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.style.opacity=1; e.target.style.transform='translateY(0)'; observer.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.callout,.doc-card,.fm-item,.stack-layer').forEach(el => {
+  el.style.opacity = 0; el.style.transform = 'translateY(12px)'; el.style.transition = 'opacity .5s ease, transform .5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

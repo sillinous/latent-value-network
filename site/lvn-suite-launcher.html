@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVN Working Documents — Tool Suite</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Sans:wght@300;400;500;600&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090e;--s1:#0c0f18;--s2:#111520;--s3:#161b28;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.12);
+  --text:#e5e3dd;--muted:rgba(229,227,221,.4);
+  --green:#3ecf8e;--blue:#5b9cf6;--purple:#c084fc;
+  --amber:#f59e0b;--red:#f87171;--teal:#2dd4bf;--orange:#fb923c;
+  --mono:'DM Mono',monospace;--serif:'DM Serif Display',Georgia,serif;
+  --sans:'Instrument Sans',sans-serif;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+
+/* ── Background mesh ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(62,207,142,.04) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(91,156,246,.04) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 50% 50%, rgba(192,132,252,.02) 0%, transparent 70%);
+}
+
+/* ── Hero ── */
+#hero{
+  position:relative;z-index:1;
+  padding:4rem 3rem 3rem;
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr auto;align-items:end;gap:3rem;
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:1rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.hero-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--teal)}
+h1{
+  font-family:var(--serif);font-size:clamp(2.4rem,5vw,4rem);
+  font-weight:700;line-height:1.06;letter-spacing:-.025em;
+  margin-bottom:.9rem;
+}
+h1 em{font-style:italic;color:var(--teal)}
+.hero-desc{
+  font-family:var(--sans);font-size:1.05rem;color:rgba(229,227,221,.6);
+  line-height:1.65;max-width:540px;
+}
+.hero-meta{
+  text-align:right;
+  font-family:var(--mono);font-size:.6rem;color:var(--muted);
+  line-height:2;
+  border-left:1px solid var(--border);padding-left:2rem;
+}
+.hero-meta span{display:block}
+.hero-meta strong{color:var(--text);font-weight:400}
+
+/* ── Stats row ── */
+#stats-row{
+  position:relative;z-index:1;
+  max-width:1200px;margin:0 auto 3.5rem;padding:0 3rem;
+  display:flex;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  background:var(--s1);
+}
+.stat-item{
+  flex:1;padding:.9rem 1.25rem;
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.stat-item:last-child{border-right:none}
+.si-val{font-family:var(--serif);font-size:1.6rem;font-style:italic;margin-bottom:.15rem}
+.si-label{font-family:var(--mono);font-size:.57rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+
+/* ── Section divider ── */
+.section-head{
+  max-width:1200px;margin:0 auto;padding:0 3rem 1.25rem;
+  display:flex;align-items:center;gap:1rem;position:relative;z-index:1;
+}
+.sh-line{flex:1;height:1px;background:var(--border)}
+.sh-label{
+  font-family:var(--mono);font-size:.6rem;text-transform:uppercase;
+  letter-spacing:.15em;color:var(--muted);white-space:nowrap;
+}
+
+/* ── Tool grid ── */
+#tool-grid{
+  max-width:1200px;margin:0 auto;padding:0 3rem 5rem;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;
+  position:relative;z-index:1;
+}
+/* WD-000 spans full width */
+#tool-grid .tool-card:first-child{grid-column:1/-1}
+
+/* ── Tool card ── */
+.tool-card{
+  background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;text-decoration:none;color:inherit;
+  display:flex;flex-direction:column;
+  transition:border-color .25s,transform .2s,box-shadow .25s;
+  cursor:pointer;
+  position:relative;
+}
+.tool-card:hover{
+  border-color:var(--border2);
+  transform:translateY(-3px);
+  box-shadow:0 16px 48px rgba(0,0,0,.4);
+}
+.tool-card:hover .tc-arrow{opacity:1;transform:translateX(0)}
+.tool-card:hover .tc-glow{opacity:1}
+
+/* Accent top bar */
+.tc-bar{height:3px;width:100%;flex-shrink:0}
+
+/* Glow behind card on hover */
+.tc-glow{
+  position:absolute;inset:-1px;border-radius:12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+
+/* Card inner */
+.tc-inner{padding:1.4rem 1.5rem;flex:1;display:flex;flex-direction:column}
+.tc-doc{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:.6rem;
+}
+.tc-title{
+  font-family:var(--serif);font-size:1.1rem;font-weight:700;
+  line-height:1.25;margin-bottom:.5rem;
+}
+/* Wide card larger title */
+.tool-card:first-child .tc-title{font-size:1.5rem}
+.tc-question{
+  font-family:var(--sans);font-size:.82rem;color:rgba(229,227,221,.55);
+  line-height:1.55;font-style:italic;flex:1;margin-bottom:1rem;
+}
+.tool-card:first-child .tc-question{font-size:.92rem;max-width:600px}
+
+.tc-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(255,255,255,.06);padding-top:.75rem;
+  margin-top:auto;
+}
+.tc-type{
+  font-family:var(--mono);font-size:.57rem;text-transform:uppercase;
+  letter-spacing:.1em;padding:.15rem .45rem;border-radius:3px;
+}
+.tc-arrow{
+  font-family:var(--mono);font-size:.65rem;
+  color:var(--muted);opacity:0;
+  transform:translateX(-6px);
+  transition:opacity .2s,transform .2s;
+}
+
+/* WD-000 special layout */
+.tool-card:first-child .tc-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:2rem;
+  align-items:start;
+}
+.tool-card:first-child .tc-footer{grid-column:1/-1}
+.wc-right{
+  display:flex;flex-direction:column;gap:.65rem;padding-top:.2rem;
+}
+.wc-bullet{
+  display:flex;gap:.6rem;align-items:flex-start;
+  font-family:var(--sans);font-size:.78rem;color:rgba(229,227,221,.55);line-height:1.45;
+}
+.wc-bullet-dot{width:4px;height:4px;border-radius:50%;margin-top:.45rem;flex-shrink:0}
+
+/* ── Status badge ── */
+.status-badge{
+  font-family:var(--mono);font-size:.55rem;padding:.15rem .45rem;
+  border-radius:100px;letter-spacing:.04em;
+}
+.sb-active{background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.25);color:var(--green)}
+.sb-wip{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber)}
+
+/* ── Footer ── */
+#footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:1.25rem 3rem;max-width:1200px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:.58rem;color:var(--muted);
+}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.fade-in{animation:fadeUp .6s ease both}
+
+/* ── Responsive ── */
+@media(max-width:960px){
+  #hero{grid-template-columns:1fr;gap:1.5rem}
+  .hero-meta{border-left:none;padding-left:0;border-top:1px solid var(--border);padding-top:1rem;text-align:left}
+  #tool-grid{grid-template-columns:1fr 1fr;padding:0 1.5rem 3rem}
+  #stats-row{padding:0 1.5rem;flex-wrap:wrap}
+  .stat-item{min-width:50%;border-bottom:1px solid var(--border)}
+  .section-head{padding:0 1.5rem 1rem}
+  #hero{padding:3rem 1.5rem 2rem}
+  .tool-card:first-child .tc-inner{grid-template-columns:1fr}
+  .tool-card:first-child .tc-footer{grid-column:auto}
+}
+@media(max-width:640px){
+  #tool-grid{grid-template-columns:1fr}
+  .tool-card:first-child{grid-column:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section id="hero">
+  <div>
+    <div class="hero-eyebrow">Post-Labor Economics · Working Document Series</div>
+    <h1>Latent Value<br><em>Network</em></h1>
+    <p class="hero-desc">
+      Eight documents. Eight companion tools. A complete specification for cooperative
+      civilization infrastructure — from metamodel to deployment playbook to federation protocol.
+    </p>
+  </div>
+  <div class="hero-meta">
+    <span>Working Drafts</span>
+    <span><strong>WD-000 → WD-013</strong></span>
+    <span>&nbsp;</span>
+    <span>License</span>
+    <span><strong>CC BY-SA 4.0</strong></span>
+    <span>&nbsp;</span>
+    <span>Status</span>
+    <span><strong>Active development</strong></span>
+  </div>
+</section>
+
+<!-- Stats -->
+<div id="stats-row">
+  <div class="stat-item">
+    <div class="si-val" style="color:var(--teal)">$1.3T</div>
+    <div class="si-label">Annual cooperative value gap</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-val" style="color:var(--amber)">~$13T</div>
+    <div class="si-label">Dynamic cost (10× multiplier)</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-val" style="color:var(--green)">15.7×</div>
+    <div class="si-label">Temporal value multiplier</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-val" style="color:var(--blue)">R₀&gt;1</div>
+    <div class="si-label">Phase transition threshold</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-val" style="color:var(--purple)">6</div>
+    <div class="si-label">Bundle components lost at job loss</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-val" style="color:var(--red)">3–5%</div>
+    <div class="si-label">Community success rate (underprepared)</div>
+  </div>
+</div>
+
+<!-- Section label -->
+<div class="section-head">
+  <div class="sh-line"></div>
+  <div class="sh-label">Interactive Tool Suite</div>
+  <div class="sh-line"></div>
+</div>
+
+<!-- Tool grid -->
+<div id="tool-grid"></div>
+
+<!-- Footer -->
+<footer id="footer">
+  <span>Latent Value Network · The LVN is humanity's concept, not ours.</span>
+  <span>fork · critique · extend</span>
+</footer>
+
+<script>
+const TOOLS = [
+  {
+    id: 'wd000',
+    doc: 'WD-000',
+    title: 'The Complete Architecture',
+    question: 'The synthesis: why this matters, what it is, and where the whole series is going — in a single page anyone can read.',
+    type: 'Integration Document',
+    typeColor: 'rgba(45,212,191,.1)',
+    typeBorder: 'rgba(45,212,191,.25)',
+    typeText: '#2dd4bf',
+    barColor: '#2dd4bf',
+    glowColor: 'rgba(45,212,191,.06)',
+    status: 'active',
+    href: 'WD-000-architecture.html',
+    bullets: [
+      { text: '$1.3T static → $13T+ dynamic: the core economic argument', color: '#2dd4bf' },
+      { text: 'Six bundle components that formal employment provides', color: '#5b9cf6' },
+      { text: 'The three-layer infrastructure stack: UBI + LVN + Commons Dividend', color: '#3ecf8e' },
+      { text: 'What can go wrong — four failure categories, named honestly', color: '#f59e0b' },
+    ]
+  },
+  {
+    id: 'wd009',
+    doc: 'WD-009',
+    title: 'Temporal Dynamics Simulator',
+    question: 'Watch decay, growth, and emergence unfold in real time. Trigger cooperative acts and observe the 15.7× value multiplier compounding.',
+    type: 'Interactive Simulator',
+    typeColor: 'rgba(62,207,142,.1)',
+    typeBorder: 'rgba(62,207,142,.25)',
+    typeText: '#3ecf8e',
+    barColor: '#3ecf8e',
+    glowColor: 'rgba(62,207,142,.06)',
+    status: 'active',
+    href: 'lvn-temporal-simulator.html',
+  },
+  {
+    id: 'wd010',
+    doc: 'WD-010',
+    title: 'Equity Monitor',
+    question: 'Three scenarios — healthy, drifting, captured — demonstrating how cooperative power asymmetries develop and how governance responds.',
+    type: 'Governance Dashboard',
+    typeColor: 'rgba(245,158,11,.1)',
+    typeBorder: 'rgba(245,158,11,.25)',
+    typeText: '#f59e0b',
+    barColor: '#f59e0b',
+    glowColor: 'rgba(245,158,11,.06)',
+    status: 'active',
+    href: 'lvn-equity-monitor.html',
+  },
+  {
+    id: 'wd011',
+    doc: 'WD-011',
+    title: 'Pilot Navigator',
+    question: 'Readiness assessment, 45-day metrics tracker, failure mode scanner, phase transition diagnostics. The practitioner\'s field guide.',
+    type: 'Deployment Tool',
+    typeColor: 'rgba(91,156,246,.1)',
+    typeBorder: 'rgba(91,156,246,.25)',
+    typeText: '#5b9cf6',
+    barColor: '#5b9cf6',
+    glowColor: 'rgba(91,156,246,.06)',
+    status: 'active',
+    href: 'lvn-pilot-navigator.html',
+  },
+  {
+    id: 'wd013',
+    doc: 'WD-013',
+    title: 'Federation Map',
+    question: 'Four topology scenarios showing how communities connect, where size asymmetries emerge, what protocol capture looks like, and how exit works.',
+    type: 'Network Visualizer',
+    typeColor: 'rgba(192,132,252,.1)',
+    typeBorder: 'rgba(192,132,252,.25)',
+    typeText: '#c084fc',
+    barColor: '#c084fc',
+    glowColor: 'rgba(192,132,252,.06)',
+    status: 'active',
+    href: 'lvn-federation-map.html',
+  },
+  {
+    id: 'wd008',
+    doc: 'WD-008',
+    title: 'Meaning Explorer',
+    question: 'The flourishing layer: MeaningElements as first-class entities, synergy multipliers, behavioral inference, vulnerability shield.',
+    type: 'Ontology Explorer',
+    typeColor: 'rgba(251,146,60,.1)',
+    typeBorder: 'rgba(251,146,60,.25)',
+    typeText: '#fb923c',
+    barColor: '#fb923c',
+    glowColor: 'rgba(251,146,60,.06)',
+    status: 'active',
+    href: 'lvn-meaning-explorer.html',
+  },
+  {
+    id: 'wd007',
+    doc: 'WD-007',
+    title: 'Ontology Graph',
+    question: 'The complete metamodel: 30+ entity types, 50+ relationship types, the seven structural gaps that define the project\'s ambition.',
+    type: 'Graph Explorer',
+    typeColor: 'rgba(248,113,113,.1)',
+    typeBorder: 'rgba(248,113,113,.25)',
+    typeText: '#f87171',
+    barColor: '#f87171',
+    glowColor: 'rgba(248,113,113,.06)',
+    status: 'active',
+    href: 'lvn-ontology-graph.html',
+  },
+];
+
+function buildGrid() {
+  const grid = document.getElementById('tool-grid');
+
+  TOOLS.forEach((tool, i) => {
+    const card = document.createElement('a');
+    card.className = 'tool-card fade-in';
+    card.href = tool.href;
+    card.style.animationDelay = `${i * 0.07}s`;
+
+    const isWide = i === 0;
+
+    // Glow
+    const glow = document.createElement('div');
+    glow.className = 'tc-glow';
+    glow.style.background = `radial-gradient(ellipse at 50% 0%, ${tool.glowColor}, transparent 70%)`;
+    card.appendChild(glow);
+
+    // Top bar
+    const bar = document.createElement('div');
+    bar.className = 'tc-bar';
+    bar.style.background = `linear-gradient(90deg, ${tool.barColor}, transparent)`;
+    card.appendChild(bar);
+
+    const inner = document.createElement('div');
+    inner.className = 'tc-inner';
+
+    if (isWide) {
+      // Left column
+      const left = document.createElement('div');
+      left.innerHTML = `
+        <div class="tc-doc" style="color:${tool.typeText}">${tool.doc}</div>
+        <div class="tc-title">${tool.title}</div>
+        <div class="tc-question">${tool.question}</div>
+      `;
+      inner.appendChild(left);
+
+      // Right column with bullets
+      const right = document.createElement('div');
+      right.className = 'wc-right';
+      tool.bullets.forEach(b => {
+        right.innerHTML += `
+          <div class="wc-bullet">
+            <div class="wc-bullet-dot" style="background:${b.color}"></div>
+            <span>${b.text}</span>
+          </div>
+        `;
+      });
+      inner.appendChild(right);
+    } else {
+      inner.innerHTML = `
+        <div class="tc-doc" style="color:${tool.typeText}">${tool.doc}</div>
+        <div class="tc-title">${tool.title}</div>
+        <div class="tc-question">${tool.question}</div>
+      `;
+    }
+
+    // Footer
+    const footer = document.createElement('div');
+    footer.className = 'tc-footer';
+    footer.innerHTML = `
+      <span class="tc-type status-badge sb-active" style="background:${tool.typeColor};border:1px solid ${tool.typeBorder};color:${tool.typeText}">${tool.type}</span>
+      <span class="tc-arrow">Open →</span>
+    `;
+    inner.appendChild(footer);
+
+    card.appendChild(inner);
+    grid.appendChild(card);
+  });
+}
+
+buildGrid();
+</script>
+</body>
+</html>

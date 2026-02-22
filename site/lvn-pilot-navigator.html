@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVN Pilot Navigator — WD-011</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090e;--s1:#0d1018;--s2:#12151f;--s3:#171b26;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --text:#e4e2dc;--muted:rgba(228,226,220,.42);
+  --green:#3ecf8e;--blue:#5b9cf6;--purple:#c084fc;
+  --amber:#f59e0b;--red:#f87171;--teal:#2dd4bf;--orange:#fb923c;
+  --mono:'DM Mono',monospace;--serif:'DM Serif Display',Georgia,serif;
+  --sans:'Instrument Sans',sans-serif;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans)}
+
+/* ── Header ── */
+#hdr{border-bottom:1px solid var(--border);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#0d1018,#090b12);position:sticky;top:0;z-index:100}
+#hdr h1{font-family:var(--serif);font-style:italic;font-size:1.05rem}
+#hdr p{font-family:var(--mono);font-size:.57rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.12rem}
+.tab-row{display:flex;gap:.35rem}
+.tab{font-family:var(--mono);font-size:.6rem;padding:.25rem .65rem;border:1px solid var(--border);border-radius:4px;background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;transition:all .15s}
+.tab:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.tab.active{border-color:var(--blue);color:var(--blue);background:rgba(91,156,246,.08)}
+
+/* ── Layout ── */
+#page{max-width:1300px;margin:0 auto;padding:1.5rem 2rem;display:none;flex-direction:column;gap:1.25rem}
+#page.visible{display:flex}
+
+/* ── Cards ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.card-hdr{padding:.65rem 1rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.57rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+
+/* ── Phase timeline ── */
+#timeline{display:flex;gap:0;position:relative;padding:1.25rem 1rem .5rem}
+.phase-seg{flex:1;position:relative;cursor:pointer}
+.phase-bar{height:8px;transition:opacity .2s}
+.phase-label{font-family:var(--mono);font-size:.58rem;margin-top:.5rem;color:var(--muted);line-height:1.4;text-align:center}
+.phase-days{font-family:var(--mono);font-size:.55rem;color:var(--muted);text-align:center;margin-top:.2rem}
+.phase-seg.active .phase-label{color:var(--text)}
+.phase-seg.active .phase-bar{opacity:1}
+.phase-seg .phase-bar{opacity:.35}
+.phase-indicator{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;display:none}
+.phase-seg.active .phase-indicator{display:block}
+
+/* ── Readiness assessment ── */
+.ra-item{display:flex;align-items:flex-start;gap:.75rem;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.ra-item:last-child{border-bottom:none}
+.ra-q{font-family:var(--sans);font-size:.8rem;font-weight:500;flex:1;margin-bottom:.2rem}
+.ra-opts{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.3rem}
+.ra-opt{font-family:var(--mono);font-size:.6rem;padding:.2rem .5rem;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted)}
+.ra-opt:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.ra-opt.selected-a{border-color:var(--green);color:var(--green);background:rgba(62,207,142,.08)}
+.ra-opt.selected-b{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.08)}
+.ra-opt.selected-c{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.08)}
+
+/* ── Readiness result ── */
+.profile-card{border-radius:8px;padding:1rem 1.25rem;margin-top:.75rem}
+.profile-title{font-family:var(--serif);font-size:1.1rem;font-style:italic;margin-bottom:.3rem}
+.profile-desc{font-family:var(--sans);font-size:.8rem;line-height:1.65;color:rgba(228,226,220,.75)}
+.profile-action{margin-top:.65rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.04em}
+
+/* ── 45-day metrics ── */
+.metric-row{display:flex;align-items:center;gap:.75rem;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.metric-row:last-child{border-bottom:none}
+.mr-label{font-family:var(--sans);font-size:.78rem;flex:1}
+.mr-range{font-family:var(--mono);font-size:.6rem;color:var(--muted);width:100px;flex-shrink:0}
+.mr-input{
+  width:60px;padding:.25rem .4rem;background:var(--s2);
+  border:1px solid var(--border);border-radius:4px;
+  font-family:var(--mono);font-size:.7rem;color:var(--text);
+  text-align:center;outline:none;
+}
+.mr-input:focus{border-color:var(--blue)}
+.mr-status{width:20px;text-align:center;font-size:.85rem}
+
+/* ── Failure mode scanner ── */
+.fm-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s}
+.fm-card:hover{border-color:var(--border2)}
+.fm-card.expanded{border-color:rgba(255,255,255,.15)}
+.fm-hdr{display:flex;align-items:center;gap:.65rem}
+.fm-num{font-family:var(--mono);font-size:.7rem;width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fm-title{font-family:var(--sans);font-size:.82rem;font-weight:600;flex:1}
+.fm-risk{font-family:var(--mono);font-size:.58rem;padding:.12rem .4rem;border-radius:3px}
+.fm-arrow{font-family:var(--mono);font-size:.65rem;color:var(--muted);transition:transform .2s}
+.fm-card.expanded .fm-arrow{transform:rotate(90deg)}
+.fm-body{display:none;margin-top:.65rem;padding-top:.65rem;border-top:1px solid rgba(255,255,255,.05)}
+.fm-card.expanded .fm-body{display:block}
+.fm-section{margin-bottom:.5rem}
+.fm-section-label{font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.2rem}
+.fm-section-text{font-family:var(--sans);font-size:.75rem;color:rgba(228,226,220,.7);line-height:1.6}
+.fm-signals{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.3rem}
+.fm-signal{font-family:var(--mono);font-size:.58rem;padding:.12rem .4rem;border-radius:3px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:#f87171}
+
+/* ── Phase transition indicators ── */
+.ti-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.ti-row:last-child{border-bottom:none}
+.ti-indicator{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ti-label{font-family:var(--sans);font-size:.8rem;flex:1}
+.ti-desc{font-family:var(--mono);font-size:.58rem;color:var(--muted);line-height:1.5;margin-top:.15rem}
+.ti-check{display:flex;gap:.35rem;margin-top:.3rem}
+.ti-check-btn{font-family:var(--mono);font-size:.58rem;padding:.12rem .4rem;border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted)}
+.ti-check-btn.yes{border-color:var(--green);color:var(--green);background:rgba(62,207,142,.08)}
+.ti-check-btn.no{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.08)}
+
+/* ── Phase transition result ── */
+#pt-result{margin-top:.75rem;padding:.75rem 1rem;border-radius:6px;font-family:var(--mono);font-size:.65rem;line-height:1.6;display:none}
+
+/* ── Weekly practice ── */
+.wp-day{margin-bottom:.75rem}
+.wp-day-label{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem}
+.wp-items{display:flex;flex-direction:column;gap:.3rem}
+.wp-item{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:5px;background:var(--s2);border:1px solid transparent;cursor:pointer;transition:all .15s}
+.wp-item:hover{border-color:var(--border2)}
+.wp-item.done{border-color:rgba(62,207,142,.2);background:rgba(62,207,142,.04)}
+.wp-item.done .wp-cb{background:var(--green);color:#07090e}
+.wp-cb{width:16px;height:16px;border-radius:3px;border:1px solid var(--border2);flex-shrink:0;margin-top:.1rem;display:flex;align-items:center;justify-content:center;font-size:.6rem;transition:all .15s}
+.wp-text{font-family:var(--sans);font-size:.75rem;color:rgba(228,226,220,.7);line-height:1.4}
+
+/* ── Probability viz ── */
+.prob-funnel{display:flex;flex-direction:column;gap:.4rem;padding:.25rem 0}
+.pf-row{display:flex;align-items:center;gap:.75rem}
+.pf-label{font-family:var(--mono);font-size:.62rem;width:220px;flex-shrink:0;color:var(--muted)}
+.pf-bar-w{flex:1;height:20px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;position:relative}
+.pf-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:.4rem;font-family:var(--mono);font-size:.6rem;transition:width .9s cubic-bezier(.16,1,.3,1)}
+.pf-pct{font-family:var(--mono);font-size:.65rem;width:40px;text-align:right}
+
+/* ── Step progress nav ── */
+.step-nav{
+  display:flex;align-items:stretch;background:var(--s1);
+  border-bottom:1px solid var(--border);overflow-x:auto;
+}
+.step-nav::-webkit-scrollbar{height:0}
+.step-item{
+  display:flex;align-items:center;gap:.55rem;
+  padding:.7rem 1.25rem;cursor:pointer;
+  border-right:1px solid var(--border);border-bottom:3px solid transparent;
+  transition:all .15s;flex-shrink:0;min-width:0;
+  position:relative;
+}
+.step-item:last-child{border-right:none}
+.step-item:hover{background:rgba(255,255,255,.025)}
+.step-item.active{border-bottom-color:var(--blue);background:rgba(91,156,246,.05)}
+.step-item.done{border-bottom-color:rgba(62,207,142,.4)}
+.step-num{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:1px solid var(--border);
+  font-family:var(--mono);font-size:.58rem;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .15s;
+}
+.step-item.active .step-num{
+  background:rgba(91,156,246,.2);border-color:rgba(91,156,246,.5);
+  color:var(--blue);
+}
+.step-item.done .step-num{
+  background:rgba(62,207,142,.15);border-color:rgba(62,207,142,.4);
+  color:var(--green);
+}
+.step-label{
+  display:flex;flex-direction:column;gap:.05rem;min-width:0;
+}
+.sl-name{
+  font-family:var(--sans);font-size:.75rem;font-weight:500;
+  white-space:nowrap;color:var(--muted);transition:color .15s;
+}
+.step-item.active .sl-name,.step-item.done .sl-name{color:var(--text)}
+.sl-desc{
+  font-family:var(--mono);font-size:.52rem;color:rgba(228,226,220,.3);
+  white-space:nowrap;display:none;
+}
+@media(min-width:960px){.sl-desc{display:block}}
+
+/* ── Progress bar ── */
+#progress-bar{
+  height:2px;background:rgba(255,255,255,.05);
+  position:relative;overflow:hidden;
+}
+#progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));
+  transition:width .4s cubic-bezier(.16,1,.3,1);
+}
+
+/* ── Metric input live feedback ── */
+.mr-input.ok{border-color:rgba(62,207,142,.5);color:var(--green)}
+.mr-input.warn{border-color:rgba(245,158,11,.5);color:var(--amber)}
+.mr-input.bad{border-color:rgba(248,113,113,.5);color:var(--red)}
+
+/* ── Mobile improvements ── */
+@media(max-width:640px){
+  #hdr-title p{display:none}
+  .step-item{padding:.6rem .75rem;gap:.35rem}
+  .step-num{width:18px;height:18px;font-size:.52rem}
+  .sl-name{font-size:.7rem}
+  #page{padding:.75rem}
+  .card-body{padding:.75rem}
+  .ra-opts{gap:.25rem}
+  .pf-label{width:160px;font-size:.58rem}
+}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}#page{padding:1rem}}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div id="hdr-title">
+    <h1>Pilot Navigator</h1>
+    <p>WD-011 — Phase Transition Playbook</p>
+  </div>
+</header>
+
+<nav class="step-nav" id="step-nav">
+  <div class="step-item active" data-tab="readiness" onclick="showTab('readiness')">
+    <div class="step-num">1</div>
+    <div class="step-label"><span class="sl-name">Readiness</span><span class="sl-desc">Is your community ready?</span></div>
+  </div>
+  <div class="step-item" data-tab="metrics" onclick="showTab('metrics')">
+    <div class="step-num">2</div>
+    <div class="step-label"><span class="sl-name">45-Day Check</span><span class="sl-desc">Seeding phase health</span></div>
+  </div>
+  <div class="step-item" data-tab="failure" onclick="showTab('failure')">
+    <div class="step-num">3</div>
+    <div class="step-label"><span class="sl-name">Failure Modes</span><span class="sl-desc">10 patterns to watch</span></div>
+  </div>
+  <div class="step-item" data-tab="transition" onclick="showTab('transition')">
+    <div class="step-num">4</div>
+    <div class="step-label"><span class="sl-name">Phase Transition</span><span class="sl-desc">R₀ > 1 indicators</span></div>
+  </div>
+  <div class="step-item" data-tab="practice" onclick="showTab('practice')">
+    <div class="step-num">5</div>
+    <div class="step-label"><span class="sl-name">Weekly Practice</span><span class="sl-desc">Coordinator checklist</span></div>
+  </div>
+  <div class="step-item" data-tab="probability" onclick="showTab('probability')">
+    <div class="step-num">6</div>
+    <div class="step-label"><span class="sl-name">Honest Odds</span><span class="sl-desc">3–5% baseline</span></div>
+  </div>
+</nav>
+<div id="progress-bar"><div id="progress-fill" style="width:16.7%"></div></div>
+
+
+<!-- ═══════════════════ READINESS ═══════════════════ -->
+<div id="tab-readiness" class="page visible">
+  <div class="card" style="max-width:900px;margin:0 auto;width:100%">
+    <div class="card-hdr"><span>Community Readiness Assessment</span><span style="color:var(--muted)">Select one answer per question</span></div>
+    <div class="card-body">
+      <div id="ra-questions"></div>
+      <div id="ra-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 45-DAY ═══════════════════ -->
+<div id="tab-metrics" class="page">
+  <div class="card" style="max-width:860px;margin:0 auto;width:100%">
+    <div class="card-hdr"><span>45-Day Seeding Phase Metrics</span><span id="metrics-verdict" style="font-size:.6rem"></span></div>
+    <div class="card-body">
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-bottom:.75rem;line-height:1.6">
+        Enter your current numbers. Green = healthy range. Amber = at minimum threshold. Red = below minimum — diagnose before expanding.
+      </div>
+      <div id="metrics-rows"></div>
+      <div id="metrics-recommendation" style="margin-top:1rem;padding:.75rem 1rem;border-radius:6px;font-family:var(--mono);font-size:.65rem;line-height:1.6;display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ FAILURE MODES ═══════════════════ -->
+<div id="tab-failure" class="page">
+  <div class="card" style="max-width:900px;margin:0 auto;width:100%">
+    <div class="card-hdr"><span>Failure Mode Scanner</span><span style="color:var(--muted)">Click to expand — assess which are active in your deployment</span></div>
+    <div class="card-body">
+      <div id="fm-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PHASE TRANSITION ═══════════════════ -->
+<div id="tab-transition" class="page">
+  <div class="card" style="max-width:860px;margin:0 auto;width:100%">
+    <div class="card-hdr"><span>Phase Transition Indicator Assessment</span><span style="color:var(--muted)">Mark each leading indicator present / absent</span></div>
+    <div class="card-body">
+      <div id="ti-list"></div>
+      <div id="pt-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ WEEKLY PRACTICE ═══════════════════ -->
+<div id="tab-practice" class="page">
+  <div class="g2" style="max-width:900px;margin:0 auto;width:100%">
+    <div class="card">
+      <div class="card-hdr"><span>Weekly Checklist</span></div>
+      <div class="card-body" id="weekly-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span>Monthly Checklist</span></div>
+      <div class="card-body" id="monthly-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PROBABILITY ═══════════════════ -->
+<div id="tab-probability" class="page">
+  <div class="card" style="max-width:800px;margin:0 auto;width:100%">
+    <div class="card-hdr"><span>The Honest Probability Funnel</span></div>
+    <div class="card-body">
+      <div style="font-family:var(--sans);font-size:.8rem;color:rgba(228,226,220,.65);line-height:1.7;margin-bottom:1rem">
+        Based on comparable cooperative infrastructure deployments. This is not a projection for your community — it is a baseline that honest deployment planning should improve upon.
+      </div>
+      <div class="prob-funnel" id="prob-funnel"></div>
+      <div style="margin-top:1.25rem;padding:.75rem 1rem;background:rgba(91,156,246,.06);border:1px solid rgba(91,156,246,.2);border-radius:6px;font-family:var(--mono);font-size:.62rem;color:rgba(228,226,220,.65);line-height:1.7">
+        The communities that succeed are distinguished not primarily by technical deployment quality but by three human factors:
+        a founding group with realistic expectations and genuine patience, active attention to equity throughout,
+        and willingness to let governance grow into something the founders didn't design.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════
+
+const RA_QUESTIONS = [
+  {
+    q: "What is the documented baseline of cooperative behavior in this community?",
+    opts: [
+      { label:"Active informal cooperation", score:'A', cls:'selected-a' },
+      { label:"Some cooperation, uneven", score:'B', cls:'selected-b' },
+      { label:"Little or no evidence", score:'C', cls:'selected-c' },
+    ]
+  },
+  {
+    q: "Is there an identifiable trust seed — a core group who already trust each other?",
+    opts: [
+      { label:"Yes, clear and connected", score:'A', cls:'selected-a' },
+      { label:"Thin or fragile trust core", score:'B', cls:'selected-b' },
+      { label:"No identifiable trust seed", score:'C', cls:'selected-c' },
+    ]
+  },
+  {
+    q: "What are the dominant failure modes in this community?",
+    opts: [
+      { label:"Cognitive (CurseOfKnowledge, MetaIgnorance)", score:'A', cls:'selected-a' },
+      { label:"Homophily or institutional gaps", score:'B', cls:'selected-b' },
+      { label:"Scale mismatch or structural conflict", score:'C', cls:'selected-c' },
+    ]
+  },
+  {
+    q: "What is the community's existing relationship with technology and data collection?",
+    opts: [
+      { label:"Generally comfortable, no prior violations", score:'A', cls:'selected-a' },
+      { label:"Mixed — some skepticism, manageable", score:'B', cls:'selected-b' },
+      { label:"Active distrust or prior violations of trust", score:'C', cls:'selected-c' },
+    ]
+  },
+  {
+    q: "Is there a recognized community leader or connector whose endorsement would give the platform credibility?",
+    opts: [
+      { label:"Yes, and they're interested", score:'A', cls:'selected-a' },
+      { label:"Uncertain — not yet approached", score:'B', cls:'selected-b' },
+      { label:"No clear connector, or they're skeptical", score:'C', cls:'selected-c' },
+    ]
+  },
+];
+
+const PROFILES = {
+  A: {
+    label: "Profile A — Ready to Deploy",
+    color: '#3ecf8e',
+    desc: "Your community shows strong readiness indicators. Active cooperative baseline, identifiable trust seed, cognitive failure modes that the protocol directly addresses. Proceed to seeding phase with appropriate trust priming conversations.",
+    action: "Next step: Identify your first fifteen participants. Use the 45-Day Metrics tab to track your seeding phase.",
+  },
+  B: {
+    label: "Profile B — Ready with Scaffolding",
+    color: '#f59e0b',
+    desc: "Your community has potential but needs 4–8 weeks of structured community-building before protocol deployment. The relational substrate that makes the technology useful isn't quite thick enough yet. This isn't failure — it's appropriate sequencing.",
+    action: "Next step: Design and run 2–3 community-building events before deployment. Focus on building trust and documenting cooperative behavior that's already present.",
+  },
+  C: {
+    label: "Profile C — Preconditions Absent",
+    color: '#fb923c',
+    desc: "The structural conditions for LVN deployment aren't present yet. Deploying now risks generating failure data that makes future deployment harder. Significant community infrastructure investment is needed first.",
+    action: "Next step: Engage a community organizer for 3–6 months of relationship-building work before attempting deployment. Document what you build.",
+  },
+  D: {
+    label: "Profile D — Active Harm Risk",
+    color: '#f87171',
+    desc: "Active conflict or significant existing power imbalances make deployment risky without prior governance work. The matching platform could accelerate harm rather than generating cooperative value in this environment.",
+    action: "Next step: Address the underlying conflict or power imbalance with appropriate facilitation and mediation before any LVN deployment consideration.",
+  },
+};
+
+const METRICS = [
+  { label:"Active participants (≥1 cooperative act)", min:9, healthy:"12–15", unit:"of 15" },
+  { label:"Total cooperative acts in 45 days", min:12, healthy:"20–35", unit:"acts" },
+  { label:"Acts with follow-on (same pair cooperated again)", min:3, healthy:"7+", unit:"acts" },
+  { label:"Participants who referred someone else", min:5, healthy:"10+", unit:"people" },
+  { label:"Meaning shift detected (any participant)", min:2, healthy:"5+", unit:"people" },
+  { label:"Cross-cluster connections formed", min:2, healthy:"5+", unit:"connections" },
+];
+
+const FAILURE_MODES = [
+  {
+    n:1, label:"Connector Dependency",
+    risk:"HIGH", riskCol:"#f87171",
+    cause:"One or two high-energy connectors driving most activity. Network appears healthy until they're absent.",
+    warning:"Remove top 2 connectors from your activity log. Does remaining activity show healthy distribution?",
+    signals:["All introductions trace back to same 1-2 people","Activity drops when key connector is away","Protocol generating few matches independently"],
+    recovery:"Deliberately reduce connectors' visible facilitation role. Surface protocol-generated matches explicitly."
+  },
+  {
+    n:2, label:"Privacy Chilling Effect",
+    risk:"HIGH", riskCol:"#f87171",
+    cause:"Participants gradually withdraw as they understand PCE data collection scope. Pronounced among marginalized community members.",
+    warning:"Dropout rates higher for lower-income or institutional-distrust participants. Qualitative feedback includes 'I don't know who can see what.'",
+    signals:["Dropout rate above 30% by day 60","Dropout skews toward specific demographics","'Privacy' language appearing in informal feedback"],
+    recovery:"Aggressive transparency about specific data held. Human-mediated matching options. Community governance of data retention."
+  },
+  {
+    n:3, label:"Reciprocity Imbalance",
+    risk:"MEDIUM", riskCol:"#f59e0b",
+    cause:"High-capacity participants engage as givers; lower-capacity (by self-assessment) as receivers. Givers feel used; receivers feel dependent. Both eventually disengage.",
+    warning:"PowerBalance scores for new participants more negative than established participants, gap widening over time.",
+    signals:["Consistent negative PB scores for newer participants","Givers describing feeling 'taken from'","Receivers using platform less over time despite unmet needs"],
+    recovery:"Capacity mapping workshops. First match design prioritizes activating receiver's latent capacity. Reframe platform purpose explicitly."
+  },
+  {
+    n:4, label:"Meaning Layer Bypass",
+    risk:"MEDIUM", riskCol:"#f59e0b",
+    cause:"Network effective at task matching, completely ineffective at meaning activation. Engagement is transactional. Retention poor.",
+    warning:"High task completion + low follow-on rates. Meaning state metrics flat despite active cooperation. Low 'referred someone' metric.",
+    signals:["SynergyMultiplier averaging near 1.0","People complete tasks but don't describe them as meaningful","No organic stories spreading through community"],
+    recovery:"Reconfigure matching weights toward balanced/meaning-first. Introduce post-act reflection prompts. Redesign first act for high synergy."
+  },
+  {
+    n:5, label:"Platform Substitution",
+    risk:"MEDIUM", riskCol:"#f59e0b",
+    cause:"LVN begins substituting for direct human relationship. People interact through interface rather than with each other. High activity, low depth.",
+    warning:"Protocol appears in stories participants tell about connections. Relationship persistence low despite high act frequency.",
+    signals:["People describe connections as 'the app matched me with...'","No relationships deepening beyond protocol-mediated acts","Participants don't know each other outside the platform"],
+    recovery:"Design acts requiring extended in-person/video interaction. Create protocol-free community spaces. Establish 'after introduction, get out of the way' norm."
+  },
+  {
+    n:6, label:"Governance Theater",
+    risk:"HIGH", riskCol:"#f87171",
+    cause:"Governance mechanisms nominally operational but functionally inert. Reports produced, nothing changes. Community stops engaging with governance.",
+    warning:"Governance recommendations with no documented follow-up. Equity metrics consistently yellow with no protocol changes.",
+    signals:["Governance meeting attendance declining","Equity alerts acknowledged but not actioned","Community describes governance as 'performative'"],
+    recovery:"Establish explicit decision rights. Create metric-to-action feedback loops. Hold coordinator accountable to improvement targets."
+  },
+  {
+    n:7, label:"Scaling Cliff",
+    risk:"HIGH", riskCol:"#f87171",
+    cause:"Network healthy at 50, breaks qualitatively around 300–500. Social norm enforcement that worked through personal pressure fails at scale.",
+    warning:"Increasing frequency of unresolved disputes that 'used to resolve themselves.' Governance queue overwhelmed.",
+    signals:["Dispute frequency rising faster than participation","Governance body missing response time targets","New participants reporting community 'doesn't feel cohesive'"],
+    recovery:"Design governance for target scale, not launch scale. This requires structural change, not incremental adjustment. Plan before deployment."
+  },
+  {
+    n:8, label:"Adjacent Predator",
+    risk:"LOW", riskCol:"#2dd4bf",
+    cause:"External actor identifies cooperative network as talent/intelligence source and begins extractive engagement with participants.",
+    warning:"Multiple participants receiving suspiciously well-calibrated unsolicited external approaches within a short period.",
+    signals:["External offers mentioning network-specific details","Multiple participants approached by same outside party","Approaches calibrated to individual capacities"],
+    recovery:"Data protection review. Community notification. Governance protocols for external engagement. Review signal vector security."
+  },
+  {
+    n:9, label:"Measurement Trap",
+    risk:"MEDIUM", riskCol:"#f59e0b",
+    cause:"Team optimizes for easy-to-measure metrics (task completion, act count) rather than hard-to-measure outcomes (meaning state, emergence yield, flourishing).",
+    warning:"High reported metrics + low organic enthusiasm. Governance dominated by task data, not meaning outcomes.",
+    signals:["Satisfaction surveys positive, organic stories absent","Meaning state metrics not in governance reports","Coordinator can cite act count but not a single emergence story"],
+    recovery:"Insist on meaning metrics in governance, even if rough estimates. Design qualitative data collection. Hold platform accountable to 'is this community flourishing?'"
+  },
+  {
+    n:10, label:"Founder's Shadow",
+    risk:"MEDIUM", riskCol:"#f59e0b",
+    cause:"Founding team's values embedded in protocol configuration limits community's genuine ownership. Governance feels managed not built.",
+    warning:"Community members saying 'but we can't change that.' Low governance participation by newer participants. Founders reluctant to cede configuration authority.",
+    signals:["'That was decided before we got here' appearing frequently","Governance body decisions that founders informally reverse","Low new-participant engagement in governance"],
+    recovery:"Explicit 18-month governance review planned from day 0. Document every founding choice and alternative. Formal authority transfer timeline."
+  },
+];
+
+const TRANSITION_INDICATORS = [
+  { label:"T1 — Organic referrals exceed protocol-routed connections", desc:"More cooperative connections initiated via 'someone told me about you' than via relay suggestions." },
+  { label:"T2 — Follow-on acts exceed first acts", desc:"More than 50% of cooperative acts are continuations of existing relationships, not new connections." },
+  { label:"T3 — Trust path length shortening", desc:"Average relationship hops between any two community members through trust chains decreasing." },
+  { label:"T4 — Unprompted governance participation", desc:"Community members raising equity concerns and suggesting improvements without specific invitation." },
+  { label:"T5 — Protocol becomes invisible in stories", desc:"People describe connections without mentioning the platform. 'María helped me' not 'the app matched me.'" },
+  { label:"T6 — Meaning state improvements precede task completions", desc:"Meaning state metrics improving faster than task completion metrics." },
+];
+
+const WEEKLY = [
+  "Review the 10 most recent cooperative acts — what emerged that wasn't there before?",
+  "Check temporal priority queue — who has entities approaching decay horizon?",
+  "Check power balance flags — any relationships trending toward governance thresholds?",
+  "Have one informal conversation with a participant outside your usual contact orbit.",
+];
+
+const MONTHLY = [
+  "Run the community transparency ritual (cooperative map review)",
+  "Review equity metrics against WD-010 thresholds",
+  "Review dropout data — run recovery conversations with each",
+  "Document one failure mode observation AND one success story",
+  "Check R₀ indicators — is cooperative activity self-sustaining or protocol-dependent?",
+];
+
+const PROB_FUNNEL = [
+  { label:"Communities that complete readiness assessment", pct:40, col:'#5b9cf6' },
+  { label:"Reach cultivation phase with healthy seeding", pct:60, col:'#3ecf8e', note:"of those who begin seeding" },
+  { label:"Cross the phase transition", pct:25, col:'#c084fc', note:"of those who complete cultivation" },
+  { label:"Maintain density at 12 months", pct:60, col:'#f59e0b', note:"of those who cross transition" },
+  { label:"Successful governance transfer by 18 months", pct:35, col:'#fb923c', note:"of those at 12 months" },
+];
+
+// ══════════════════════════════════════════════════════════════
+// READINESS
+// ══════════════════════════════════════════════════════════════
+
+const raAnswers = {};
+
+function buildReadiness() {
+  const container = document.getElementById('ra-questions');
+  RA_QUESTIONS.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'ra-item';
+    div.innerHTML = `
+      <div style="flex:1">
+        <div class="ra-q">${q.q}</div>
+        <div class="ra-opts">${q.opts.map(o =>
+          `<button class="ra-opt" data-qi="${i}" data-score="${o.score}" data-cls="${o.cls}">${o.label}</button>`
+        ).join('')}</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  container.addEventListener('click', e => {
+    const btn = e.target.closest('.ra-opt');
+    if (!btn) return;
+    const qi = btn.dataset.qi;
+    const allInGroup = container.querySelectorAll(`.ra-opt[data-qi="${qi}"]`);
+    allInGroup.forEach(b => b.className = 'ra-opt');
+    btn.className = `ra-opt ${btn.dataset.cls}`;
+    raAnswers[qi] = btn.dataset.score;
+    updateReadinessResult();
+  });
+}
+
+function updateReadinessResult() {
+  if (Object.keys(raAnswers).length < RA_QUESTIONS.length) return;
+  const scores = Object.values(raAnswers);
+  const cCount = scores.filter(s => s === 'C').length;
+  const bCount = scores.filter(s => s === 'B').length;
+
+  let profile;
+  if (cCount >= 3) profile = 'D';
+  else if (cCount >= 2 || (cCount === 1 && bCount >= 2)) profile = 'C';
+  else if (bCount >= 2 || cCount === 1) profile = 'B';
+  else profile = 'A';
+
+  const p = PROFILES[profile];
+  const el = document.getElementById('ra-result');
+  el.innerHTML = `
+    <div class="profile-card" style="background:${p.color}10;border:1px solid ${p.color}35;margin-top:.75rem">
+      <div class="profile-title" style="color:${p.color}">${p.label}</div>
+      <div class="profile-desc">${p.desc}</div>
+      <div class="profile-action" style="color:${p.color};margin-top:.5rem">→ ${p.action}</div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+// METRICS
+// ══════════════════════════════════════════════════════════════
+
+function buildMetrics() {
+  const container = document.getElementById('metrics-rows');
+  METRICS.forEach((m, i) => {
+    const row = document.createElement('div');
+    row.className = 'metric-row';
+    row.innerHTML = `
+      <div style="flex:1">
+        <div style="font-family:var(--sans);font-size:.8rem;font-weight:500;margin-bottom:.1rem">${m.label}</div>
+        <div style="font-family:var(--mono);font-size:.58rem;color:var(--muted)">Min: ${m.min} ${m.unit} · Healthy: ${m.healthy} ${m.unit}</div>
+      </div>
+      <input class="mr-input" type="number" min="0" placeholder="?" data-min="${m.min}" data-healthy="${m.healthy}" id="mi-${i}">
+      <div class="mr-status" id="ms-${i}">—</div>
+    `;
+    container.appendChild(row);
+  });
+
+  container.addEventListener('input', updateMetrics);
+}
+
+function updateMetrics() {
+  let filled = 0, greens = 0, ambers = 0, reds = 0;
+  METRICS.forEach((m, i) => {
+    const inp = document.getElementById(`mi-${i}`);
+    const status = document.getElementById(`ms-${i}`);
+    const val = parseInt(inp.value);
+    if (isNaN(val) || inp.value === '') { status.textContent = '—'; return; }
+    filled++;
+    const healthyMin = parseInt(m.healthy);
+    if (val >= healthyMin || (m.healthy.endsWith('+') && val >= parseInt(m.healthy))) {
+      status.textContent = '✓'; status.style.color = '#3ecf8e'; greens++;
+    } else if (val >= m.min) {
+      status.textContent = '△'; status.style.color = '#f59e0b'; ambers++;
+    } else {
+      status.textContent = '✗'; status.style.color = '#f87171'; reds++;
+    }
+  });
+
+  if (filled < METRICS.length) return;
+
+  const verdict = document.getElementById('metrics-verdict');
+  const rec = document.getElementById('metrics-recommendation');
+  rec.style.display = 'block';
+
+  if (reds <= 1 && greens >= 4) {
+    verdict.textContent = '✓ Healthy — proceed to cultivation';
+    verdict.style.color = '#3ecf8e';
+    rec.style.background = 'rgba(62,207,142,.08)';
+    rec.style.border = '1px solid rgba(62,207,142,.25)';
+    rec.style.color = '#3ecf8e';
+    rec.textContent = 'Your seeding phase metrics are in healthy range. Proceed to cultivation phase — expand from 15 to ~50 participants using sequential, referral-based expansion. Review the Failure Modes tab before expanding.';
+  } else if (reds >= 3) {
+    verdict.textContent = '✗ Below threshold — diagnose before expanding';
+    verdict.style.color = '#f87171';
+    rec.style.background = 'rgba(248,113,113,.08)';
+    rec.style.border = '1px solid rgba(248,113,113,.25)';
+    rec.style.color = '#f87171';
+    rec.textContent = 'Three or more metrics are below minimum threshold. Do not expand before diagnosing root causes. Most common causes: inadequate trust priming, wrong composition in first fifteen, or first act design failure. All recoverable.';
+  } else {
+    verdict.textContent = '△ Mixed — review before proceeding';
+    verdict.style.color = '#f59e0b';
+    rec.style.background = 'rgba(245,158,11,.08)';
+    rec.style.border = '1px solid rgba(245,158,11,.25)';
+    rec.style.color = '#f59e0b';
+    rec.textContent = 'Mixed results. You can proceed cautiously if your red metrics are non-critical, but address the underperforming areas in parallel. Expand slowly (15→30, not 15→50) until metrics improve.';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// FAILURE MODES
+// ══════════════════════════════════════════════════════════════
+
+function buildFailureModes() {
+  const list = document.getElementById('fm-list');
+  FAILURE_MODES.forEach(fm => {
+    const card = document.createElement('div');
+    card.className = 'fm-card';
+    card.innerHTML = `
+      <div class="fm-hdr">
+        <div class="fm-num" style="background:${fm.riskCol}15;border:1px solid ${fm.riskCol}30;color:${fm.riskCol}">${fm.n}</div>
+        <div class="fm-title">${fm.label}</div>
+        <span class="fm-risk" style="background:${fm.riskCol}12;border:1px solid ${fm.riskCol}30;color:${fm.riskCol}">${fm.risk}</span>
+        <span class="fm-arrow">›</span>
+      </div>
+      <div class="fm-body">
+        <div class="fm-section">
+          <div class="fm-section-label">Why it happens</div>
+          <div class="fm-section-text">${fm.cause}</div>
+        </div>
+        <div class="fm-section">
+          <div class="fm-section-label">Early warning</div>
+          <div class="fm-section-text">${fm.warning}</div>
+        </div>
+        <div class="fm-section">
+          <div class="fm-section-label">Active signals</div>
+          <div class="fm-signals">${fm.signals.map(s => `<span class="fm-signal">${s}</span>`).join('')}</div>
+        </div>
+        <div class="fm-section" style="margin-bottom:0">
+          <div class="fm-section-label">Recovery</div>
+          <div class="fm-section-text">${fm.recovery}</div>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      card.classList.toggle('expanded');
+    });
+    list.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// PHASE TRANSITION
+// ══════════════════════════════════════════════════════════════
+
+const tiAnswers = {};
+
+function buildTransition() {
+  const list = document.getElementById('ti-list');
+  TRANSITION_INDICATORS.forEach((ti, i) => {
+    const row = document.createElement('div');
+    row.className = 'ti-row';
+    row.innerHTML = `
+      <div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.1);flex-shrink:0;margin-top:4px" id="ti-dot-${i}"></div>
+      <div style="flex:1">
+        <div class="ti-label">${ti.label}</div>
+        <div class="ti-desc">${ti.desc}</div>
+        <div class="ti-check">
+          <button class="ti-check-btn" data-ti="${i}" data-val="yes">Present ✓</button>
+          <button class="ti-check-btn" data-ti="${i}" data-val="no">Absent ✗</button>
+          <button class="ti-check-btn" data-ti="${i}" data-val="partial">Partial △</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  list.addEventListener('click', e => {
+    const btn = e.target.closest('.ti-check-btn');
+    if (!btn) return;
+    const ti = btn.dataset.ti;
+    const val = btn.dataset.val;
+    list.querySelectorAll(`.ti-check-btn[data-ti="${ti}"]`).forEach(b => {
+      b.className = 'ti-check-btn';
+      if (b.dataset.val === val) b.classList.add(val === 'yes' ? 'yes' : val === 'no' ? 'no' : 'yes');
+    });
+    const dot = document.getElementById(`ti-dot-${ti}`);
+    dot.style.background = val === 'yes' ? '#3ecf8e' : val === 'no' ? '#f87171' : '#f59e0b';
+    tiAnswers[ti] = val;
+    updatePTResult();
+  });
+}
+
+function updatePTResult() {
+  const answered = Object.keys(tiAnswers).length;
+  if (answered < 4) return;
+  const yeses = Object.values(tiAnswers).filter(v => v === 'yes').length;
+  const partials = Object.values(tiAnswers).filter(v => v === 'partial').length;
+  const score = yeses + partials * 0.5;
+  const res = document.getElementById('pt-result');
+  res.style.display = 'block';
+  if (score >= 5) {
+    res.style.background = 'rgba(62,207,142,.08)'; res.style.border = '1px solid rgba(62,207,142,.25)'; res.style.color = '#3ecf8e';
+    res.innerHTML = '✓ Strong phase transition signal. Your community is likely at or past the transition threshold. The protocol\'s role should be shifting from initiation to amplification. Review WD-010 — post-transition failure modes (power asymmetry, governance capture) become more relevant now.';
+  } else if (score >= 3) {
+    res.style.background = 'rgba(245,158,11,.08)'; res.style.border = '1px solid rgba(245,158,11,.25)'; res.style.color = '#f59e0b';
+    res.innerHTML = '△ Approaching transition — not there yet. The indicators you\'re missing are more important than the ones you have. Focus on what\'s absent. In particular: if T5 (protocol invisibility) and T6 (meaning improvements) are absent, the network may be in the Transactional Loop false positive.';
+  } else {
+    res.style.background = 'rgba(248,113,113,.08)'; res.style.border = '1px solid rgba(248,113,113,.25)'; res.style.color = '#f87171';
+    res.innerHTML = '✗ Subcritical — not approaching transition yet. Cooperative activity is protocol-dependent, not self-sustaining. Review the Failure Modes tab. The most likely blockers at this stage are Connector Dependency, Meaning Layer Bypass, or Platform Substitution.';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// WEEKLY PRACTICE
+// ══════════════════════════════════════════════════════════════
+
+const weeklyDone = new Set();
+const monthlyDone = new Set();
+
+function buildPractice() {
+  buildChecklist(document.getElementById('weekly-list'), WEEKLY, 'w', weeklyDone);
+  buildChecklist(document.getElementById('monthly-list'), MONTHLY, 'm', monthlyDone);
+}
+
+function buildChecklist(container, items, prefix, doneSet) {
+  items.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'wp-item';
+    div.id = `${prefix}-item-${i}`;
+    div.innerHTML = `<div class="wp-cb" id="${prefix}-cb-${i}"></div><div class="wp-text">${item}</div>`;
+    div.addEventListener('click', () => {
+      const key = `${prefix}-${i}`;
+      if (doneSet.has(key)) { doneSet.delete(key); div.classList.remove('done'); document.getElementById(`${prefix}-cb-${i}`).textContent = ''; }
+      else { doneSet.add(key); div.classList.add('done'); document.getElementById(`${prefix}-cb-${i}`).textContent = '✓'; }
+    });
+    container.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROBABILITY
+// ══════════════════════════════════════════════════════════════
+
+function buildProbability() {
+  const container = document.getElementById('prob-funnel');
+  let running = 100;
+  PROB_FUNNEL.forEach((p, i) => {
+    const effective = i === 0 ? p.pct : running * p.pct / 100;
+    const prev = running;
+    running = effective;
+    const row = document.createElement('div');
+    row.className = 'pf-row';
+    row.innerHTML = `
+      <div class="pf-label">${p.label}${p.note ? `<br><span style="opacity:.6;font-size:.55rem">(${p.note})</span>` : ''}</div>
+      <div class="pf-bar-w">
+        <div class="pf-bar" style="width:${prev}%;background:${p.col}22;border-right:2px solid ${p.col}66">
+          <span style="color:${p.col}">${p.pct}%</span>
+        </div>
+      </div>
+      <div class="pf-pct" style="color:${p.col}">${Math.round(effective)}%</div>
+    `;
+    container.appendChild(row);
+  });
+
+  const final = document.createElement('div');
+  final.style.marginTop = '.75rem';
+  final.style.fontFamily = 'var(--mono)';
+  final.style.fontSize = '.62rem';
+  final.style.color = 'var(--muted)';
+  final.innerHTML = `Overall: approximately <strong style="color:#f59e0b">3–5%</strong> of communities that inquire will reach stable, community-owned cooperative infrastructure at 18 months. This is the honest number — and a reason to take the readiness assessment seriously.`;
+  container.appendChild(final);
+}
+
+// ══════════════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+// STEP NAV + TABS
+// ══════════════════════════════════════════════════════════════
+
+const TAB_ORDER = ['readiness','metrics','failure','transition','practice','probability'];
+const visitedTabs = new Set(['readiness']);
+
+function showTab(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+  document.getElementById(`tab-${id}`).classList.add('visible');
+
+  visitedTabs.add(id);
+
+  // Update step nav
+  document.querySelectorAll('.step-item').forEach(item => {
+    const tab = item.dataset.tab;
+    item.classList.remove('active','done');
+    if (tab === id) item.classList.add('active');
+    else if (visitedTabs.has(tab)) item.classList.add('done');
+    // Mark done num as checkmark
+    const num = item.querySelector('.step-num');
+    if (tab !== id && visitedTabs.has(tab)) num.textContent = '✓';
+    else num.textContent = TAB_ORDER.indexOf(tab) + 1;
+  });
+
+  // Progress bar
+  const idx = TAB_ORDER.indexOf(id);
+  const pct = ((idx + 1) / TAB_ORDER.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ── Live metric input feedback ──
+function bindMetricFeedback() {
+  document.querySelectorAll('.mr-input').forEach(input => {
+    function evaluate() {
+      const val = parseFloat(input.value);
+      if (isNaN(val)) { input.className = 'mr-input'; return; }
+      const row = input.closest('.metric-row');
+      const rangeEl = row?.querySelector('.mr-range');
+      if (!rangeEl) return;
+      const rangeText = rangeEl.textContent; // e.g. "≥12" or "≥30%"
+      const num = parseFloat(rangeText.replace(/[^0-9.]/g,''));
+      if (!isNaN(num)) {
+        if (val >= num) input.className = 'mr-input ok';
+        else if (val >= num * 0.7) input.className = 'mr-input warn';
+        else input.className = 'mr-input bad';
+      }
+      // Trigger existing metric verdict
+      if (typeof updateMetricsVerdict === 'function') updateMetricsVerdict();
+    }
+    input.addEventListener('input', evaluate);
+    input.addEventListener('change', evaluate);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════
+
+buildReadiness();
+buildMetrics();
+buildFailureModes();
+buildTransition();
+buildPractice();
+buildProbability();
+bindMetricFeedback();
+showTab('readiness');
+</script>
+</body>
+</html>
