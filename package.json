@@ -1,0 +1,9 @@
+{
+  "name": "latent-value-network",
+  "version": "2.0.0",
+  "description": "Interactive research tools for exploring value network dynamics",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "^8.0.0"
+  }
+}
